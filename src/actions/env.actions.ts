@@ -25,6 +25,7 @@ import {
   EnvVariableSummary,
 } from "@/services/env.service";
 import { ActionResult, successResult, errorResult, handleActionError } from "@/lib/action-result";
+import { checkRateLimit } from "@/lib/rate-limit";
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 
@@ -106,6 +107,12 @@ export async function revealEnvVariableAction(
   try {
     const user = await requireUser();
 
+    // Rate limit: 30 reveal/copy requests per minute per user (TASK-114)
+    const rateCheck = checkRateLimit(`reveal:env:${user.id}`, 30, 60);
+    if (!rateCheck.allowed) {
+      return errorResult("Rate limit exceeded for revealing environment variables. Please wait a moment before trying again.");
+    }
+
     const parseResult = revealEnvVariableSchema.safeParse(rawInput);
     if (!parseResult.success) {
       return errorResult(parseResult.error.issues[0]?.message || "Invalid reveal request.");
@@ -146,6 +153,12 @@ export async function exportEnvAction(
 ): Promise<ActionResult<string>> {
   try {
     const user = await requireUser();
+
+    // Rate limit: 5 exports per 5 minutes per user (TASK-114)
+    const rateCheck = checkRateLimit(`export:env:${user.id}`, 5, 300);
+    if (!rateCheck.allowed) {
+      return errorResult("Export rate limit exceeded. Please wait a few minutes before exporting again.");
+    }
 
     const parseResult = exportEnvSchema.safeParse(rawInput);
     if (!parseResult.success) {

@@ -21,6 +21,7 @@ import {
 import { ActionResult, successResult, errorResult, handleActionError } from "@/lib/action-result";
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
+import { checkRateLimit } from "@/lib/rate-limit";
 
 async function getClientIp(): Promise<string> {
   try {
@@ -103,6 +104,12 @@ export async function revealCredentialAction(
 ): Promise<ActionResult<string>> {
   try {
     const user = await requireUser();
+
+    // Rate limit: 30 reveal/copy requests per minute per user (TASK-114)
+    const rateCheck = checkRateLimit(`reveal:credential:${user.id}`, 30, 60);
+    if (!rateCheck.allowed) {
+      return errorResult("Rate limit exceeded for revealing passwords. Please wait a moment before trying again.");
+    }
 
     const parseResult = revealCredentialSchema.safeParse(rawInput);
     if (!parseResult.success) {

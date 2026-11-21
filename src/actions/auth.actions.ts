@@ -15,6 +15,7 @@ import {
 } from "@/features/auth/schemas";
 import { ActionResult, successResult, errorResult, handleActionError } from "@/lib/action-result";
 import { logAction } from "@/services/audit.service";
+import { checkRateLimit, resetRateLimit } from "@/lib/rate-limit";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -41,6 +42,17 @@ export async function loginAction(rawInput: LoginInput): Promise<ActionResult<Lo
 
     const { email, password } = parseResult.data;
     const ipAddress = await getClientIp();
+
+    // Check rate limit for login attempts (TASK-114)
+    const rateLimitKey = `login:${ipAddress}:${email.toLowerCase()}`;
+    const rateCheck = checkRateLimit(rateLimitKey, 5, 900); // 5 attempts per 15 minutes
+    if (!rateCheck.allowed) {
+      const waitMinutes = Math.max(1, Math.ceil(rateCheck.resetInSeconds / 60));
+      return errorResult(
+        `Too many login attempts. Please try again in ${waitMinutes} minute${waitMinutes > 1 ? "s" : ""}.`
+      );
+    }
+
     const supabase = await createClient();
 
     const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
@@ -82,6 +94,9 @@ export async function loginAction(rawInput: LoginInput): Promise<ActionResult<Lo
       targetType: "auth",
       ipAddress,
     });
+
+    // Reset rate limit on successful authentication
+    resetRateLimit(rateLimitKey);
 
     return successResult({
       requiresMfa: false,

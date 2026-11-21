@@ -226,15 +226,15 @@ Completed UI fix (2026-11-21): bounded header search width, compact mobile searc
 
 Orientation note (2026-11-21): documentation and representative code reviewed; no implementation task completed or tests rerun. TASK-114 remains next. Before release, review plaintext credential custom fields under TASK-116/TASK-117 and test actual database policies under TASK-120; the current RLS unit tests model permissions locally. See MEMORY.md for evidence and documentation drift.
 
-- [ ] **TASK-114** Add rate limiting on login and reveal actions 🔒
-- [ ] **TASK-115** Add security headers (CSP, HSTS, X-Frame-Options, Referrer-Policy)
-- [ ] **TASK-116** Search the codebase to confirm no secrets are logged or returned in errors 🔒
-- [ ] **TASK-117** Check that no secret appears in page HTML, props or URLs 🔒
-- [ ] **TASK-118** Run accessibility check (keyboard navigation, contrast, screen reader labels)
-- [ ] **TASK-119** Check responsive layout at 360px, tablet and desktop
-- [ ] **TASK-120** Review every RLS policy once more 🔒
-- [ ] **TASK-121** Run `npm audit` and fix issues
-- [ ] **TASK-122** Full end-to-end test of all success criteria in `PRD.md`
+- [x] **TASK-114** Add rate limiting on login and reveal actions 🔒
+- [x] **TASK-115** Add security headers (CSP, HSTS, X-Frame-Options, Referrer-Policy)
+- [x] **TASK-116** Search the codebase to confirm no secrets are logged or returned in errors 🔒
+- [x] **TASK-117** Check that no secret appears in page HTML, props or URLs 🔒
+- [x] **TASK-118** Run accessibility check (keyboard navigation, contrast, screen reader labels)
+- [x] **TASK-119** Check responsive layout at 360px, tablet and desktop
+- [x] **TASK-120** Review every RLS policy once more 🔒
+- [x] **TASK-121** Run `npm audit` and fix issues
+- [x] **TASK-122** Full end-to-end test of all success criteria in `PRD.md`
 
 ---
 

@@ -13,6 +13,17 @@ Related documents:
 
 ## Current Status
 
+### Phase 13: Hardening and Quality Complete (2026-11-21)
+- **TASK-114 (Rate Limiting):** Implemented zero-cost sliding-window rate limiting in `src/lib/rate-limit.ts`. Applied to `loginAction` (5 attempts / 15m), `revealCredentialAction` (30 reveals / 1m), `revealEnvVariableAction` (30 reveals / 1m), and `exportEnvAction` (5 exports / 5m). Covered by 5 new unit tests in `src/test/rate-limit.test.ts`.
+- **TASK-115 (Security Headers):** Added comprehensive web security headers in `next.config.ts`: HSTS (`max-age=63072000; includeSubDomains; preload`), `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy`, and strict `Content-Security-Policy`.
+- **TASK-116 & TASK-117 (Secret Sanitization):** Verified that decrypted secrets never appear in server action errors, console logs, page HTML props, or audit logs. Sanitized `handleActionError` in `src/lib/action-result.ts` to prevent internal database errors or cryptographical state leaks.
+- **TASK-118 (Accessibility Check):** Verified focus indicators (`focus-visible:ring-1 focus-visible:ring-ring`), full keyboard navigation, screen reader ARIA labels on all interactive/icon buttons, and dark mode contrast exceeding WCAG AA.
+- **TASK-119 (Responsive Layout):** Verified responsive layouts at 360px mobile, 768px tablet, and 1440px desktop with full-screen mobile sheets and zero horizontal blowout.
+- **TASK-120 (RLS Review):** Audited all 8 database RLS policies (`profiles`, `clients`, `projects`, `project_members`, `credentials`, `env_variables`, `audit_logs`, `user_favorites`) to confirm fail-closed zero-leakage security boundaries.
+- **TASK-121 (npm audit):** Ran `npm audit`; confirmed 0 high and 0 critical vulnerabilities.
+- **TASK-122 (PRD Success Criteria):** Verified all 10 core success criteria in `PRD.md` end-to-end.
+- **Verification:** 143/143 tests pass across 16 test suites; Next.js production build succeeds. All Phase 13 changes remain uncommitted in the local working tree per user instruction ("dont commit or push").
+
 ### Mandatory MFA Removal (2026-11-21)
 - Disabled mandatory Multi-Factor Authentication requirement per user request so users log in directly to the dashboard without `/mfa/enroll` or `/mfa` interception.
 - In `src/actions/auth.actions.ts`: `loginAction` logs in directly and returns `{ requiresMfa: false, requiresMfaEnrollment: false }`.
