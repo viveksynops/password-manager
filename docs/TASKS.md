@@ -201,12 +201,12 @@ When done, list files changed and how to test it.
 
 ## Phase 11: Audit Logs
 
-- [ ] **TASK-103** Make sure all sensitive actions write audit logs (review every action)
-- [ ] **TASK-104** Create audit logs page (Admin only)
-- [ ] **TASK-105** Add filters (user, action, project, date range) and pagination
-- [ ] **TASK-106** Show relative time with full timestamp on hover
-- [ ] **TASK-107** Confirm audit logs cannot be edited or deleted by any role 🔒
-- [ ] **TASK-108** Add tests for audit logs
+- [x] **TASK-103** Make sure all sensitive actions write audit logs (review every action)
+- [x] **TASK-104** Create audit logs page (Admin only)
+- [x] **TASK-105** Add filters (user, action, project, date range) and pagination
+- [x] **TASK-106** Show relative time with full timestamp on hover
+- [x] **TASK-107** Confirm audit logs cannot be edited or deleted by any role 🔒
+- [x] **TASK-108** Add tests for audit logs
 
 ---
 

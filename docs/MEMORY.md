@@ -13,9 +13,9 @@ Related documents:
 
 ## Current Status
 
-Phases 1 through 10 are complete. Database schema, security foundation, AES-256-GCM encryption libraries, Supabase clients, fail-closed audit logging, full authentication flow (Login, MFA, password reset, invites), responsive App Layout (shadcn Sidebar, Breadcrumbs, Avatar, DataTable, ThemeToggle), full Team Management (Admin controls, immediate revocation), complete Client Management, complete Project Management (folder-based grid view, responsive slide-over edit sheet, project detail view with responsive tabs), complete Credentials Vault (AES-256-GCM password encryption on save, `SecretField` with reveal auto-hide after 15s and copy clipboard auto-clear after 30s), and complete Environment Variables Manager (AES-256-GCM encryption on save, environment switcher for Dev/Staging/Prod, SecretField table, typed delete confirmation for Production, Paste .env bulk import with live preview, Export .env file download with audit logging, and 115/115 passing unit tests) are implemented, verified, and passing all tests.
+Phases 1 through 11 are complete. Database schema, security foundation, AES-256-GCM encryption libraries, Supabase clients, fail-closed audit logging, full authentication flow (Login, MFA, password reset, invites), responsive App Layout (shadcn Sidebar, Breadcrumbs, Avatar, DataTable, ThemeToggle), full Team Management (Admin controls, immediate revocation), complete Client Management, complete Project Management (folder-based grid view, responsive slide-over edit sheet, project detail view with responsive tabs), complete Credentials Vault (AES-256-GCM password encryption on save, `SecretField` with reveal auto-hide after 15s and copy clipboard auto-clear after 30s), complete Environment Variables Manager (AES-256-GCM encryption on save, environment switcher for Dev/Staging/Prod, SecretField table, typed delete confirmation for Production, Paste .env bulk import with live preview, Export .env file download with audit logging), and complete Audit Logs (Admin-only immutable append-only ledger, action/user/project/date filters, pagination, relative time with full timestamp hover tooltip, metadata inspector, and 122/122 passing unit tests) are implemented, verified, and passing all tests.
 
-**Overall progress:** 101 of 138 tasks complete (73%) — 1 skipped per user preference (TASK-005).
+**Overall progress:** 107 of 138 tasks complete (78%) — 1 skipped per user preference (TASK-005).
 
 ---
 
@@ -163,11 +163,21 @@ Phases 1 through 10 are complete. Database schema, security foundation, AES-256-
 
 ---
 
+### Phase 11: Audit Logs (6/6 complete)
+- [x] **TASK-103**: Make sure all sensitive actions write audit logs (verified across auth, team, clients, projects, credentials, and env variables)
+- [x] **TASK-104**: Create audit logs page at `src/app/(dashboard)/audit-logs/page.tsx` (< 25 lines, Admin only)
+- [x] **TASK-105**: Add filters (action, user, project, date range) and pagination (`AuditLogsFilterBar.tsx`, `AuditLogsView.tsx`)
+- [x] **TASK-106**: Show relative time with full timestamp on hover via `Tooltip` (`RelativeTimeTooltip.tsx`)
+- [x] **TASK-107**: Confirm audit logs cannot be edited or deleted by any role via immutable Postgres trigger and RLS 🔒
+- [x] **TASK-108**: Add unit tests for audit logs, filters, schemas, formatting, and immutability invariants (`src/test/audit-logs.test.ts`) 🔒
+
+---
+
 ## Current Task
 
-**TASK-103:** Make sure all sensitive actions write audit logs (review every action) (Phase 11: Audit Logs)
+**TASK-109:** Create global search across clients, projects and services (Phase 12: Search and Productivity)
 
-**Phase:** 11, Audit Logs
+**Phase:** 12, Search and Productivity
 
 **Status:** Ready to start
 
@@ -187,7 +197,7 @@ Phases 1 through 10 are complete. Database schema, security foundation, AES-256-
 | 8. Projects | Complete | 11 / 11 |
 | 9. Credentials Vault | Complete | 15 / 15 |
 | 10. Environment Variables | Complete | 13 / 13 |
-| 11. Audit Logs | Not started | 0 / 6 |
+| 11. Audit Logs | Complete | 6 / 6 |
 | 12. Search and Productivity | Not started | 0 / 5 |
 | 13. Hardening and Quality | Not started | 0 / 9 |
 | 14. Deployment | Not started | 0 / 8 |
