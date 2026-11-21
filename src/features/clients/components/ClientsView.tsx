@@ -173,58 +173,60 @@ export function ClientsView({ data, userRole }: ClientsViewProps) {
             <ClientTable clients={data.clients} userRole={userRole} />
           </div>
 
-          {/* Server-Side Pagination Controls */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted-foreground pt-1">
-            <div className="flex items-center gap-2">
-              <span>Rows per page:</span>
-              <Select
-                value={String(data.pageSize)}
-                onValueChange={(val) => handlePageSizeChange(Number(val) || 20)}
-                disabled={isPending}
-              >
-                <SelectTrigger className="h-8 w-16 text-xs">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="10">10</SelectItem>
-                  <SelectItem value="20">20</SelectItem>
-                  <SelectItem value="50">50</SelectItem>
-                </SelectContent>
-              </Select>
-              <span>
-                Showing <span className="font-medium text-foreground">{fromEntry}</span> to{" "}
-                <span className="font-medium text-foreground">{toEntry}</span> of{" "}
-                <span className="font-medium text-foreground">{data.total}</span> entries
-              </span>
-            </div>
+          {/* Server-Side Pagination Controls (only shown when data exceeds a single page) */}
+          {(data.totalPages > 1 || data.page > 1) && (
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted-foreground pt-1">
+              <div className="flex items-center gap-2">
+                <span>Rows per page:</span>
+                <Select
+                  value={String(data.pageSize)}
+                  onValueChange={(val) => handlePageSizeChange(Number(val) || 20)}
+                  disabled={isPending}
+                >
+                  <SelectTrigger className="h-8 w-16 text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="10">10</SelectItem>
+                    <SelectItem value="20">20</SelectItem>
+                    <SelectItem value="50">50</SelectItem>
+                  </SelectContent>
+                </Select>
+                <span>
+                  Showing <span className="font-medium text-foreground">{fromEntry}</span> to{" "}
+                  <span className="font-medium text-foreground">{toEntry}</span> of{" "}
+                  <span className="font-medium text-foreground">{data.total}</span> entries
+                </span>
+              </div>
 
-            <div className="flex items-center gap-1.5">
-              <span className="mr-2">
-                Page <span className="font-medium text-foreground">{data.page}</span> of{" "}
-                <span className="font-medium text-foreground">{data.totalPages}</span>
-              </span>
-              <Button
-                variant="outline"
-                size="icon"
-                className="size-8"
-                disabled={data.page <= 1 || isPending}
-                onClick={() => handlePageChange(data.page - 1)}
-                aria-label="Previous page"
-              >
-                <ChevronLeft className="size-4" />
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                className="size-8"
-                disabled={data.page >= data.totalPages || isPending}
-                onClick={() => handlePageChange(data.page + 1)}
-                aria-label="Next page"
-              >
-                <ChevronRight className="size-4" />
-              </Button>
+              <div className="flex items-center gap-1.5">
+                <span className="mr-2">
+                  Page <span className="font-medium text-foreground">{data.page}</span> of{" "}
+                  <span className="font-medium text-foreground">{data.totalPages}</span>
+                </span>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="size-8"
+                  disabled={data.page <= 1 || isPending}
+                  onClick={() => handlePageChange(data.page - 1)}
+                  aria-label="Previous page"
+                >
+                  <ChevronLeft className="size-4" />
+                </Button>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  className="size-8"
+                  disabled={data.page >= data.totalPages || isPending}
+                  onClick={() => handlePageChange(data.page + 1)}
+                  aria-label="Next page"
+                >
+                  <ChevronRight className="size-4" />
+                </Button>
+              </div>
             </div>
-          </div>
+          )}
         </div>
       ) : (
         <EmptyState

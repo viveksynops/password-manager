@@ -248,3 +248,4 @@ Phases 1 through 11 are complete. Database schema, security foundation, AES-256-
 | 2026-11-21 | Completed Phase 10 & 11 (Audit Logs, append-only ledger, filters, metadata inspection, 122/122 tests passing) | Phase 12 |
 | 2026-11-21 | Optimized Audit Logs with server-side URL pagination, explicit limits, range, and lightweight filter queries to minimize Supabase egress. 124/124 tests passing, build passing | Phase 12: Search and Productivity |
 | 2026-11-21 | Added server-side pagination with limits to /projects and /clients, lightweight client options, URL searchParams sync, and removed client-side full dataset in-memory filtering. 126/126 tests passing, build passing | Phase 12: Search and Productivity |
+| 2026-11-21 | Conditionally render pagination controls only when records exceed single-page capacity (data.totalPages > 1 || data.page > 1) across Projects, Clients, and Audit Logs. | Phase 12 |
