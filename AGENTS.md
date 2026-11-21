@@ -7,3 +7,21 @@ This version has breaking changes — APIs, conventions, and file structure may 
 This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
 
 <!-- END:nextjs-agent-rules -->
+
+---
+
+# Critical Agent Rules & Mandatory Guidelines
+
+## 1. STRICT SHADCN MANDATE
+- **ALWAYS use shadcn/ui components**: Check the shadcn component library for ANY UI requirement (e.g. sidebar, breadcrumb, avatar, table, dialog, alert-dialog, sheet, dropdown-menu, form, tabs, tooltip, popover, badge, button, input, separator, etc.).
+- **NEVER build custom components from scratch** when a shadcn component exists for that capability.
+- **Check and Install**: If a required shadcn component is not already present in `src/components/ui/`, **ALWAYS install it immediately** using `npx shadcn add <component-name>` and use it.
+- **NEVER edit `src/components/ui/*` directly**: Treat them as unmodified primitives from shadcn. Compose and style them via props, wrappers, or `render` props.
+
+## 2. MODULAR CODE & LEAN PAGES
+- **Keep page files lean (< 25 lines)**: Page files (`page.tsx`) must only do route-level auth checks/fetching and delegate rendering to modular, reusable feature components in `src/features/<feature>/components/*`.
+- **Don't dump large codeblocks in a single file**: Extract reusable parts into `src/components/` (generic UI) or `src/features/<feature>/` (domain-specific UI & schemas).
+
+## 3. ALWAYS READ AND UPDATE DOCS
+- AI agents must ALWAYS read `docs/RULES.md`, `docs/TASKS.md`, and `docs/MEMORY.md` before starting work.
+- **Update `docs/MEMORY.md` and `docs/TASKS.md` at the end of every task/phase** without exception. Keep `docs/MEMORY.md` accurate and matching the code at all times.

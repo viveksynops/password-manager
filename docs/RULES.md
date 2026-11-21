@@ -64,9 +64,11 @@ If a rule here conflicts with a request, follow the rule and ask for clarificati
 
 ## UI
 
+- **Mandatory shadcn Component Rule**: ALWAYS check shadcn for any required UI component. Never build custom components from scratch if shadcn has one (sidebar, breadcrumb, avatar, table, dialog, alert-dialog, sheet, dropdown-menu, form, etc.). If it is not installed, install it using `npx shadcn add <component>` and use it.
 - Follow `DESIGN.md` for colors, typography, spacing, radius and components.
 - Use shadcn/ui components and CSS variables. Do not hardcode colors or create one-off styles.
 - Do not edit `src/components/ui/*` components directly. Treat them as unedited primitives from shadcn; compose and style them via props and wrapper components.
+- Keep page files lean (< 25 lines). Defer all rendering and UI logic to reusable components in `features/` or `components/`.
 - Use Tailwind utility classes. No inline styles, no separate CSS files for components.
 - Use lucide-react for icons.
 - Maintain responsive design from 360px upward.
