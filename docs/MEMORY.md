@@ -39,23 +39,30 @@ Planning phase is complete. Project documentation is written and ready. No appli
 - [x] Task breakdown created, 138 tasks in 15 phases (`TASKS.md`)
 - [x] Architecture decisions recorded, 21 ADRs (`DECISIONS.md`)
 - [x] **TASK-001**: Initialize Next.js project with TypeScript, App Router and `src/` directory
+- [x] **TASK-002**: Enable TypeScript `strict` mode and configure ESLint and Prettier
+- [x] **TASK-003**: Configure Tailwind CSS (Tailwind v4 with `@theme inline` and shadcn integration)
 - [x] **TASK-004**: Initialize shadcn/ui and add base components (built on Base UI, zinc theme)
+- [x] **TASK-006**: Create folder structure from `ARCHITECTURE.md`
+- [x] **TASK-007**: Configure Git, `.gitignore`, and `.env.example`
+- [x] **TASK-008**: Install core packages (`@supabase/supabase-js`, `@supabase/ssr`, `zod`, `react-hook-form`, `server-only`)
+- [x] **TASK-009**: Set up testing tools (Vitest, React Testing Library, jsdom)
+- [x] **TASK-011**: Set up validated environment variables in `lib/env.ts`
 
 ---
 
 ## Current Task
 
-**TASK-002:** Enable TypeScript `strict` mode and configure ESLint and Prettier
+**TASK-010 / TASK-012:** Awaiting user-created Supabase project keys to configure `.env.local` and complete Supabase settings.
 
 **Phase:** 1, Setup
 
-**Status:** Not started
+**Status:** Awaiting Supabase credentials from user
 
 ---
 
 ## In Progress
 
-Nothing yet.
+Phase 1 code setup complete; awaiting Supabase project keys.
 
 ---
 
@@ -63,7 +70,7 @@ Nothing yet.
 
 | Phase | Status | Tasks done |
 |---|---|---|
-| 1. Setup | In progress | 2 / 12 |
+| 1. Setup | Mostly complete (awaiting Supabase keys) | 9 / 12 |
 | 2. Database and Security Foundation | Not started | 0 / 12 |
 | 3. Encryption and Core Libraries | Not started | 0 / 7 |
 | 4. Authentication | Not started | 0 / 10 |

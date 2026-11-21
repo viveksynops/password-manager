@@ -50,17 +50,17 @@ When done, list files changed and how to test it.
 ## Phase 1: Setup
 
 - [x] **TASK-001** Initialize Next.js project with TypeScript, App Router and `src/` directory
-- [ ] **TASK-002** Enable TypeScript `strict` mode and configure ESLint and Prettier
-- [ ] **TASK-003** Configure Tailwind CSS
+- [x] **TASK-002** Enable TypeScript `strict` mode and configure ESLint and Prettier
+- [x] **TASK-003** Configure Tailwind CSS
 - [x] **TASK-004** Initialize shadcn/ui and add base components (button, input, card, table, dialog, dropdown-menu, tabs, badge, sonner, sidebar, form, select, textarea, skeleton, alert-dialog)
-- [ ] **TASK-005** Apply `DESIGN.md` theme (Inter and JetBrains Mono fonts, color variables, radius, dark mode)
-- [ ] **TASK-006** Create folder structure from `ARCHITECTURE.md`
-- [ ] **TASK-007** Configure Git, `.gitignore`, `.env.example` and branch rules
-- [ ] **TASK-008** Install core packages (`@supabase/supabase-js`, `@supabase/ssr`, `zod`, `react-hook-form`, `lucide-react`)
-- [ ] **TASK-009** Set up testing tools (Vitest, React Testing Library)
-- [ ] **TASK-010** Create a new, separate Supabase project for the vault
-- [ ] **TASK-011** Set up validated environment variables in `lib/env.ts`
-- [ ] **TASK-012** Disable public signup in Supabase Auth settings
+- [-] **TASK-005** Apply `DESIGN.md` theme (Inter and JetBrains Mono fonts, color variables, radius, dark mode) *(Skipped per user request: keep installed shadcn base-vega zinc theme)*
+- [x] **TASK-006** Create folder structure from `ARCHITECTURE.md`
+- [x] **TASK-007** Configure Git, `.gitignore`, `.env.example` and branch rules
+- [x] **TASK-008** Install core packages (`@supabase/supabase-js`, `@supabase/ssr`, `zod`, `react-hook-form`, `lucide-react`)
+- [x] **TASK-009** Set up testing tools (Vitest, React Testing Library)
+- [ ] **TASK-010** Create a new, separate Supabase project for the vault *(Pending: user creating Supabase account and providing keys)*
+- [x] **TASK-011** Set up validated environment variables in `lib/env.ts`
+- [ ] **TASK-012** Disable public signup in Supabase Auth settings *(Pending Supabase project)*
 
 ---
 
