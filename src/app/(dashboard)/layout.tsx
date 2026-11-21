@@ -24,7 +24,7 @@ export default async function DashboardLayout({
       <Sidebar user={user} />
 
       {/* Official shadcn SidebarInset for main content shell */}
-      <SidebarInset className="min-w-0 max-w-full overflow-x-clip">
+      <SidebarInset className="min-w-0 w-auto flex-1">
         <Header user={user} />
         <main className="flex flex-1 flex-col gap-4 p-4 sm:p-6 lg:p-8 max-w-7xl w-full mx-auto min-w-0">
           {children}
