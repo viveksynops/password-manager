@@ -265,6 +265,10 @@ export interface Database {
     };
     Views: Record<string, never>;
     Functions: {
+      archive_client_cascade: {
+        Args: { p_client_id: string; p_is_archived: boolean };
+        Returns: Json;
+      };
       get_current_user_role: {
         Args: Record<PropertyKey, never>;
         Returns: string;

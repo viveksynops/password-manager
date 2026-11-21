@@ -323,7 +323,7 @@ export function ProjectCredentialsTab({
                         >
                           <MoreHorizontal className="size-4" />
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
+                        <DropdownMenuContent align="end" className="w-48">
                           {cred.login_url && (
                             <DropdownMenuItem
                               render={<a href={cred.login_url} target="_blank" rel="noreferrer" />}

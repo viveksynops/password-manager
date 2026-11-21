@@ -183,7 +183,7 @@ export function TeamTable({ users, currentUserId }: TeamTableProps) {
                       >
                         <MoreHorizontal className="size-4" />
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
+                      <DropdownMenuContent align="end" className="w-48">
                         <DropdownMenuItem onClick={() => handleRoleClick(user)}>
                           <ShieldCheck className="mr-2 size-4" />
                           Change Role

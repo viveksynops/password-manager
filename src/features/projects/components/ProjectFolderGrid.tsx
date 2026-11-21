@@ -2,6 +2,7 @@
 
 import React, { useState, useTransition } from "react";
 import Link from "next/link";
+import { cn } from "@/lib/utils";
 import { ProjectWithDetails } from "@/services/project.service";
 import { UserRole, Client } from "@/types/database.types";
 import { Badge } from "@/components/ui/badge";
@@ -145,51 +146,52 @@ export function ProjectFolderGrid({ projects, userRole, clients }: ProjectFolder
                   >
                     <MoreVertical className="size-4" />
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem render={<Link href={`/projects/${proj.id}`} />}>
-                      <ExternalLink className="mr-2 size-4" />
-                      Open Folder
+                  <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuItem render={<Link href={`/projects/${proj.id}`} />} className="cursor-pointer">
+                      <ExternalLink className="mr-2 size-4 shrink-0" />
+                      <span>Open Folder</span>
                     </DropdownMenuItem>
 
                     {proj.live_url && (
-                      <DropdownMenuItem render={<a href={proj.live_url} target="_blank" rel="noreferrer" />}>
-                        <Globe className="mr-2 size-4" />
-                        Visit Live Site
+                      <DropdownMenuItem render={<a href={proj.live_url} target="_blank" rel="noreferrer" />} className="cursor-pointer">
+                        <Globe className="mr-2 size-4 shrink-0" />
+                        <span>Visit Live Site</span>
                       </DropdownMenuItem>
                     )}
 
                     {proj.repo_url && (
-                      <DropdownMenuItem render={<a href={proj.repo_url} target="_blank" rel="noreferrer" />}>
-                        <GitBranch className="mr-2 size-4" />
-                        View Repository
+                      <DropdownMenuItem render={<a href={proj.repo_url} target="_blank" rel="noreferrer" />} className="cursor-pointer">
+                        <GitBranch className="mr-2 size-4 shrink-0" />
+                        <span>View Repository</span>
                       </DropdownMenuItem>
                     )}
 
                     {canManage && (
                       <>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => handleEdit(proj)}>
-                          <Edit2 className="mr-2 size-4" />
-                          Edit Folder Info
+                        <DropdownMenuItem onClick={() => handleEdit(proj)} className="cursor-pointer">
+                          <Edit2 className="mr-2 size-4 shrink-0" />
+                          <span>Edit Folder Info</span>
                         </DropdownMenuItem>
 
                         <DropdownMenuItem
                           onClick={() => handleArchiveClick(proj)}
-                          className={
+                          className={cn(
+                            "cursor-pointer",
                             proj.is_archived
                               ? "text-foreground"
                               : "text-destructive focus:text-destructive"
-                          }
+                          )}
                         >
                           {proj.is_archived ? (
                             <>
-                              <ArchiveRestore className="mr-2 size-4" />
-                              Restore Folder
+                              <ArchiveRestore className="mr-2 size-4 shrink-0" />
+                              <span>Restore Folder</span>
                             </>
                           ) : (
                             <>
-                              <Archive className="mr-2 size-4" />
-                              Archive Folder
+                              <Archive className="mr-2 size-4 shrink-0" />
+                              <span>Archive Folder</span>
                             </>
                           )}
                         </DropdownMenuItem>

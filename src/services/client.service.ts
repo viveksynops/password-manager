@@ -269,18 +269,50 @@ export async function archiveClient(
 ): Promise<Client> {
   const supabase = await createServerClient();
 
-  const { data, error } = await supabase
-    .from("clients")
-    .update({
-      is_archived: isArchived,
-      updated_at: new Date().toISOString(),
-    })
-    .eq("id", id)
-    .select()
-    .single();
+  let clientData: Client;
+  let affectedProjects = 0;
 
-  if (error || !data) {
-    throw new Error(`Failed to archive client: ${error?.message || "Client not found"}`);
+  // Attempt atomic database transaction via RPC function
+  const { data: rpcResult, error: rpcError } = await supabase.rpc(
+    "archive_client_cascade",
+    {
+      p_client_id: id,
+      p_is_archived: isArchived,
+    }
+  );
+
+  if (!rpcError && rpcResult) {
+    const parsed = rpcResult as unknown as { client: Client; projects_updated: number };
+    clientData = parsed.client;
+    affectedProjects = parsed.projects_updated;
+  } else {
+    // Fallback: Update client and cascade to all projects
+    const { data, error } = await supabase
+      .from("clients")
+      .update({
+        is_archived: isArchived,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (error || !data) {
+      throw new Error(`Failed to archive client: ${error?.message || "Client not found"}`);
+    }
+
+    clientData = data as Client;
+
+    // Atomically cascade archive status to all child projects
+    const { count } = await supabase
+      .from("projects")
+      .update({
+        is_archived: isArchived,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("client_id", id);
+
+    affectedProjects = count ?? 0;
   }
 
   // Immutable audit log
@@ -291,10 +323,11 @@ export async function archiveClient(
     targetId: id,
     ipAddress,
     metadata: {
-      clientName: data.name,
+      clientName: clientData.name,
       archived: isArchived,
+      projectsCascaded: affectedProjects,
     },
   });
 
-  return data as Client;
+  return clientData;
 }

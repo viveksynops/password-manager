@@ -92,6 +92,7 @@ export async function archiveClientAction(
 
     revalidatePath("/clients");
     revalidatePath(`/clients/${id}`);
+    revalidatePath("/projects");
     return successResult(client);
   } catch (err) {
     return handleActionError(err);

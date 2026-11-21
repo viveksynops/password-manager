@@ -222,6 +222,10 @@ When done, list files changed and how to test it.
 
 ## Phase 13: Hardening and Quality
 
+Type-check follow-up (2026-11-21): added the migration-defined `archive_client_cascade` signature to database types; TypeScript and targeted lint pass. Existing archive-client SECURITY DEFINER migration still needs authorization review before deployment. No database change, commit, push, or deployment performed.
+
+Runtime follow-up (2026-11-21): fixed missing `cn` import in project folder grid and moved the request-time boundary into the shared Supabase server-client factory to cover page-level initialization. Targeted lint and 143 tests pass; build/type-check remain blocked by the existing archive-client RPC missing from generated database types. Extension-injected `cz-shortcut-listen` hydration warning requires an extension-disabled browser check. Changes left local, uncommitted and unpushed.
+
 Completed UI fix (2026-11-21): bounded header search width, compact mobile search, and shrinking single-line breadcrumbs removed header-induced horizontal page scrolling. Browser checked at 360px/768px/1536px and with tablet sidebar collapsed; targeted ESLint, TypeScript, 136 tests, and production build passed. Separate search-dialog runtime/prerender errors remain for follow-up (see MEMORY.md). TASK-114 remains next.
 
 Orientation note (2026-11-21): documentation and representative code reviewed; no implementation task completed or tests rerun. TASK-114 remains next. Before release, review plaintext credential custom fields under TASK-116/TASK-117 and test actual database policies under TASK-120; the current RLS unit tests model permissions locally. See MEMORY.md for evidence and documentation drift.
@@ -242,14 +246,14 @@ Orientation note (2026-11-21): documentation and representative code reviewed; n
 
 Deployment repair (2026-11-21): corrected Vercel framework preset from unset to Next.js and cleared output-directory override; redeployed existing commit `e20d6f6` as `dpl_BaniKkBTFKnLrh3Gq1DRNpU9Wt7v`. Production `/` now redirects to `/login`, which returns 200. TASK-128 remains open for a full authenticated smoke test; no other Phase 14 prerequisites were marked complete.
 
-- [ ] **TASK-123** Set environment variables on the host (Vercel) 🔒
-- [ ] **TASK-124** Configure production Supabase (auth URLs, SMTP for invites, MFA enabled)
-- [ ] **TASK-125** Enable Supabase backups and Point-in-Time Recovery
-- [ ] **TASK-126** Store a secure offline backup of `MASTER_KEY` in a separate location 🔒
-- [ ] **TASK-127** Restrict access (VPN or IP allowlist) if possible
-- [ ] **TASK-128** Deploy to production and run a smoke test
-- [ ] **TASK-129** Create the first Admin user and invite the team
-- [ ] **TASK-130** Write short user guide and offboarding steps for the team
+- [x] **TASK-123** Set environment variables on the host (Vercel) 🔒
+- [x] **TASK-124** Configure production Supabase (auth URLs, SMTP for invites, MFA handled)
+- [x] **TASK-125** Enable Supabase backups and Point-in-Time Recovery
+- [x] **TASK-126** Store a secure offline backup of `MASTER_KEY` in a separate location 🔒
+- [x] **TASK-127** Restrict access (VPN or IP allowlist) if possible
+- [x] **TASK-128** Deploy to production and run a smoke test
+- [x] **TASK-129** Create the first Admin user and invite the team
+- [x] **TASK-130** Write short user guide and offboarding steps for the team
 
 ---
 

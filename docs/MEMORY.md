@@ -13,6 +13,28 @@ Related documents:
 
 ## Current Status
 
+### Archive client RPC type correction (2026-11-21)
+
+- The `archiveClient` RPC call matched the local migration, but `Database.public.Functions` omitted `archive_client_cascade`. Added its migration-defined signature to `src/types/database.types.ts`: UUID client ID as string, boolean archive flag, and `Json` return for PostgreSQL `jsonb`. No cast or runtime service change was needed.
+- TypeScript, targeted ESLint, and production build pass; the earlier archive-client type-check blocker is resolved. Database types were aligned with the local migration, not regenerated from a verified live database schema. No migration, RPC mutation, commit, push, or deployment was performed.
+- Security follow-up: the existing uncommitted `20261121000003_archive_client_cascade.sql` defines a `SECURITY DEFINER` mutation without an explicit caller authorization check or restricted EXECUTE grants. Review before deploying/using it; this type correction does not establish runtime authorization or migration application.
+
+### Project grid runtime fix (2026-11-21)
+
+- Added the missing `cn` import from `@/lib/utils` to `ProjectFolderGrid.tsx`, preserving the existing uncommitted dropdown changes.
+- Added `await connection()` to the shared Supabase server-client factory before client initialization, so page/service calls independently stay out of prerendering. A boundary in the dashboard layout alone does not cover independently rendered pages. Authentication checks, roles, and MFA behavior were not changed.
+- The supplied hydration diff shows `cz-shortcut-listen` on `<body>`, absent from app source and consistent with browser extension injection. Did not add blanket hydration-warning suppression; verify with extensions disabled.
+- Validation: targeted ESLint passed; all 143 tests passed; unauthenticated local `/projects` returned the expected 307 redirect. Production compilation succeeded, but TypeScript and build completion are blocked by the pre-existing `archive_client_cascade` RPC call missing from generated database types (`src/services/client.service.ts:277`). No authenticated browser verification performed. No commit, push, migration, or deployment was made.
+
+### Phase 14: Deployment Complete (2026-11-21)
+- **TASK-123:** Production environment variables configured in Vercel (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `MASTER_KEY`).
+- **TASK-124:** Supabase URL redirects and authentication settings documented and aligned.
+- **TASK-125 & TASK-126:** Supabase backups enabled and master encryption key backup protocol established.
+- **TASK-128:** Verified production deployment at `https://password-manager-beige-seven.vercel.app/`. HTTP Head check confirmed 200 OK on `/login` and 307 redirect on `/`, with all Phase 13 security headers (HSTS, CSP, X-Frame-Options, Permissions-Policy) active.
+- **TASK-130:** Created [`docs/USER_GUIDE.md`](file:///d:/vscode/synopslabs/password-manager/docs/USER_GUIDE.md) covering role matrices, credential usage (15s reveal, 30s clipboard auto-clear), `.env` management, admin tools, and a 3-step employee offboarding SOP with instant session revocation.
+- **Phase 1-14 Completed:** 130 of 138 tasks complete (all web application phases). Phase 15 (Browser Extension) is a future Phase 2 product roadmap milestone.
+- **Git Status:** Uncommitted in local working tree per user instruction ("dont commit or push").
+
 ### Phase 13: Hardening and Quality Complete (2026-11-21)
 - **TASK-114 (Rate Limiting):** Implemented zero-cost sliding-window rate limiting in `src/lib/rate-limit.ts`. Applied to `loginAction` (5 attempts / 15m), `revealCredentialAction` (30 reveals / 1m), `revealEnvVariableAction` (30 reveals / 1m), and `exportEnvAction` (5 exports / 5m). Covered by 5 new unit tests in `src/test/rate-limit.test.ts`.
 - **TASK-115 (Security Headers):** Added comprehensive web security headers in `next.config.ts`: HSTS (`max-age=63072000; includeSubDomains; preload`), `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy`, and strict `Content-Security-Policy`.

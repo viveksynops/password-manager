@@ -151,7 +151,7 @@ export function EnvVariablesTable({
                     >
                       <MoreHorizontal className="size-4" />
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
+                    <DropdownMenuContent align="end" className="w-48">
                       <DropdownMenuItem onClick={() => handleCopyKey(v.id, v.key)}>
                         <Copy className="mr-2 size-4" />
                         Copy Key Name

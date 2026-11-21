@@ -177,7 +177,7 @@ export function ClientTable({ clients, userRole }: ClientTableProps) {
                     >
                       <MoreHorizontal className="size-4" />
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
+                    <DropdownMenuContent align="end" className="w-48">
                       <DropdownMenuItem
                         onClick={() => router.push(`/clients/${client.id}`)}
                       >

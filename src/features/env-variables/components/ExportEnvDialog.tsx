@@ -87,7 +87,7 @@ export function ExportEnvDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-xl">
+      <DialogContent className="sm:max-w-xl max-w-[95vw] max-h-[90vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <div className="flex items-center gap-2">
             <div className="flex size-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
@@ -105,7 +105,7 @@ export function ExportEnvDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="py-2">
+        <div className="py-2 min-w-0 max-w-full flex-1 overflow-hidden">
           {isPending ? (
             <div className="flex flex-col items-center justify-center py-12 gap-2 text-muted-foreground">
               <Loader2 className="size-6 animate-spin text-primary" />
@@ -116,7 +116,7 @@ export function ExportEnvDialog({
               rows={12}
               value={exportedContent}
               readOnly
-              className="font-mono text-xs select-all bg-muted/40"
+              className="font-mono text-xs select-all bg-muted/40 w-full max-w-full min-w-0 break-all resize-y"
             />
           )}
         </div>

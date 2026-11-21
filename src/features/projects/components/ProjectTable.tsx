@@ -217,7 +217,7 @@ export function ProjectTable({ projects, userRole, clients }: ProjectTableProps)
                     >
                       <MoreHorizontal className="size-4" />
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
+                    <DropdownMenuContent align="end" className="w-48">
                       <DropdownMenuItem
                         render={<Link href={`/projects/${proj.id}`} />}
                       >
