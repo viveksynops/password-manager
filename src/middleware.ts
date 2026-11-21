@@ -20,6 +20,13 @@ export async function middleware(request: NextRequest) {
 
   const { supabaseResponse, user } = await updateSession(request);
 
+  // If this is a Server Action call (identified by next-action header),
+  // pass through with session cookies so Next.js action dispatcher can execute it.
+  // Never redirect a Server Action POST to an HTML page as it breaks React Flight RPC.
+  if (request.headers.has("next-action")) {
+    return supabaseResponse;
+  }
+
   const isAuthRoute = AUTH_ROUTES.some((route) => pathname.startsWith(route));
 
   // 1. Unauthenticated users cannot access private dashboard routes
@@ -28,12 +35,20 @@ export async function middleware(request: NextRequest) {
     if (pathname !== "/") {
       loginUrl.searchParams.set("redirectTo", pathname);
     }
-    return NextResponse.redirect(loginUrl);
+    const redirectResponse = NextResponse.redirect(loginUrl);
+    supabaseResponse.cookies.getAll().forEach((cookie) => {
+      redirectResponse.cookies.set(cookie.name, cookie.value);
+    });
+    return redirectResponse;
   }
 
-  // 2. If authenticated, prevent logged-in users from accessing login page again
+  // 2. If authenticated, prevent logged-in users from accessing auth pages
   if (user && pathname === "/login") {
-    return NextResponse.redirect(new URL("/", request.url));
+    const redirectResponse = NextResponse.redirect(new URL("/", request.url));
+    supabaseResponse.cookies.getAll().forEach((cookie) => {
+      redirectResponse.cookies.set(cookie.name, cookie.value);
+    });
+    return redirectResponse;
   }
 
   return supabaseResponse;
