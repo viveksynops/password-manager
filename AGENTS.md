@@ -25,3 +25,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 ## 3. ALWAYS READ AND UPDATE DOCS
 - AI agents must ALWAYS read `docs/RULES.md`, `docs/TASKS.md`, and `docs/MEMORY.md` before starting work.
 - **Update `docs/MEMORY.md` and `docs/TASKS.md` at the end of every task/phase** without exception. Keep `docs/MEMORY.md` accurate and matching the code at all times.
+
+## 4. STATE MANAGEMENT
+- Use **Zustand** if client-side global state management is needed (e.g. cross-component UI state, command palettes, search/filter states, modal controllers).
+- Install with `npm install zustand` whenever global client state is required. Avoid complex/heavy alternatives like Redux.

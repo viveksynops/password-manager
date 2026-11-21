@@ -30,6 +30,9 @@ Zod (shared by forms and server actions)
 ## Forms
 React Hook Form + Zod resolver
 
+## State Management
+Zustand (for client-side global state if needed, e.g. cross-component UI state, search/filter states, modal controllers)
+
 ## Deployment
 Vercel (or any host that supports Next.js), with a dedicated Supabase project for the vault
 

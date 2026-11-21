@@ -25,7 +25,7 @@ Phases 1, 2, 3, 4, and 5 are complete. Database schema, security foundation, AES
 
 **What it stores:** client details, project service logins (Supabase, Cloudinary, Vercel, etc.) and environment variables per project (dev, staging, production).
 
-**Stack:** Next.js (App Router, Turbopack), TypeScript, Supabase (Postgres, Auth, RLS), shadcn/ui (Base UI primitives, zinc theme), Tailwind CSS v4.
+**Stack:** Next.js (App Router, Turbopack), TypeScript, Supabase (Postgres, Auth, RLS), shadcn/ui (Base UI primitives, zinc theme), Tailwind CSS v4, Zustand (for client state if needed).
 
 **Requested by:** Software company manager.
 

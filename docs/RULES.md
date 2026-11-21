@@ -20,6 +20,7 @@ If a rule here conflicts with a request, follow the rule and ask for clarificati
 - Keep files focused. Split any file over ~300 lines.
 - Do not modify unrelated files.
 - Do not add new dependencies without a clear reason. Prefer what the stack already provides (Next.js, Supabase, shadcn/ui, Tailwind, Zod, React Hook Form).
+- **State Management**: Use **Zustand** if client-side global state management is needed (e.g. cross-component UI state, search/filter states, modal controllers, clipboard timers). Avoid Redux, MobX, or excessive React Context.
 - Use clear, descriptive names. No abbreviations like `usr`, `cred2`, `tmp`.
 - Remove unused code, console logs and commented-out code before committing.
 - Do not leave TODOs without a ticket or note explaining why.
