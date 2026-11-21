@@ -79,19 +79,23 @@ export function DashboardOverview({ user, metrics }: DashboardOverviewProps) {
         {statCards.map((card) => {
           const Icon = card.icon;
           return (
-            <Card key={card.title} className="hover:border-foreground/20 transition-colors">
-              <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <Card
+              key={card.title}
+              size="sm"
+              className="hover:border-foreground/20 transition-colors py-3.5 px-0 gap-2"
+            >
+              <CardHeader className="flex flex-row items-center justify-between pb-0 px-4">
                 <CardTitle className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                   {card.title}
                 </CardTitle>
-                <div className="flex size-8 items-center justify-center rounded-md bg-muted text-muted-foreground">
-                  <Icon className="size-4" />
+                <div className="flex size-7 items-center justify-center rounded-md bg-muted text-muted-foreground">
+                  <Icon className="size-3.5" />
                 </div>
               </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold text-foreground">{card.value}</div>
-                <p className="text-xs text-muted-foreground mt-1">{card.description}</p>
-                <div className="mt-3 pt-2 border-t flex justify-end">
+              <CardContent className="px-4 pt-1">
+                <div className="text-2xl font-bold text-foreground leading-none">{card.value}</div>
+                <p className="text-xs text-muted-foreground mt-1 truncate">{card.description}</p>
+                <div className="mt-2.5 pt-2 border-t flex justify-end">
                   <Link
                     href={card.href}
                     className="inline-flex items-center text-xs font-medium text-primary hover:underline"
