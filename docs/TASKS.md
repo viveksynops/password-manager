@@ -66,18 +66,18 @@ When done, list files changed and how to test it.
 
 ## Phase 2: Database and Security Foundation
 
-- [ ] **TASK-013** Set up Supabase CLI and the `supabase/migrations/` folder
-- [ ] **TASK-014** Create `profiles` table (role, status) linked to Supabase Auth users, with RLS
-- [ ] **TASK-015** Create `clients` table with RLS
-- [ ] **TASK-016** Create `projects` table with RLS
-- [ ] **TASK-017** Create `project_members` table with RLS
-- [ ] **TASK-018** Create `credentials` table with RLS 🔒
-- [ ] **TASK-019** Create `env_variables` table with RLS 🔒
-- [ ] **TASK-020** Create append-only `audit_logs` table with RLS 🔒
-- [ ] **TASK-021** Create helper SQL functions for role and project-access checks used by policies
-- [ ] **TASK-022** Generate TypeScript types into `types/database.types.ts`
-- [ ] **TASK-023** Write RLS tests (Developer cannot read unassigned projects) 🔒
-- [ ] **TASK-024** Create seed data with fake, clearly non-real values
+- [x] **TASK-013** Set up Supabase CLI and the `supabase/migrations/` folder
+- [x] **TASK-014** Create `profiles` table (role, status) linked to Supabase Auth users, with RLS
+- [x] **TASK-015** Create `clients` table with RLS
+- [x] **TASK-016** Create `projects` table with RLS
+- [x] **TASK-017** Create `project_members` table with RLS
+- [x] **TASK-018** Create `credentials` table with RLS 🔒
+- [x] **TASK-019** Create `env_variables` table with RLS 🔒
+- [x] **TASK-020** Create append-only `audit_logs` table with RLS 🔒
+- [x] **TASK-021** Create helper SQL functions for role and project-access checks used by policies
+- [x] **TASK-022** Generate TypeScript types into `types/database.types.ts`
+- [x] **TASK-023** Write RLS tests (Developer cannot read unassigned projects) 🔒
+- [x] **TASK-024** Create seed data with fake, clearly non-real values
 
 ---
 

@@ -47,22 +47,34 @@ Planning phase is complete. Project documentation is written and ready. No appli
 - [x] **TASK-008**: Install core packages (`@supabase/supabase-js`, `@supabase/ssr`, `zod`, `react-hook-form`, `server-only`)
 - [x] **TASK-009**: Set up testing tools (Vitest, React Testing Library, jsdom)
 - [x] **TASK-011**: Set up validated environment variables in `lib/env.ts`
+- [x] **TASK-013**: Set up Supabase CLI and `supabase/migrations/` folder
+- [x] **TASK-014**: Create `profiles` table (role, status) linked to Supabase Auth users, with RLS
+- [x] **TASK-015**: Create `clients` table with RLS
+- [x] **TASK-016**: Create `projects` table with RLS
+- [x] **TASK-017**: Create `project_members` table with RLS
+- [x] **TASK-018**: Create `credentials` table with RLS
+- [x] **TASK-019**: Create `env_variables` table with RLS
+- [x] **TASK-020**: Create append-only `audit_logs` table with RLS and immutable trigger
+- [x] **TASK-021**: Create helper SQL functions for role and project-access checks used by policies
+- [x] **TASK-022**: Generate TypeScript types into `src/types/database.types.ts`
+- [x] **TASK-023**: Write RLS tests (Developer cannot read unassigned projects)
+- [x] **TASK-024**: Create seed data with fake, non-real values in `supabase/seed.sql`
 
 ---
 
 ## Current Task
 
-**TASK-010 / TASK-012:** Awaiting user-created Supabase project keys to configure `.env.local` and complete Supabase settings.
+**TASK-025:** Generate `MASTER_KEY` and store it in local `.env.local` and a secure backup 🔒 (Phase 3: Encryption and Core Libraries)
 
-**Phase:** 1, Setup
+**Phase:** 3, Encryption and Core Libraries
 
-**Status:** Awaiting Supabase credentials from user
+**Status:** Ready to start
 
 ---
 
 ## In Progress
 
-Phase 1 code setup complete; awaiting Supabase project keys.
+Phase 2 complete (12/12 tasks). Ready for Phase 3.
 
 ---
 
@@ -71,7 +83,7 @@ Phase 1 code setup complete; awaiting Supabase project keys.
 | Phase | Status | Tasks done |
 |---|---|---|
 | 1. Setup | Mostly complete (awaiting Supabase keys) | 9 / 12 |
-| 2. Database and Security Foundation | Not started | 0 / 12 |
+| 2. Database and Security Foundation | Complete | 12 / 12 |
 | 3. Encryption and Core Libraries | Not started | 0 / 7 |
 | 4. Authentication | Not started | 0 / 10 |
 | 5. App Layout | Not started | 0 / 7 |
