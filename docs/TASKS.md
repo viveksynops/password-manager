@@ -58,9 +58,9 @@ When done, list files changed and how to test it.
 - [x] **TASK-007** Configure Git, `.gitignore`, `.env.example` and branch rules
 - [x] **TASK-008** Install core packages (`@supabase/supabase-js`, `@supabase/ssr`, `zod`, `react-hook-form`, `lucide-react`)
 - [x] **TASK-009** Set up testing tools (Vitest, React Testing Library)
-- [ ] **TASK-010** Create a new, separate Supabase project for the vault *(Pending: user creating Supabase account and providing keys)*
+- [x] **TASK-010** Create a new, separate Supabase project for the vault
 - [x] **TASK-011** Set up validated environment variables in `lib/env.ts`
-- [ ] **TASK-012** Disable public signup in Supabase Auth settings *(Pending Supabase project)*
+- [x] **TASK-012** Disable public signup in Supabase Auth settings (enforced invite-only)
 
 ---
 
