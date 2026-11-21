@@ -10,10 +10,12 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { ProjectMembersTab } from "./ProjectMembersTab";
 import { ProjectCredentialsTab } from "@/features/credentials/components/ProjectCredentialsTab";
+import { ProjectEnvTab } from "@/features/env-variables/components/ProjectEnvTab";
 import { ProjectEditSheet } from "./ProjectEditSheet";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { archiveProjectAction } from "@/actions/project.actions";
 import { CredentialSummary } from "@/services/credential.service";
+import { EnvVariableSummary } from "@/services/env.service";
 import {
   FolderLock,
   Building2,
@@ -40,6 +42,7 @@ interface ProjectDetailViewProps {
   allUsers: UserProfile[];
   clients: Pick<Client, "id" | "name">[];
   initialCredentials?: CredentialSummary[];
+  initialEnvVariables?: EnvVariableSummary[];
   userRole: UserRole;
 }
 
@@ -48,6 +51,7 @@ export function ProjectDetailView({
   allUsers,
   clients,
   initialCredentials = [],
+  initialEnvVariables = [],
   userRole,
 }: ProjectDetailViewProps) {
   const router = useRouter();
@@ -180,7 +184,7 @@ export function ProjectDetailView({
               <FileCode2 className="size-4 shrink-0" />
               <span>Env Variables</span>
               <Badge variant="secondary" className="px-1.5 py-0 text-[11px] shrink-0">
-                {env_count}
+                {initialEnvVariables.length}
               </Badge>
             </TabsTrigger>
 
@@ -211,29 +215,12 @@ export function ProjectDetailView({
 
         {/* Environment Variables Tab */}
         <TabsContent value="env" className="space-y-4">
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle className="text-lg">Environment Variables (.env)</CardTitle>
-                  <CardDescription>
-                    Per-environment secret keys and configs for Development, Staging, and Production.
-                  </CardDescription>
-                </div>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="rounded-md border border-dashed p-8 text-center bg-muted/20">
-                <FileCode2 className="mx-auto size-9 text-muted-foreground/60 mb-3" />
-                <h4 className="text-sm font-semibold text-foreground">
-                  Environment Manager ({env_count} variables stored)
-                </h4>
-                <p className="text-xs text-muted-foreground max-w-md mx-auto mt-1">
-                  Full .env bulk import/export, environment switching (Dev, Staging, Prod), and reveal protection are coming in Phase 10.
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+          <ProjectEnvTab
+            projectId={project.id}
+            projectName={project.name}
+            variables={initialEnvVariables}
+            userRole={userRole}
+          />
         </TabsContent>
 
         {/* Team Members Tab */}

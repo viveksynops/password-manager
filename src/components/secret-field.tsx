@@ -5,15 +5,24 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Eye, EyeOff, Copy, Check, Loader2 } from "lucide-react";
 import { revealCredentialAction } from "@/actions/credential.actions";
+import { revealEnvVariableAction } from "@/actions/env.actions";
 import { toast } from "sonner";
 
 interface SecretFieldProps {
-  credentialId: string;
+  credentialId?: string;
+  envVariableId?: string;
   projectId: string;
   className?: string;
+  label?: string;
 }
 
-export function SecretField({ credentialId, projectId, className = "" }: SecretFieldProps) {
+export function SecretField({
+  credentialId,
+  envVariableId,
+  projectId,
+  className = "",
+  label = "Secret",
+}: SecretFieldProps) {
   const [isRevealed, setIsRevealed] = useState(false);
   const [secretValue, setSecretValue] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -49,14 +58,20 @@ export function SecretField({ credentialId, projectId, className = "" }: SecretF
 
     setIsLoading(true);
     try {
-      const res = await revealCredentialAction({
-        id: credentialId,
-        projectId,
-        action: "reveal",
-      });
+      const res = envVariableId
+        ? await revealEnvVariableAction({
+            id: envVariableId,
+            projectId,
+            action: "reveal",
+          })
+        : await revealCredentialAction({
+            id: credentialId!,
+            projectId,
+            action: "reveal",
+          });
 
       if (!res.success) {
-        toast.error(res.error || "Failed to reveal secret.");
+        toast.error(res.error || `Failed to reveal ${label.toLowerCase()}.`);
         return;
       }
 
@@ -80,10 +95,10 @@ export function SecretField({ credentialId, projectId, className = "" }: SecretF
       if (autoHideTimerRef.current) clearTimeout(autoHideTimerRef.current);
       autoHideTimerRef.current = setTimeout(() => {
         hideSecret();
-        toast.info("Password hidden automatically after 15 seconds.");
+        toast.info(`${label} hidden automatically after 15 seconds.`);
       }, 15000);
     } catch {
-      toast.error("Failed to decrypt password.");
+      toast.error(`Failed to decrypt ${label.toLowerCase()}.`);
     } finally {
       setIsLoading(false);
     }
@@ -92,14 +107,20 @@ export function SecretField({ credentialId, projectId, className = "" }: SecretF
   const handleCopy = async () => {
     setIsLoading(true);
     try {
-      const res = await revealCredentialAction({
-        id: credentialId,
-        projectId,
-        action: "copy",
-      });
+      const res = envVariableId
+        ? await revealEnvVariableAction({
+            id: envVariableId,
+            projectId,
+            action: "copy",
+          })
+        : await revealCredentialAction({
+            id: credentialId!,
+            projectId,
+            action: "copy",
+          });
 
       if (!res.success) {
-        toast.error(res.error || "Failed to copy secret.");
+        toast.error(res.error || `Failed to copy ${label.toLowerCase()}.`);
         return;
       }
 
@@ -107,7 +128,7 @@ export function SecretField({ credentialId, projectId, className = "" }: SecretF
       setIsCopied(true);
       setTimeout(() => setIsCopied(false), 2000);
 
-      toast.success("Password copied. Clipboard will be cleared in 30 seconds.");
+      toast.success(`${label} copied. Clipboard will be cleared in 30 seconds.`);
 
       // Clear clipboard after 30 seconds (TASK-083)
       if (clipboardTimerRef.current) clearTimeout(clipboardTimerRef.current);
@@ -129,7 +150,7 @@ export function SecretField({ credentialId, projectId, className = "" }: SecretF
         }
       }, 30000);
     } catch {
-      toast.error("Failed to copy password to clipboard.");
+      toast.error(`Failed to copy ${label.toLowerCase()} to clipboard.`);
     } finally {
       setIsLoading(false);
     }

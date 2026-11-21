@@ -183,19 +183,19 @@ When done, list files changed and how to test it.
 
 ## Phase 10: Environment Variables
 
-- [ ] **TASK-090** Create Zod schemas for env variables
-- [ ] **TASK-091** Create `env-parser.ts` utility to parse and export `.env` text
-- [ ] **TASK-092** Add tests for the env parser (comments, quotes, empty values, duplicates)
-- [ ] **TASK-093** Create `env.service.ts` that encrypts on save 🔒
-- [ ] **TASK-094** Create environment switcher (Dev, Staging, Prod) with environment badges
-- [ ] **TASK-095** Create env variables table using `SecretField`
-- [ ] **TASK-096** Create add and edit variable form
-- [ ] **TASK-097** Create delete variable with confirmation (typed confirmation for Production)
-- [ ] **TASK-098** Create "Paste .env" bulk import dialog with preview
-- [ ] **TASK-099** Create "Export .env" action with audit log 🔒
-- [ ] **TASK-100** Add reveal and copy actions with audit logging 🔒
-- [ ] **TASK-101** Add loading, empty and error states
-- [ ] **TASK-102** Add tests for env variables 🔒
+- [x] **TASK-090** Create Zod schemas for env variables
+- [x] **TASK-091** Create `env-parser.ts` utility to parse and export `.env` text
+- [x] **TASK-092** Add tests for the env parser (comments, quotes, empty values, duplicates)
+- [x] **TASK-093** Create `env.service.ts` that encrypts on save 🔒
+- [x] **TASK-094** Create environment switcher (Dev, Staging, Prod) with environment badges
+- [x] **TASK-095** Create env variables table using `SecretField`
+- [x] **TASK-096** Create add and edit variable form
+- [x] **TASK-097** Create delete variable with confirmation (typed confirmation for Production)
+- [x] **TASK-098** Create "Paste .env" bulk import dialog with preview
+- [x] **TASK-099** Create "Export .env" action with audit log 🔒
+- [x] **TASK-100** Add reveal and copy actions with audit logging 🔒
+- [x] **TASK-101** Add loading, empty and error states
+- [x] **TASK-102** Add tests for env variables 🔒
 
 ---
 

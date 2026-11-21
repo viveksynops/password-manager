@@ -13,9 +13,9 @@ Related documents:
 
 ## Current Status
 
-Phases 1 through 9 are complete. Database schema, security foundation, AES-256-GCM encryption libraries, Supabase clients, fail-closed audit logging, full authentication flow (Login, MFA, password reset, invites), responsive App Layout (shadcn Sidebar, Breadcrumbs, Avatar, DataTable, ThemeToggle), full Team Management (Admin controls, immediate revocation), complete Client Management, complete Project Management (folder-based grid view, project detail view with tabbed sections, member assignment/removal), and complete Credentials Vault (AES-256-GCM password encryption on save, `SecretField` with reveal auto-hide after 15s and copy clipboard auto-clear after 30s, built-in strong password generator, open login site, fail-closed audit logging on all access/mutations, and 92/92 passing unit tests) are implemented, verified, and passing all tests.
+Phases 1 through 10 are complete. Database schema, security foundation, AES-256-GCM encryption libraries, Supabase clients, fail-closed audit logging, full authentication flow (Login, MFA, password reset, invites), responsive App Layout (shadcn Sidebar, Breadcrumbs, Avatar, DataTable, ThemeToggle), full Team Management (Admin controls, immediate revocation), complete Client Management, complete Project Management (folder-based grid view, responsive slide-over edit sheet, project detail view with responsive tabs), complete Credentials Vault (AES-256-GCM password encryption on save, `SecretField` with reveal auto-hide after 15s and copy clipboard auto-clear after 30s), and complete Environment Variables Manager (AES-256-GCM encryption on save, environment switcher for Dev/Staging/Prod, SecretField table, typed delete confirmation for Production, Paste .env bulk import with live preview, Export .env file download with audit logging, and 115/115 passing unit tests) are implemented, verified, and passing all tests.
 
-**Overall progress:** 88 of 138 tasks complete (64%) — 1 skipped per user preference (TASK-005).
+**Overall progress:** 101 of 138 tasks complete (73%) — 1 skipped per user preference (TASK-005).
 
 ---
 
@@ -146,11 +146,28 @@ Phases 1 through 9 are complete. Database schema, security foundation, AES-256-G
 
 ---
 
+### Phase 10: Environment Variables (13/13 complete)
+- [x] **TASK-090**: Create Zod schemas for env variables (`src/features/env-variables/schemas.ts`)
+- [x] **TASK-091**: Create `src/utils/env-parser.ts` utility to parse and export `.env` text (handles quotes, multiline, inline comments, empty values, duplicates)
+- [x] **TASK-092**: Add unit tests for env parser (`src/test/env-parser.test.ts`)
+- [x] **TASK-093**: Create `src/services/env.service.ts` that encrypts on save with AES-256-GCM and unique IVs 🔒
+- [x] **TASK-094**: Create environment switcher (Dev, Staging, Prod) with color-coded badges and counts (`EnvSwitcher.tsx`)
+- [x] **TASK-095**: Create env variables table using `SecretField` with reveal and copy auto-protection (`EnvVariablesTable.tsx`)
+- [x] **TASK-096**: Create add and edit variable form dialog (`EnvVariableFormDialog.tsx`) with key generator
+- [x] **TASK-097**: Create delete variable confirmation with typed key safety confirmation for Production (`DeleteEnvConfirmDialog.tsx`)
+- [x] **TASK-098**: Create "Paste .env" bulk import dialog with live parsing preview and overwrite toggle (`PasteEnvDialog.tsx`)
+- [x] **TASK-099**: Create "Export .env" action with file download and fail-closed audit log (`ExportEnvDialog.tsx`) 🔒
+- [x] **TASK-100**: Add reveal and copy actions with fail-closed audit logging (`revealEnvVariableAction`) 🔒
+- [x] **TASK-101**: Add loading, empty, and error states across environment variables views (`ProjectEnvTab.tsx`)
+- [x] **TASK-102**: Add unit tests for env variables, schemas, encryption round-trip, production confirmation, and export (`src/test/env-variables.test.ts`) 🔒
+
+---
+
 ## Current Task
 
-**TASK-090:** Create Zod schemas for env variables (Phase 10: Environment Variables)
+**TASK-103:** Make sure all sensitive actions write audit logs (review every action) (Phase 11: Audit Logs)
 
-**Phase:** 10, Environment Variables
+**Phase:** 11, Audit Logs
 
 **Status:** Ready to start
 
@@ -169,7 +186,7 @@ Phases 1 through 9 are complete. Database schema, security foundation, AES-256-G
 | 7. Clients | Complete | 9 / 9 |
 | 8. Projects | Complete | 11 / 11 |
 | 9. Credentials Vault | Complete | 15 / 15 |
-| 10. Environment Variables | Not started | 0 / 13 |
+| 10. Environment Variables | Complete | 13 / 13 |
 | 11. Audit Logs | Not started | 0 / 6 |
 | 12. Search and Productivity | Not started | 0 / 5 |
 | 13. Hardening and Quality | Not started | 0 / 9 |
