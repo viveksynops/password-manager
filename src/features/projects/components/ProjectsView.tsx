@@ -4,7 +4,6 @@ import React, { useMemo, useState } from "react";
 import { ProjectWithDetails } from "@/services/project.service";
 import { UserRole, Client, UserProfile } from "@/types/database.types";
 import { ProjectTable } from "./ProjectTable";
-import { ProjectFolderGrid } from "./ProjectFolderGrid";
 import { ProjectFormDialog } from "./ProjectFormDialog";
 import { EmptyState } from "@/components/empty-state";
 import { Button } from "@/components/ui/button";
@@ -17,8 +16,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FolderLock, Plus, Search, FilterX, LayoutGrid, List } from "lucide-react";
-import { useProjectStore, ProjectStatusFilter, ProjectViewMode } from "../store";
+import { FolderLock, Plus, Search, FilterX } from "lucide-react";
+import { useProjectStore, ProjectStatusFilter } from "../store";
 
 interface ProjectsViewProps {
   initialProjects: ProjectWithDetails[];
@@ -40,11 +39,9 @@ export function ProjectsView({
     searchQuery,
     statusFilter,
     clientFilter,
-    viewMode,
     setSearchQuery,
     setStatusFilter,
     setClientFilter,
-    setViewMode,
     resetFilters,
   } = useProjectStore();
 
@@ -149,43 +146,17 @@ export function ProjectsView({
           )}
         </div>
 
-        <div className="flex items-center gap-2 self-start sm:self-auto">
-          {/* Status Tabs */}
-          <Tabs
-            value={statusFilter}
-            onValueChange={(val) => setStatusFilter(val as ProjectStatusFilter)}
-          >
-            <TabsList>
-              <TabsTrigger value="active">Active</TabsTrigger>
-              <TabsTrigger value="archived">Archived</TabsTrigger>
-              <TabsTrigger value="all">All</TabsTrigger>
-            </TabsList>
-          </Tabs>
-
-          {/* View Mode Toggle (Folders vs Table) */}
-          <div className="flex items-center rounded-lg border bg-muted/30 p-0.5">
-            <Button
-              variant={viewMode === "folders" ? "secondary" : "ghost"}
-              size="icon"
-              className="size-8"
-              onClick={() => setViewMode("folders")}
-              title="Folder View"
-              aria-label="Folder View"
-            >
-              <LayoutGrid className="size-4" />
-            </Button>
-            <Button
-              variant={viewMode === "table" ? "secondary" : "ghost"}
-              size="icon"
-              className="size-8"
-              onClick={() => setViewMode("table")}
-              title="Table View"
-              aria-label="Table View"
-            >
-              <List className="size-4" />
-            </Button>
-          </div>
-        </div>
+        {/* Status Tabs */}
+        <Tabs
+          value={statusFilter}
+          onValueChange={(val) => setStatusFilter(val as ProjectStatusFilter)}
+        >
+          <TabsList>
+            <TabsTrigger value="active">Active</TabsTrigger>
+            <TabsTrigger value="archived">Archived</TabsTrigger>
+            <TabsTrigger value="all">All</TabsTrigger>
+          </TabsList>
+        </Tabs>
       </div>
 
       {/* Content State */}
@@ -202,9 +173,9 @@ export function ProjectsView({
             action={
               canManage
                 ? {
-                    label: "Create Project",
-                    onClick: () => setCreateDialogOpen(true),
-                  }
+                  label: "Create Project",
+                  onClick: () => setCreateDialogOpen(true),
+                }
                 : undefined
             }
           />
@@ -219,12 +190,6 @@ export function ProjectsView({
             }}
           />
         )
-      ) : viewMode === "folders" ? (
-        <ProjectFolderGrid
-          projects={filteredProjects}
-          userRole={userRole}
-          clients={clients}
-        />
       ) : (
         <ProjectTable
           projects={filteredProjects}

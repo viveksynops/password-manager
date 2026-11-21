@@ -136,13 +136,13 @@ export function SecretField({ credentialId, projectId, className = "" }: SecretF
   };
 
   return (
-    <div className={`inline-flex items-center gap-2 font-mono text-sm ${className}`}>
+    <div className={`inline-flex items-center gap-1.5 font-mono ${className}`}>
       {/* Secret text or masked dots */}
       <span
-        className={`px-2 py-0.5 rounded select-all ${
+        className={`inline-flex items-center px-2 py-1 rounded text-xs transition-colors ${
           isRevealed
-            ? "bg-muted font-mono text-foreground font-medium text-xs tracking-normal"
-            : "text-muted-foreground tracking-widest text-base select-none"
+            ? "bg-muted font-mono text-foreground font-medium select-all"
+            : "bg-muted/40 text-muted-foreground font-mono tracking-wider select-none"
         }`}
       >
         {isRevealed && secretValue ? secretValue : "••••••••••••"}
@@ -152,7 +152,7 @@ export function SecretField({ credentialId, projectId, className = "" }: SecretF
       {isRevealed && secondsRemaining > 0 && (
         <Badge
           variant="outline"
-          className="text-[10px] px-1.5 py-0 h-5 font-mono text-amber-500 border-amber-500/30 bg-amber-500/10"
+          className="text-[10px] px-1.5 py-0 h-5 font-mono text-amber-500 border-amber-500/30 bg-amber-500/10 shrink-0"
           title="Auto-hides in"
         >
           {secondsRemaining}s
@@ -163,7 +163,7 @@ export function SecretField({ credentialId, projectId, className = "" }: SecretF
       <Button
         variant="ghost"
         size="icon"
-        className="size-7 text-muted-foreground hover:text-foreground"
+        className="size-7 text-muted-foreground hover:text-foreground shrink-0"
         onClick={handleToggleReveal}
         disabled={isLoading}
         aria-label={isRevealed ? "Hide password" : "Reveal password"}
@@ -182,7 +182,7 @@ export function SecretField({ credentialId, projectId, className = "" }: SecretF
       <Button
         variant="ghost"
         size="icon"
-        className="size-7 text-muted-foreground hover:text-foreground"
+        className="size-7 text-muted-foreground hover:text-foreground shrink-0"
         onClick={handleCopy}
         disabled={isLoading}
         aria-label="Copy password"

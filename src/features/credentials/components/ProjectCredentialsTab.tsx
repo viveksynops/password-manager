@@ -178,21 +178,21 @@ export function ProjectCredentialsTab({
         <div className="rounded-md border bg-card overflow-hidden shadow-xs">
           <Table>
             <TableHeader>
-              <TableRow>
-                <TableHead className="w-[200px]">Service</TableHead>
-                <TableHead>Username / Email</TableHead>
-                <TableHead className="w-[240px]">Password</TableHead>
-                <TableHead>Notes</TableHead>
-                <TableHead className="w-[70px] text-right">Actions</TableHead>
+              <TableRow className="bg-muted/30">
+                <TableHead className="w-[22%] min-w-[170px] pl-4">Service</TableHead>
+                <TableHead className="w-[28%] min-w-[220px]">Username / Email</TableHead>
+                <TableHead className="w-[28%] min-w-[240px]">Password</TableHead>
+                <TableHead className="min-w-[150px]">Notes</TableHead>
+                <TableHead className="w-[80px] text-right pr-4">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {filteredCredentials.map((cred) => (
-                <TableRow key={cred.id} className="hover:bg-muted/50 transition-colors">
+                <TableRow key={cred.id} className="hover:bg-muted/50 transition-colors h-14">
                   {/* Service Name & Site Link */}
-                  <TableCell>
-                    <div className="flex flex-col">
-                      <span className="font-semibold text-foreground text-sm">
+                  <TableCell className="pl-4">
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-medium text-foreground text-sm">
                         {cred.service_name}
                       </span>
                       {cred.login_url && (
@@ -200,11 +200,10 @@ export function ProjectCredentialsTab({
                           href={cred.login_url}
                           target="_blank"
                           rel="noreferrer"
-                          className="inline-flex items-center text-xs text-primary hover:underline mt-0.5"
-                          title="Open login site (TASK-085)"
+                          className="inline-flex items-center text-muted-foreground hover:text-primary transition-colors"
+                          title={`Open site (${cred.login_url})`}
                         >
-                          Open site
-                          <ExternalLink className="ml-1 size-3" />
+                          <ExternalLink className="size-3.5" />
                         </a>
                       )}
                     </div>
@@ -219,15 +218,15 @@ export function ProjectCredentialsTab({
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="size-6 text-muted-foreground hover:text-foreground"
+                        className="size-7 text-muted-foreground hover:text-foreground shrink-0"
                         onClick={() => handleCopyUsername(cred.id, cred.username)}
                         aria-label="Copy username"
                         title="Copy username"
                       >
                         {copiedUsernameId === cred.id ? (
-                          <Check className="size-3 text-emerald-500" />
+                          <Check className="size-3.5 text-emerald-500" />
                         ) : (
-                          <Copy className="size-3" />
+                          <Copy className="size-3.5" />
                         )}
                       </Button>
                     </div>
@@ -239,57 +238,59 @@ export function ProjectCredentialsTab({
                   </TableCell>
 
                   {/* Notes */}
-                  <TableCell className="text-xs text-muted-foreground max-w-xs">
+                  <TableCell className="text-xs text-muted-foreground">
                     {cred.notes ? (
-                      <span className="line-clamp-2" title={cred.notes}>
+                      <span className="line-clamp-1 max-w-[220px]" title={cred.notes}>
                         {cred.notes}
                       </span>
                     ) : (
-                      <span className="text-muted-foreground/50">—</span>
+                      <span className="text-muted-foreground/40">—</span>
                     )}
                   </TableCell>
 
                   {/* Actions Dropdown */}
-                  <TableCell className="text-right">
-                    <DropdownMenu>
-                      <DropdownMenuTrigger
-                        render={
-                          <Button
-                            variant="ghost"
-                            size="icon"
-                            className="size-8"
-                            aria-label={`Actions for ${cred.service_name}`}
-                          />
-                        }
-                      >
-                        <MoreHorizontal className="size-4" />
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        {cred.login_url && (
-                          <DropdownMenuItem
-                            render={<a href={cred.login_url} target="_blank" rel="noreferrer" />}
-                          >
-                            <ExternalLink className="mr-2 size-4" />
-                            Open Site
-                          </DropdownMenuItem>
-                        )}
+                  <TableCell className="text-right pr-4">
+                    <div className="flex justify-end">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger
+                          render={
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              className="size-8"
+                              aria-label={`Actions for ${cred.service_name}`}
+                            />
+                          }
+                        >
+                          <MoreHorizontal className="size-4" />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          {cred.login_url && (
+                            <DropdownMenuItem
+                              render={<a href={cred.login_url} target="_blank" rel="noreferrer" />}
+                            >
+                              <ExternalLink className="mr-2 size-4" />
+                              Open Site
+                            </DropdownMenuItem>
+                          )}
 
-                        <DropdownMenuItem onClick={() => handleEdit(cred)}>
-                          <Edit2 className="mr-2 size-4" />
-                          Edit Credential
-                        </DropdownMenuItem>
-
-                        {canManage && (
-                          <DropdownMenuItem
-                            onClick={() => handleDeleteClick(cred)}
-                            className="text-destructive focus:text-destructive"
-                          >
-                            <Trash2 className="mr-2 size-4" />
-                            Delete Credential
+                          <DropdownMenuItem onClick={() => handleEdit(cred)}>
+                            <Edit2 className="mr-2 size-4" />
+                            Edit Credential
                           </DropdownMenuItem>
-                        )}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+
+                          {canManage && (
+                            <DropdownMenuItem
+                              onClick={() => handleDeleteClick(cred)}
+                              className="text-destructive focus:text-destructive"
+                            >
+                              <Trash2 className="mr-2 size-4" />
+                              Delete Credential
+                            </DropdownMenuItem>
+                          )}
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))}
