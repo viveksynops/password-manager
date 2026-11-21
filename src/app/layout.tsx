@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono, Inter } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import { Toaster } from "@/components/ui/sonner";
+import { ThemeProvider } from "@/components/theme-provider";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -15,17 +17,20 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-import { Toaster } from "@/components/ui/sonner";
-
 export const metadata: Metadata = {
   title: "Company Vault - Internal Secrets Manager",
   description: "Internal password and secrets manager for client projects",
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
   return (
     <html
       lang="en"
+      suppressHydrationWarning
       className={cn(
         "h-full",
         "antialiased",
@@ -35,9 +40,16 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         inter.variable
       )}
     >
-      <body className="min-h-full flex flex-col">
-        {children}
-        <Toaster position="top-right" richColors />
+      <body className="min-h-full flex flex-col bg-background text-foreground">
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+          <Toaster position="top-right" richColors />
+        </ThemeProvider>
       </body>
     </html>
   );

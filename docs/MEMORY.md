@@ -13,9 +13,9 @@ Related documents:
 
 ## Current Status
 
-Phases 1, 2, 3, and 4 are complete. Database schema and security foundation, AES-256-GCM encryption libraries, Supabase clients, audit logging, and full authentication flow (Login, MFA enrollment/verify, forgot/reset password, invite acceptance, and middleware guards) are implemented and verified. Test accounts have been seeded in Supabase Auth.
+Phases 1, 2, 3, 4, and 5 are complete. Database schema, security foundation, AES-256-GCM encryption libraries, Supabase clients, fail-closed audit logging, full authentication flow (Login, MFA enrollment/verify, forgot/reset password, invite acceptance, and middleware guards), and responsive App Layout (composed with official shadcn components: `Sidebar`, `SidebarProvider`, `SidebarInset`, `SidebarTrigger`, `Breadcrumb`, `Avatar`, `DataTable`, `EmptyState`, `ErrorState`, `ConfirmDialog`, `ThemeToggle`, and the dashboard overview home page) are implemented, verified, and passing all tests.
 
-**Overall progress:** 40 of 138 tasks complete (29%) — 1 skipped per user preference (TASK-005).
+**Overall progress:** 47 of 138 tasks complete (34%) — 1 skipped per user preference (TASK-005).
 
 ---
 
@@ -80,23 +80,26 @@ Phases 1, 2, 3, and 4 are complete. Database schema and security foundation, AES
 - [x] **TASK-038**: Add logout (`logoutAction`) and session refresh handling
 - [x] **TASK-039**: Create forgot password (`/forgot-password`) and reset password (`/reset-password`) flow
 - [x] **TASK-040**: Create accept-invite page (`/accept-invite`) for new team members
-- [x] **TASK-041**: Add authentication schema tests in `src/test/auth-schemas.test.ts` (30 unit tests passing)
+- [x] **TASK-041**: Add authentication schema tests in `src/test/auth-schemas.test.ts`
+
+### Phase 5: App Layout (7/7 complete)
+- [x] **TASK-042**: Create dashboard layout with official shadcn sidebar (`SidebarProvider`, `Sidebar`, `SidebarInset`) and header
+- [x] **TASK-043**: Make sidebar responsive (built-in mobile Sheet and `SidebarTrigger`)
+- [x] **TASK-044**: Show sidebar items by role (hide Team and Audit Logs from developer role)
+- [x] **TASK-045**: Add official shadcn `Breadcrumb` component (`src/components/layout/Breadcrumbs.tsx`)
+- [x] **TASK-046**: Add dark mode toggle with `next-themes` (`src/components/layout/ThemeToggle.tsx`)
+- [x] **TASK-047**: Create reusable `DataTable`, `EmptyState`, `ErrorState`, and `ConfirmDialog` components using shadcn primitives
+- [x] **TASK-048**: Create dashboard home page (`src/app/(dashboard)/page.tsx` < 25 lines) with client/project metric cards and quick actions
 
 ---
 
 ## Current Task
 
-**TASK-042:** Create dashboard layout with sidebar and header (Phase 5: App Layout)
+**TASK-049:** Create `user.service.ts` (Phase 6: Team Management)
 
-**Phase:** 5, App Layout
+**Phase:** 6, Team Management (Admin)
 
 **Status:** Ready to start
-
----
-
-## In Progress
-
-- Next: Phase 5 (App Layout: sidebar, header, responsive sheet, role-based navigation, breadcrumbs, dark mode toggle, shared data tables, and dashboard home page).
 
 ---
 
@@ -108,7 +111,7 @@ Phases 1, 2, 3, and 4 are complete. Database schema and security foundation, AES
 | 2. Database and Security Foundation | Complete | 12 / 12 |
 | 3. Encryption and Core Libraries | Complete | 7 / 7 |
 | 4. Authentication | Complete | 10 / 10 |
-| 5. App Layout | Not started | 0 / 7 |
+| 5. App Layout | Complete | 7 / 7 |
 | 6. Team Management | Not started | 0 / 6 |
 | 7. Clients | Not started | 0 / 9 |
 | 8. Projects | Not started | 0 / 11 |
@@ -126,14 +129,14 @@ Phases 1, 2, 3, and 4 are complete. Database schema and security foundation, AES
 
 | Item | Status |
 |---|---|
-| Git repository | Initialized, clean working tree on `main` branch |
+| Git repository | Clean working tree on `main` branch |
 | Next.js project | Next.js 16 (Turbopack, App Router, React 19) in `src/` |
 | Supabase remote project | Configured at `https://wyycdjxqffgtraqukqjb.supabase.co` |
 | Database migrations | Initial schema applied in `supabase/migrations/20261121000000_initial_schema.sql` |
 | Permissions grant script | Created in `supabase/setup_profiles.sql` |
 | `MASTER_KEY` | Generated (64-hex chars) in `.env.local` |
-| Test suite | Vitest: 30 / 30 tests passing |
-| Production build | `next build` passing |
+| Test suite | Vitest: 38 / 38 unit tests passing |
+| Production build | `next build` passing with 0 errors |
 
 ---
 
@@ -149,23 +152,10 @@ Phases 1, 2, 3, and 4 are complete. Database schema and security foundation, AES
 
 ## Known Issues and Fixes
 
+- [x] **Fixed:** Replaced custom sidebar and breadcrumb implementations with official shadcn components (`npx shadcn add sidebar breadcrumb avatar`).
 - [x] **Fixed:** Middleware intercepted Server Action RPC requests (`POST /` with `next-action` header), causing `Uncaught Error: An unexpected response was received from the server`. Resolved in `src/middleware.ts` by passing through requests with `next-action` and preserving session cookies.
-- [x] **Fixed:** Tables created via the Supabase Web SQL Editor default to `postgres` owner and need permission grants for `anon`, `authenticated`, and `service_role`. SQL grant script created in `supabase/setup_profiles.sql`.
-- [x] **Fixed:** Supabase TypeScript types missing explicit `Relationships: []` caused insert type inference to evaluate to `never[]`. Fixed in `src/types/database.types.ts`.
-- [x] **Fixed:** Base UI `Field` component expects `data-invalid` instead of `invalid`. Fixed in all auth forms.
-
----
-
-## Next Steps
-
-1. Start **Phase 5: App Layout** (TASK-042 through TASK-048):
-   - **TASK-042**: Create dashboard layout with sidebar and header (`src/app/(dashboard)/layout.tsx`)
-   - **TASK-043**: Make sidebar responsive (sheet on mobile)
-   - **TASK-044**: Show sidebar items by role (hide Admin/Manager items from Developer)
-   - **TASK-045**: Add breadcrumb navigation component
-   - **TASK-046**: Add dark mode toggle (`next-themes`)
-   - **TASK-047**: Create reusable `DataTable`, `EmptyState`, `ErrorState`, and `ConfirmDialog`
-   - **TASK-048**: Build dashboard home page (`src/app/(dashboard)/page.tsx`) with client/project metric cards
+- [x] **Fixed:** Next.js 16 Partial Prefetching / Cache Components blocking dynamic routes: configured `export const instant = false` on dashboard layout.
+- [x] **Fixed:** JSDOM mock for `window.matchMedia` added to `src/test/setup.ts` to support shadcn `useIsMobile`.
 
 ---
 
@@ -178,4 +168,5 @@ Phases 1, 2, 3, and 4 are complete. Database schema and security foundation, AES
 | 2026-11-21 | Completed Phase 2 (Database Schema, Tables, RLS, Helper Functions, Types, RLS Tests, Seed) | Phase 3 |
 | 2026-11-21 | Completed Phase 3 (AES-256-GCM Crypto, Supabase Clients, Auth Helpers, Audit Service) | Phase 4 |
 | 2026-11-21 | Completed Phase 4 (Full Auth: Login, MFA, Password Reset, Invite Acceptance, Middleware) | Test credentials |
-| 2026-11-21 | Created test accounts in Supabase Auth (`admin`, `manager`, `developer`), resolved Server Action middleware redirect bug, updated docs | Phase 5: App Layout |
+| 2026-11-21 | Created test accounts in Supabase Auth (`admin`, `manager`, `developer`), resolved Server Action middleware redirect bug | Phase 5 |
+| 2026-11-21 | Completed Phase 5 using official shadcn components (`sidebar`, `breadcrumb`, `avatar`, `alert-dialog`, `table`). 38/38 tests passing, build passing | Phase 6: Team Management |

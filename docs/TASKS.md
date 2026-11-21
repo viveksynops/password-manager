@@ -110,13 +110,13 @@ When done, list files changed and how to test it.
 
 ## Phase 5: App Layout
 
-- [ ] **TASK-042** Create dashboard layout with sidebar and header
-- [ ] **TASK-043** Make sidebar responsive (sheet on mobile)
-- [ ] **TASK-044** Show sidebar items by role (hide Admin-only items)
-- [ ] **TASK-045** Add breadcrumb component
-- [ ] **TASK-046** Add dark mode toggle
-- [ ] **TASK-047** Create reusable `DataTable`, `EmptyState`, `ErrorState` and `ConfirmDialog` components
-- [ ] **TASK-048** Create dashboard home page (counts of clients and projects, recent activity)
+- [x] **TASK-042** Create dashboard layout with sidebar and header
+- [x] **TASK-043** Make sidebar responsive (sheet on mobile)
+- [x] **TASK-044** Show sidebar items by role (hide Admin-only items)
+- [x] **TASK-045** Add breadcrumb component
+- [x] **TASK-046** Add dark mode toggle
+- [x] **TASK-047** Create reusable `DataTable`, `EmptyState`, `ErrorState` and `ConfirmDialog` components
+- [x] **TASK-048** Create dashboard home page (counts of clients and projects, recent activity)
 
 ---
 
