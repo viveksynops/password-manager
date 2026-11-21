@@ -9,7 +9,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { FilterX } from "lucide-react";
+import { Activity, Calendar, FilterX, FolderLock, User } from "lucide-react";
 import { useAuditLogStore } from "../store";
 import { UserProfile, Project } from "@/types/database.types";
 
@@ -17,6 +17,29 @@ interface AuditLogsFilterBarProps {
   users: UserProfile[];
   projects: Pick<Project, "id" | "name">[];
 }
+
+const ACTION_LABELS: Record<string, string> = {
+  all: "All Actions",
+  reveal: "Reveal Secret",
+  copy: "Copy Secret",
+  export: "Export .env",
+  create: "Create",
+  update: "Update",
+  delete: "Delete",
+  login: "Login",
+  failed_login: "Failed Login",
+  mfa_verify: "MFA Verified",
+  invite: "Invite",
+  role_change: "Role Change",
+  deactivate: "Deactivate",
+};
+
+const DATE_RANGE_LABELS: Record<string, string> = {
+  all: "All Time",
+  today: "Today",
+  "7d": "Last 7 Days",
+  "30d": "Last 30 Days",
+};
 
 export function AuditLogsFilterBar({ users, projects }: AuditLogsFilterBarProps) {
   const {
@@ -37,13 +60,25 @@ export function AuditLogsFilterBar({ users, projects }: AuditLogsFilterBarProps)
     projectId !== "all" ||
     dateRange !== "all";
 
+  const selectedUser = users.find((u) => u.id === userId);
+  const userLabel = selectedUser ? (selectedUser.email || selectedUser.full_name || "User") : "All Actors";
+
+  const selectedProject = projects.find((p) => p.id === projectId);
+  const projectLabel = selectedProject ? selectedProject.name : "All Projects";
+
   return (
-    <div className="flex flex-wrap items-center gap-2.5">
+    <div className="rounded-lg border bg-card/60 p-2.5 flex flex-wrap items-center gap-2.5 shadow-xs">
       {/* Action Filter */}
-      <div className="w-full sm:w-44">
+      <div className="w-full sm:w-52">
         <Select value={action} onValueChange={(val) => setAction(val ?? "all")}>
-          <SelectTrigger className="h-9 text-xs">
-            <SelectValue placeholder="All Actions" />
+          <SelectTrigger className="h-9 text-xs w-full">
+            <div className="flex items-center gap-1.5 truncate">
+              <Activity className="size-3.5 text-muted-foreground shrink-0" />
+              <span className="text-muted-foreground font-normal">Action:</span>
+              <SelectValue>
+                {ACTION_LABELS[action] || "All Actions"}
+              </SelectValue>
+            </div>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Actions</SelectItem>
@@ -64,13 +99,19 @@ export function AuditLogsFilterBar({ users, projects }: AuditLogsFilterBarProps)
       </div>
 
       {/* User Filter */}
-      <div className="w-full sm:w-48">
+      <div className="w-full sm:w-56">
         <Select value={userId} onValueChange={(val) => setUserId(val ?? "all")}>
-          <SelectTrigger className="h-9 text-xs">
-            <SelectValue placeholder="All Users" />
+          <SelectTrigger className="h-9 text-xs w-full">
+            <div className="flex items-center gap-1.5 truncate">
+              <User className="size-3.5 text-muted-foreground shrink-0" />
+              <span className="text-muted-foreground font-normal">Actor:</span>
+              <SelectValue>
+                {userLabel}
+              </SelectValue>
+            </div>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All Users</SelectItem>
+            <SelectItem value="all">All Actors</SelectItem>
             {users.map((u) => (
               <SelectItem key={u.id} value={u.id}>
                 {u.email}
@@ -81,10 +122,16 @@ export function AuditLogsFilterBar({ users, projects }: AuditLogsFilterBarProps)
       </div>
 
       {/* Project Filter */}
-      <div className="w-full sm:w-44">
+      <div className="w-full sm:w-48">
         <Select value={projectId} onValueChange={(val) => setProjectId(val ?? "all")}>
-          <SelectTrigger className="h-9 text-xs">
-            <SelectValue placeholder="All Projects" />
+          <SelectTrigger className="h-9 text-xs w-full">
+            <div className="flex items-center gap-1.5 truncate">
+              <FolderLock className="size-3.5 text-muted-foreground shrink-0" />
+              <span className="text-muted-foreground font-normal">Project:</span>
+              <SelectValue>
+                {projectLabel}
+              </SelectValue>
+            </div>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Projects</SelectItem>
@@ -98,13 +145,19 @@ export function AuditLogsFilterBar({ users, projects }: AuditLogsFilterBarProps)
       </div>
 
       {/* Date Range Filter */}
-      <div className="w-full sm:w-36">
+      <div className="w-full sm:w-44">
         <Select
           value={dateRange}
           onValueChange={(val) => setDateRange(((val as any) ?? "all") as "all" | "today" | "7d" | "30d")}
         >
-          <SelectTrigger className="h-9 text-xs">
-            <SelectValue placeholder="Date Range" />
+          <SelectTrigger className="h-9 text-xs w-full">
+            <div className="flex items-center gap-1.5 truncate">
+              <Calendar className="size-3.5 text-muted-foreground shrink-0" />
+              <span className="text-muted-foreground font-normal">Time:</span>
+              <SelectValue>
+                {DATE_RANGE_LABELS[dateRange] || "All Time"}
+              </SelectValue>
+            </div>
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Time</SelectItem>
