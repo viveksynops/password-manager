@@ -1,6 +1,7 @@
 import React from "react";
 import { getCurrentUser } from "@/lib/auth";
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
 import { SidebarProvider, SidebarInset } from "@/components/ui/sidebar";
 import { Sidebar } from "@/components/layout/Sidebar";
 import { Header } from "@/components/layout/Header";
@@ -12,6 +13,8 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode;
 }) {
+  // Session initialization must run for a real request, outside prerendering.
+  await connection();
   const user = await getCurrentUser();
 
   if (!user) {

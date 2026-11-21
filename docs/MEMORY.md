@@ -242,7 +242,7 @@ Phases 1 through 11 are complete. Database schema, security foundation, AES-256-
 | Supabase remote project | Configured at `https://wyycdjxqffgtraqukqjb.supabase.co` |
 | Database migrations | Migrations in `supabase/migrations/` |
 | `MASTER_KEY` | Generated (64-hex chars) in `.env.local` |
-| Test suite | Vitest: 136 / 136 unit tests passing |
+| Test suite | Vitest: 138 / 138 unit tests passing |
 | Production build | `next build` passing with 0 errors |
 
 ---
