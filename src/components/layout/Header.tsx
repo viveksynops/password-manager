@@ -33,15 +33,15 @@ export function Header({ user }: HeaderProps) {
     .toUpperCase();
 
   return (
-    <header className="sticky top-0 z-40 flex h-16 shrink-0 items-center justify-between gap-3 border-b bg-background/95 px-4 backdrop-blur transition-[width,height] ease-linear w-full max-w-full">
-      <div className="flex items-center gap-2 min-w-0 overflow-hidden">
+    <header className="sticky top-0 z-40 flex h-16 w-full min-w-0 shrink-0 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur">
+      <div className="flex min-w-0 flex-1 items-center gap-2">
         {/* Built-in shadcn SidebarTrigger handles both desktop collapse and mobile sheet toggle */}
         <SidebarTrigger className="-ml-1 shrink-0" />
         <Separator orientation="vertical" className="mr-2 h-4 shrink-0" />
         <Breadcrumbs />
       </div>
 
-      <div className="flex items-center gap-3 shrink-0">
+      <div className="ml-auto flex shrink-0 items-center gap-2 sm:gap-3">
         <GlobalSearchButton />
         <Badge
           variant={roleBadgeVariant}

@@ -93,6 +93,7 @@ export function ProjectDetailView({
           <Button
             variant="outline"
             size="icon"
+            nativeButton={false}
             render={<Link href="/projects" />}
             aria-label="Back to Projects"
           >
@@ -126,14 +127,14 @@ export function ProjectDetailView({
         {/* Action Buttons */}
         <div className="flex items-center gap-2 self-start sm:self-auto">
           {project.live_url && (
-            <Button variant="outline" size="sm" render={<a href={project.live_url} target="_blank" rel="noreferrer" />}>
+            <Button variant="outline" size="sm" nativeButton={false} render={<a href={project.live_url} target="_blank" rel="noreferrer" />}>
               <Globe className="mr-1.5 size-3.5" />
               Live Site
             </Button>
           )}
 
           {project.repo_url && (
-            <Button variant="outline" size="sm" render={<a href={project.repo_url} target="_blank" rel="noreferrer" />}>
+            <Button variant="outline" size="sm" nativeButton={false} render={<a href={project.repo_url} target="_blank" rel="noreferrer" />}>
               <GitBranch className="mr-1.5 size-3.5" />
               Repo
             </Button>

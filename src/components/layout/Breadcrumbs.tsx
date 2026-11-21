@@ -28,10 +28,10 @@ export function Breadcrumbs() {
   // If at root dashboard
   if (pathname === "/") {
     return (
-      <Breadcrumb>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbPage>Dashboard</BreadcrumbPage>
+      <Breadcrumb className="min-w-0">
+        <BreadcrumbList className="flex-nowrap">
+          <BreadcrumbItem className="min-w-0">
+            <BreadcrumbPage className="truncate">Dashboard</BreadcrumbPage>
           </BreadcrumbItem>
         </BreadcrumbList>
       </Breadcrumb>
@@ -57,17 +57,17 @@ export function Breadcrumbs() {
   });
 
   return (
-    <Breadcrumb>
-      <BreadcrumbList>
-        <BreadcrumbItem>
+    <Breadcrumb className="min-w-0">
+      <BreadcrumbList className="flex-nowrap">
+        <BreadcrumbItem className="hidden shrink-0 md:inline-flex">
           <BreadcrumbLink render={<Link href="/" />}>Dashboard</BreadcrumbLink>
         </BreadcrumbItem>
         {crumbs.map((crumb) => (
           <React.Fragment key={crumb.href}>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
+            <BreadcrumbSeparator className="hidden shrink-0 md:block" />
+            <BreadcrumbItem className={crumb.isLast ? "min-w-0" : "hidden shrink-0 md:inline-flex"}>
               {crumb.isLast ? (
-                <BreadcrumbPage>{crumb.label}</BreadcrumbPage>
+                <BreadcrumbPage className="truncate">{crumb.label}</BreadcrumbPage>
               ) : (
                 <BreadcrumbLink render={<Link href={crumb.href} />}>
                   {crumb.label}

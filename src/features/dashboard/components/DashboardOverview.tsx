@@ -123,6 +123,7 @@ export function DashboardOverview({ user, metrics }: DashboardOverviewProps) {
           <CardContent className="grid gap-2.5">
             <Button
               variant="outline"
+              nativeButton={false}
               render={<Link href="/projects" />}
               className="justify-start"
             >
@@ -131,6 +132,7 @@ export function DashboardOverview({ user, metrics }: DashboardOverviewProps) {
             </Button>
             <Button
               variant="outline"
+              nativeButton={false}
               render={<Link href="/clients" />}
               className="justify-start"
             >
@@ -141,6 +143,7 @@ export function DashboardOverview({ user, metrics }: DashboardOverviewProps) {
               <>
                 <Button
                   variant="outline"
+                  nativeButton={false}
                   render={<Link href="/team" />}
                   className="justify-start"
                 >
@@ -149,6 +152,7 @@ export function DashboardOverview({ user, metrics }: DashboardOverviewProps) {
                 </Button>
                 <Button
                   variant="outline"
+                  nativeButton={false}
                   render={<Link href="/audit-logs" />}
                   className="justify-start"
                 >

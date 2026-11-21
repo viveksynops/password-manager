@@ -222,6 +222,10 @@ When done, list files changed and how to test it.
 
 ## Phase 13: Hardening and Quality
 
+Completed UI fix (2026-11-21): bounded header search width, compact mobile search, and shrinking single-line breadcrumbs removed header-induced horizontal page scrolling. Browser checked at 360px/768px/1536px and with tablet sidebar collapsed; targeted ESLint, TypeScript, 136 tests, and production build passed. Separate search-dialog runtime/prerender errors remain for follow-up (see MEMORY.md). TASK-114 remains next.
+
+Orientation note (2026-11-21): documentation and representative code reviewed; no implementation task completed or tests rerun. TASK-114 remains next. Before release, review plaintext credential custom fields under TASK-116/TASK-117 and test actual database policies under TASK-120; the current RLS unit tests model permissions locally. See MEMORY.md for evidence and documentation drift.
+
 - [ ] **TASK-114** Add rate limiting on login and reveal actions 🔒
 - [ ] **TASK-115** Add security headers (CSP, HSTS, X-Frame-Options, Referrer-Policy)
 - [ ] **TASK-116** Search the codebase to confirm no secrets are logged or returned in errors 🔒

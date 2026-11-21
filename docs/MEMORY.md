@@ -15,7 +15,16 @@ Related documents:
 
 Phases 1 through 11 are complete. Database schema, security foundation, AES-256-GCM encryption libraries, Supabase clients, fail-closed audit logging, full authentication flow (Login, MFA, password reset, invites), responsive App Layout (shadcn Sidebar, Breadcrumbs, Avatar, DataTable, ThemeToggle), full Team Management (Admin controls, immediate revocation), complete Client Management, complete Project Management (folder-based grid view, responsive slide-over edit sheet, project detail view with responsive tabs), complete Credentials Vault (AES-256-GCM password encryption on save, `SecretField` with reveal auto-hide after 15s and copy clipboard auto-clear after 30s), complete Environment Variables Manager (AES-256-GCM encryption on save, environment switcher for Dev/Staging/Prod, SecretField table, typed delete confirmation for Production, Paste .env bulk import with live preview, Export .env file download with audit logging), and complete Audit Logs (Admin-only immutable append-only ledger, action/user/project/date filters, pagination, relative time with full timestamp hover tooltip, metadata inspector, and 122/122 passing unit tests) are implemented, verified, and passing all tests.
 
-**Overall progress:** 107 of 138 tasks complete (78%) — 1 skipped per user preference (TASK-005).
+**Overall progress:** 112 of 138 tasks marked complete (81%) — 1 skipped per user preference (TASK-005). Phase 12 is also marked complete; TASK-114 is next. The preceding narrative and historical verification counts describe an earlier snapshot, not a fresh verification.
+
+### Documentation and code orientation (2026-11-21)
+
+- Read all project documents and inspected representative routes, auth helpers, actions, services, secret handling, search, favorites, and tests. No application code changed; no tests, build, live database checks, or browser verification were run in this session.
+- Working structure: client -> project -> credentials and environment variables; Next.js App Router UI -> server actions -> services -> user-session Supabase client, with server-only crypto. Admin manages users and audit logs; Manager manages clients/projects; Developer access is scoped by project membership. Secret mutation permissions need to be read from the implementation and policies: the test-plan matrix still leaves Developer deletion unresolved.
+- Security follow-up: credential custom fields are serialized into plaintext `notes` by `src/utils/credential-fields.ts`, saved and returned by `src/services/credential.service.ts`, and displayed/copied directly in `ProjectCredentialsTab.tsx`. Fields intended for API keys or other secrets do not receive the password encryption, SecretField masking, or audited reveal/copy controls. This conflicts with the documented secret-handling requirements and needs review before release.
+- Verification limitation: `src/test/rls-policies.test.ts` models access rules with local functions; it does not execute database RLS policies. Historical passing unit-test counts do not establish live RLS enforcement or end-to-end security.
+- Documentation drift: DESIGN.md still describes theme switching, while AGENTS.md mandates permanent dark mode and the root layout forces dark mode. Follow AGENTS.md. Search/favorites services also contain explicit `any` despite the strict typing rule.
+- TASK-114 remains unstarted. No production readiness claim was established by this orientation.
 
 ---
 
@@ -185,6 +194,14 @@ Phases 1 through 11 are complete. Database schema, security foundation, AES-256-
 ---
 
 ## Current Task
+
+### Header overflow fix (2026-11-21)
+
+- Fixed the header action group's sizing: the search button used `w-full` inside an intrinsically sized flex group, so the button grew beyond the group's allocated width and pushed the role badge and avatar outside the viewport. Search now uses explicit responsive widths and an icon-only mobile presentation. Header navigation takes the remaining space; breadcrumbs stay on one line, truncate the current label, and show only the current crumb below `md`.
+- Changed only `src/components/global-search-button.tsx`, `src/components/layout/Header.tsx`, and `src/components/layout/Breadcrumbs.tsx` plus task/memory documentation. No shadcn primitives changed.
+- Browser measurements: before, a 1536px viewport had 1619px document scroll width; after, document scroll width equals viewport width at 360px, 768px, and 1536px. Confirmed tablet sidebar collapse also retains a fitting header. Restored the original desktop viewport and expanded sidebar.
+- Validation: targeted ESLint and TypeScript checks passed; all 136 tests passed; production build passed. Build retains existing middleware deprecation and Turbopack root warnings.
+- Separate follow-up: opening global search produced a runtime error (`Cannot read properties of undefined (reading 'subscribe')`), and the dev overlay also reported blocking `Date.now()` prerender diagnostics. Search interaction is not verified as working; these issues were not changed in this CSS layout fix. Reload restored the dashboard.
 
 **TASK-114:** Add rate limiting on login and reveal actions (Phase 13: Hardening and Quality)
 

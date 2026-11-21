@@ -48,7 +48,7 @@ export function ClientDetailView({ client, userRole }: ClientDetailViewProps) {
       {/* Back button & Title */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
-          <Button variant="outline" size="icon" render={<Link href="/clients" />} aria-label="Back to Clients">
+          <Button variant="outline" size="icon" nativeButton={false} render={<Link href="/clients" />} aria-label="Back to Clients">
             <ArrowLeft className="size-4" />
           </Button>
           <div>

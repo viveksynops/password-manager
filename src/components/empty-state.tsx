@@ -31,7 +31,7 @@ export function EmptyState({
       <p className="text-sm text-muted-foreground max-w-sm mb-6">{description}</p>
       {action && (
         action.href ? (
-          <Button render={<Link href={action.href} />}>{action.label}</Button>
+          <Button nativeButton={false} render={<Link href={action.href} />}>{action.label}</Button>
         ) : (
           <Button onClick={action.onClick}>{action.label}</Button>
         )
