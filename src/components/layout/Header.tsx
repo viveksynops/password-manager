@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Breadcrumbs } from "./Breadcrumbs";
 import { UserRole } from "@/types/database.types";
 import { Badge } from "@/components/ui/badge";
+import { GlobalSearchButton } from "@/components/global-search-button";
 
 interface HeaderProps {
   user: {
@@ -41,6 +42,7 @@ export function Header({ user }: HeaderProps) {
       </div>
 
       <div className="flex items-center gap-3">
+        <GlobalSearchButton />
         <Badge
           variant={roleBadgeVariant}
           className="hidden sm:inline-flex capitalize text-xs font-normal"

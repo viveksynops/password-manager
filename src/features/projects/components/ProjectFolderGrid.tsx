@@ -27,7 +27,9 @@ import {
   Globe,
   GitBranch,
   ChevronRight,
+  Star,
 } from "lucide-react";
+import { useFavoritesStore } from "@/features/favorites/store";
 import { ProjectEditSheet } from "./ProjectEditSheet";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { archiveProjectAction } from "@/actions/project.actions";
@@ -43,6 +45,7 @@ interface ProjectFolderGridProps {
 export function ProjectFolderGrid({ projects, userRole, clients }: ProjectFolderGridProps) {
   const router = useRouter();
   const [, startTransition] = useTransition();
+  const { isProjectFavorited, toggleProjectFavorite } = useFavoritesStore();
 
   // Edit dialog state
   const [editingProject, setEditingProject] = useState<ProjectWithDetails | null>(null);
@@ -111,6 +114,20 @@ export function ProjectFolderGrid({ projects, userRole, clients }: ProjectFolder
               </Link>
 
               <div className="flex items-center gap-1.5">
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className={`size-7 ${isProjectFavorited(proj.id) ? "text-amber-400 hover:text-amber-300" : "text-muted-foreground/40 hover:text-foreground"}`}
+                  onClick={(e) => {
+                    e.preventDefault();
+                    toggleProjectFavorite(proj.id);
+                  }}
+                  aria-label={isProjectFavorited(proj.id) ? "Remove from favorites" : "Add to favorites"}
+                  title={isProjectFavorited(proj.id) ? "Favorited" : "Add to favorites"}
+                >
+                  <Star className={`size-3.5 ${isProjectFavorited(proj.id) ? "fill-amber-400 text-amber-400" : ""}`} />
+                </Button>
+
                 <Badge variant={proj.is_archived ? "outline" : "default"} className="text-[11px] px-2 py-0">
                   {proj.is_archived ? "Archived" : "Active"}
                 </Badge>

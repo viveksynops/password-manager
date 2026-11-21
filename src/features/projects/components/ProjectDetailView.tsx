@@ -170,9 +170,9 @@ export function ProjectDetailView({
 
       {/* Tabs Layout */}
       <Tabs defaultValue="credentials" className="space-y-6">
-        <div className="w-full overflow-x-auto pb-1">
-          <TabsList className="inline-flex h-10 w-max items-center justify-start gap-1 p-1 bg-muted/60">
-            <TabsTrigger value="credentials" className="gap-2 px-3 py-1.5 text-xs sm:text-sm">
+        <div className="w-full overflow-x-auto pb-1 scrollbar-none">
+          <TabsList className="inline-flex h-10 w-max min-w-full sm:min-w-fit items-center justify-start gap-1 p-1 bg-muted/60 rounded-lg">
+            <TabsTrigger value="credentials" className="shrink-0 flex-none gap-2 px-3.5 py-1.5 text-xs sm:text-sm">
               <KeyRound className="size-4 shrink-0" />
               <span>Credentials</span>
               <Badge variant="secondary" className="px-1.5 py-0 text-[11px] shrink-0">
@@ -180,7 +180,7 @@ export function ProjectDetailView({
               </Badge>
             </TabsTrigger>
 
-            <TabsTrigger value="env" className="gap-2 px-3 py-1.5 text-xs sm:text-sm">
+            <TabsTrigger value="env" className="shrink-0 flex-none gap-2 px-3.5 py-1.5 text-xs sm:text-sm">
               <FileCode2 className="size-4 shrink-0" />
               <span>Env Variables</span>
               <Badge variant="secondary" className="px-1.5 py-0 text-[11px] shrink-0">
@@ -188,7 +188,7 @@ export function ProjectDetailView({
               </Badge>
             </TabsTrigger>
 
-            <TabsTrigger value="members" className="gap-2 px-3 py-1.5 text-xs sm:text-sm">
+            <TabsTrigger value="members" className="shrink-0 flex-none gap-2 px-3.5 py-1.5 text-xs sm:text-sm">
               <Users className="size-4 shrink-0" />
               <span>Team Members</span>
               <Badge variant="secondary" className="px-1.5 py-0 text-[11px] shrink-0">
@@ -196,7 +196,7 @@ export function ProjectDetailView({
               </Badge>
             </TabsTrigger>
 
-            <TabsTrigger value="overview" className="gap-2 px-3 py-1.5 text-xs sm:text-sm">
+            <TabsTrigger value="overview" className="shrink-0 flex-none gap-2 px-3.5 py-1.5 text-xs sm:text-sm">
               <Info className="size-4 shrink-0" />
               <span>Project Info</span>
             </TabsTrigger>

@@ -1,5 +1,14 @@
 import { z } from "zod";
 
+export const credentialCustomFieldSchema = z.object({
+  id: z.string(),
+  label: z.string().trim().min(1, "Field name required").max(50, "Field name too long"),
+  value: z.string().trim().max(1000, "Value too long"),
+  isSecret: z.boolean().default(false),
+});
+
+export type CredentialCustomField = z.infer<typeof credentialCustomFieldSchema>;
+
 export const credentialSchema = z.object({
   projectId: z.string().uuid("Invalid project ID"),
   serviceName: z
@@ -27,6 +36,8 @@ export const credentialSchema = z.object({
     .max(1000, "Notes cannot exceed 1000 characters")
     .optional()
     .or(z.literal("")),
+  tags: z.array(z.string().trim().max(30)).optional().default([]),
+  customFields: z.array(credentialCustomFieldSchema).optional().default([]),
 });
 
 export const createCredentialSchema = credentialSchema;
@@ -60,6 +71,8 @@ export const updateCredentialSchema = z.object({
     .max(1000, "Notes cannot exceed 1000 characters")
     .optional()
     .or(z.literal("")),
+  tags: z.array(z.string().trim().max(30)).optional().default([]),
+  customFields: z.array(credentialCustomFieldSchema).optional().default([]),
 });
 
 export const deleteCredentialSchema = z.object({

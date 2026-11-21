@@ -14,8 +14,9 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { Badge } from "@/components/ui/badge";
 import { Field, FieldLabel, FieldError } from "@/components/ui/field";
-import { Loader2, Wand2, Eye, EyeOff } from "lucide-react";
+import { Loader2, Wand2, Eye, EyeOff, Plus, Trash2, Tag, Key, Database, Shield } from "lucide-react";
 import { z } from "zod";
 import {
   createCredentialAction,
@@ -23,6 +24,8 @@ import {
 } from "@/actions/credential.actions";
 import { CredentialSummary } from "@/services/credential.service";
 import { generatePassword } from "@/utils/password-generator";
+import { CredentialCustomField } from "@/features/credentials/schemas";
+import { parseNotesWithMetadata } from "@/utils/credential-fields";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
@@ -74,6 +77,9 @@ export function CredentialFormDialog({
   const isEditing = !!credential;
   const [isPending, startTransition] = useTransition();
   const [showPassword, setShowPassword] = useState(false);
+  const [customFields, setCustomFields] = useState<CredentialCustomField[]>([]);
+  const [tags, setTags] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState("");
   const router = useRouter();
 
   const {
@@ -96,16 +102,21 @@ export function CredentialFormDialog({
 
   useEffect(() => {
     if (credential) {
+      const parsed = parseNotesWithMetadata(credential.notes);
+      setCustomFields(parsed.customFields);
+      setTags(parsed.tags);
       reset({
         projectId,
         serviceName: credential.service_name,
         loginUrl: credential.login_url || "",
         username: credential.username,
         password: "", // empty means leave unchanged when editing
-        notes: credential.notes || "",
+        notes: parsed.notes,
       });
       setShowPassword(false);
     } else {
+      setCustomFields([]);
+      setTags([]);
       reset({
         projectId,
         serviceName: "",
@@ -116,6 +127,7 @@ export function CredentialFormDialog({
       });
       setShowPassword(false);
     }
+    setTagInput("");
   }, [credential, projectId, reset, open]);
 
   const handleGeneratePassword = () => {
@@ -123,6 +135,44 @@ export function CredentialFormDialog({
     setValue("password", generated, { shouldValidate: true });
     setShowPassword(true);
     toast.success("Generated strong 20-character password.");
+  };
+
+  const handleAddCustomField = (templateName = "") => {
+    const newField: CredentialCustomField = {
+      id: crypto.randomUUID(),
+      label: templateName || "",
+      value: "",
+      isSecret: true,
+    };
+    setCustomFields((prev) => [...prev, newField]);
+  };
+
+  const handleRemoveCustomField = (id: string) => {
+    setCustomFields((prev) => prev.filter((f) => f.id !== id));
+  };
+
+  const handleUpdateCustomField = (
+    id: string,
+    key: "label" | "value" | "isSecret",
+    val: any
+  ) => {
+    setCustomFields((prev) =>
+      prev.map((f) => (f.id === id ? { ...f, [key]: val } : f))
+    );
+  };
+
+  const handleAddTag = (e?: React.KeyboardEvent) => {
+    if (e && e.key !== "Enter" && e.key !== ",") return;
+    if (e) e.preventDefault();
+    const cleanTag = tagInput.trim().replace(/^#/, "").toLowerCase();
+    if (cleanTag && !tags.includes(cleanTag)) {
+      setTags((prev) => [...prev, cleanTag]);
+      setTagInput("");
+    }
+  };
+
+  const handleRemoveTag = (tagToRemove: string) => {
+    setTags((prev) => prev.filter((t) => t !== tagToRemove));
   };
 
   const onSubmit = (data: CredentialFormData) => {
@@ -141,6 +191,8 @@ export function CredentialFormDialog({
           username: data.username,
           password: data.password || undefined,
           notes: data.notes || "",
+          customFields,
+          tags,
         });
 
         if (res.success) {
@@ -158,6 +210,8 @@ export function CredentialFormDialog({
           username: data.username,
           password: data.password!,
           notes: data.notes || "",
+          customFields,
+          tags,
         });
 
         if (res.success) {
@@ -174,13 +228,13 @@ export function CredentialFormDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{isEditing ? "Edit Credential" : "Add Service Credential"}</DialogTitle>
           <DialogDescription>
             {isEditing
-              ? "Update login credentials or service notes. Passwords remain AES-256-GCM encrypted."
-              : "Store an encrypted service login (Supabase, AWS, Cloudinary, etc.) in this project vault."}
+              ? "Update login credentials, API keys, or custom fields. Passwords remain AES-256-GCM encrypted."
+              : "Store an encrypted service login (Supabase, AWS, Cloudinary, etc.) with custom fields."}
           </DialogDescription>
         </DialogHeader>
 
@@ -264,6 +318,139 @@ export function CredentialFormDialog({
             </div>
             {errors.password && <FieldError>{errors.password.message}</FieldError>}
           </Field>
+
+          {/* Tags (TASK-111) */}
+          <Field>
+            <FieldLabel htmlFor="tags">Tags</FieldLabel>
+            <div className="space-y-2">
+              <div className="flex gap-2">
+                <Input
+                  id="tags"
+                  placeholder="Add tag (e.g. aws, prod, database) and press Enter"
+                  value={tagInput}
+                  onChange={(e) => setTagInput(e.target.value)}
+                  onKeyDown={handleAddTag}
+                  disabled={isPending}
+                  className="text-xs"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => handleAddTag()}
+                  disabled={!tagInput.trim() || isPending}
+                  className="text-xs shrink-0"
+                >
+                  <Plus className="size-3 mr-1" />
+                  Add
+                </Button>
+              </div>
+              {tags.length > 0 && (
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  {tags.map((t) => (
+                    <Badge
+                      key={t}
+                      variant="secondary"
+                      className="text-xs py-0.5 px-2 flex items-center gap-1 cursor-pointer hover:bg-destructive/20"
+                      onClick={() => handleRemoveTag(t)}
+                      title="Click to remove tag"
+                    >
+                      <Tag className="size-3 text-muted-foreground" />
+                      #{t}
+                      <span className="text-muted-foreground ml-0.5">×</span>
+                    </Badge>
+                  ))}
+                </div>
+              )}
+            </div>
+          </Field>
+
+          {/* Custom Fields (TASK-112: API Key, License Key, Database URL) */}
+          <div className="space-y-2.5 rounded-lg border bg-muted/20 p-3">
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="text-xs font-medium text-foreground block">Custom Fields</span>
+                <span className="text-[11px] text-muted-foreground">
+                  Store API keys, license tokens, database URLs, and ports
+                </span>
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="h-7 text-xs"
+                onClick={() => handleAddCustomField()}
+                disabled={isPending}
+              >
+                <Plus className="size-3 mr-1" />
+                Add Field
+              </Button>
+            </div>
+
+            {/* Quick Templates Shortcuts */}
+            {customFields.length === 0 && (
+              <div className="flex flex-wrap gap-1.5 pt-1">
+                <span className="text-[11px] text-muted-foreground self-center mr-1">Quick add:</span>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 text-[11px] px-2 border border-border/50 text-muted-foreground hover:text-foreground"
+                  onClick={() => handleAddCustomField("API Key")}
+                >
+                  + API Key
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 text-[11px] px-2 border border-border/50 text-muted-foreground hover:text-foreground"
+                  onClick={() => handleAddCustomField("Database URL")}
+                >
+                  + Database URL
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  className="h-6 text-[11px] px-2 border border-border/50 text-muted-foreground hover:text-foreground"
+                  onClick={() => handleAddCustomField("License Key")}
+                >
+                  + License Key
+                </Button>
+              </div>
+            )}
+
+            {/* Custom Field Rows */}
+            {customFields.map((field) => (
+              <div key={field.id} className="flex items-center gap-2 pt-1">
+                <Input
+                  placeholder="Field Name (e.g. API Key)"
+                  value={field.label}
+                  onChange={(e) => handleUpdateCustomField(field.id, "label", e.target.value)}
+                  className="w-1/3 text-xs h-8"
+                  disabled={isPending}
+                />
+                <Input
+                  placeholder="Field Value"
+                  value={field.value}
+                  onChange={(e) => handleUpdateCustomField(field.id, "value", e.target.value)}
+                  className="flex-1 font-mono text-xs h-8"
+                  disabled={isPending}
+                />
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  className="size-8 text-muted-foreground hover:text-destructive shrink-0"
+                  onClick={() => handleRemoveCustomField(field.id)}
+                  aria-label="Remove field"
+                >
+                  <Trash2 className="size-3.5" />
+                </Button>
+              </div>
+            ))}
+          </div>
 
           {/* Notes */}
           <Field>

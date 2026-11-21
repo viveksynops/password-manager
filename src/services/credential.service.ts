@@ -7,6 +7,7 @@ import {
   CreateCredentialInput,
   UpdateCredentialInput,
 } from "@/features/credentials/schemas";
+import { formatNotesWithMetadata } from "@/utils/credential-fields";
 
 type CredentialUpdate = Database["public"]["Tables"]["credentials"]["Update"];
 
@@ -66,7 +67,7 @@ export async function createCredential(
       encrypted_password: ciphertext,
       iv,
       tag,
-      notes: input.notes || null,
+      notes: formatNotesWithMetadata(input.notes, input.customFields, input.tags),
       created_by: userId,
     })
     .select("id, project_id, service_name, login_url, username, notes, created_by, created_at, updated_at")
@@ -110,7 +111,7 @@ export async function updateCredential(
     service_name: input.serviceName,
     login_url: input.loginUrl || null,
     username: input.username,
-    notes: input.notes || null,
+    notes: formatNotesWithMetadata(input.notes, input.customFields, input.tags),
     updated_at: new Date().toISOString(),
   };
 

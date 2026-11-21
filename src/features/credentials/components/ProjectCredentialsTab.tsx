@@ -34,7 +34,12 @@ import {
   Trash2,
   MoreHorizontal,
   Info,
+  Star,
+  Tag,
 } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
+import { useFavoritesStore } from "@/features/favorites/store";
+import { parseNotesWithMetadata } from "@/utils/credential-fields";
 import { deleteCredentialAction } from "@/actions/credential.actions";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -54,6 +59,7 @@ export function ProjectCredentialsTab({
 }: ProjectCredentialsTabProps) {
   const router = useRouter();
   const [, startTransition] = useTransition();
+  const { isCredentialFavorited, toggleCredentialFavorite } = useFavoritesStore();
 
   const [searchQuery, setSearchQuery] = useState("");
   const [copiedUsernameId, setCopiedUsernameId] = useState<string | null>(null);
@@ -187,66 +193,119 @@ export function ProjectCredentialsTab({
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredCredentials.map((cred) => (
-                <TableRow key={cred.id} className="hover:bg-muted/50 transition-colors h-14">
-                  {/* Service Name & Site Link */}
-                  <TableCell className="pl-4">
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-medium text-foreground text-sm">
-                        {cred.service_name}
-                      </span>
-                      {cred.login_url && (
-                        <a
-                          href={cred.login_url}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="inline-flex items-center text-muted-foreground hover:text-primary transition-colors"
-                          title={`Open site (${cred.login_url})`}
-                        >
-                          <ExternalLink className="size-3.5" />
-                        </a>
-                      )}
-                    </div>
-                  </TableCell>
+              {filteredCredentials.map((cred) => {
+                const parsed = parseNotesWithMetadata(cred.notes);
+                const isFav = isCredentialFavorited(cred.id);
 
-                  {/* Username with Copy Button */}
-                  <TableCell>
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-mono text-xs text-foreground/90 select-all">
-                        {cred.username}
-                      </span>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="size-7 text-muted-foreground hover:text-foreground shrink-0"
-                        onClick={() => handleCopyUsername(cred.id, cred.username)}
-                        aria-label="Copy username"
-                        title="Copy username"
-                      >
-                        {copiedUsernameId === cred.id ? (
-                          <Check className="size-3.5 text-emerald-500" />
-                        ) : (
-                          <Copy className="size-3.5" />
+                return (
+                  <TableRow key={cred.id} className="hover:bg-muted/50 transition-colors h-14">
+                    {/* Service Name, Favorite Star & Site Link */}
+                    <TableCell className="pl-4">
+                      <div className="flex flex-col gap-1">
+                        <div className="flex items-center gap-1.5">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className={`size-6 shrink-0 ${isFav ? "text-amber-400 hover:text-amber-300" : "text-muted-foreground/30 hover:text-foreground"}`}
+                            onClick={() => toggleCredentialFavorite(cred.id)}
+                            aria-label={isFav ? "Remove from favorites" : "Add to favorites"}
+                            title={isFav ? "Favorited" : "Add to favorites"}
+                          >
+                            <Star className={`size-3.5 ${isFav ? "fill-amber-400 text-amber-400" : ""}`} />
+                          </Button>
+                          <span className="font-medium text-foreground text-sm">
+                            {cred.service_name}
+                          </span>
+                          {cred.login_url && (
+                            <a
+                              href={cred.login_url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="inline-flex items-center text-muted-foreground hover:text-primary transition-colors"
+                              title={`Open site (${cred.login_url})`}
+                            >
+                              <ExternalLink className="size-3.5" />
+                            </a>
+                          )}
+                        </div>
+
+                        {/* Tags (TASK-111) */}
+                        {parsed.tags.length > 0 && (
+                          <div className="flex flex-wrap gap-1 pl-7">
+                            {parsed.tags.map((t) => (
+                              <Badge key={t} variant="outline" className="text-[10px] py-0 px-1.5 text-muted-foreground font-mono">
+                                #{t}
+                              </Badge>
+                            ))}
+                          </div>
                         )}
-                      </Button>
-                    </div>
-                  </TableCell>
+                      </div>
+                    </TableCell>
 
-                  {/* Password with SecretField (Reveal/Copy/Auto-hide/Timer) */}
-                  <TableCell>
-                    <SecretField credentialId={cred.id} projectId={projectId} />
-                  </TableCell>
+                    {/* Username with Copy Button */}
+                    <TableCell>
+                      <div className="flex items-center gap-1.5">
+                        <span className="font-mono text-xs text-foreground/90 select-all">
+                          {cred.username}
+                        </span>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="size-7 text-muted-foreground hover:text-foreground shrink-0"
+                          onClick={() => handleCopyUsername(cred.id, cred.username)}
+                          aria-label="Copy username"
+                          title="Copy username"
+                        >
+                          {copiedUsernameId === cred.id ? (
+                            <Check className="size-3.5 text-emerald-500" />
+                          ) : (
+                            <Copy className="size-3.5" />
+                          )}
+                        </Button>
+                      </div>
+                    </TableCell>
 
-                  {/* Notes */}
-                  <TableCell className="text-xs text-muted-foreground">
-                    {cred.notes ? (
-                      <span className="line-clamp-1 max-w-[220px]" title={cred.notes}>
-                        {cred.notes}
-                      </span>
-                    ) : (
-                      <span className="text-muted-foreground/40">—</span>
-                    )}
-                  </TableCell>
+                    {/* Password with SecretField (Reveal/Copy/Auto-hide/Timer) */}
+                    <TableCell>
+                      <SecretField credentialId={cred.id} projectId={projectId} />
+                    </TableCell>
+
+                    {/* Notes & Custom Fields (TASK-112: API key, license key, database URL) */}
+                    <TableCell className="text-xs text-muted-foreground">
+                      <div className="flex flex-col gap-1 max-w-[240px]">
+                        {parsed.notes && (
+                          <span className="line-clamp-1" title={parsed.notes}>
+                            {parsed.notes}
+                          </span>
+                        )}
+
+                        {/* Custom Fields pills */}
+                        {parsed.customFields.length > 0 && (
+                          <div className="flex flex-wrap gap-1 pt-0.5">
+                            {parsed.customFields.map((field) => (
+                              <button
+                                key={field.id}
+                                type="button"
+                                onClick={() => {
+                                  navigator.clipboard.writeText(field.value);
+                                  toast.success(`Copied ${field.label} to clipboard.`);
+                                }}
+                                className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-border/60 bg-muted/30 text-[10px] font-mono text-foreground hover:bg-muted/70 transition-colors"
+                                title={`Click to copy ${field.label}: ${field.value}`}
+                              >
+                                <span className="text-muted-foreground font-sans font-medium">{field.label}:</span>
+                                <span>{field.value.slice(0, 12)}{field.value.length > 12 ? "..." : ""}</span>
+                                <Copy className="size-2.5 opacity-60" />
+                              </button>
+                            ))}
+                          </div>
+                        )}
+
+                        {!parsed.notes && parsed.customFields.length === 0 && (
+                          <span className="text-muted-foreground/40">—</span>
+                        )}
+                      </div>
+                    </TableCell>
 
                   {/* Actions Dropdown */}
                   <TableCell className="text-right pr-4">
@@ -293,7 +352,8 @@ export function ProjectCredentialsTab({
                     </div>
                   </TableCell>
                 </TableRow>
-              ))}
+              );
+            })}
             </TableBody>
           </Table>
         </div>

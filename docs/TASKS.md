@@ -212,11 +212,11 @@ When done, list files changed and how to test it.
 
 ## Phase 12: Search and Productivity
 
-- [ ] **TASK-109** Create global search across clients, projects and services
-- [ ] **TASK-110** Add search shortcut (Cmd/Ctrl + K) with results by user access
-- [ ] **TASK-111** Add tags and favorites
-- [ ] **TASK-112** Add custom fields for credentials (API key, license key, database URL)
-- [ ] **TASK-113** Add tests for search (users only see results they have access to) 🔒
+- [x] **TASK-109** Create global search across clients, projects and services
+- [x] **TASK-110** Add search shortcut (Cmd/Ctrl + K) with results by user access
+- [x] **TASK-111** Add tags and favorites
+- [x] **TASK-112** Add custom fields for credentials (API key, license key, database URL)
+- [x] **TASK-113** Add tests for search (users only see results they have access to) 🔒
 
 ---
 
@@ -284,19 +284,19 @@ Copy this when adding new tasks:
 
 | Phase | Status |
 |---|---|
-| 1. Setup | Not started |
-| 2. Database and Security Foundation | Not started |
-| 3. Encryption and Core Libraries | Not started |
-| 4. Authentication | Not started |
-| 5. App Layout | Not started |
-| 6. Team Management | Not started |
-| 7. Clients | Not started |
-| 8. Projects | Not started |
-| 9. Credentials Vault | Not started |
-| 10. Environment Variables | Not started |
-| 11. Audit Logs | Not started |
-| 12. Search and Productivity | Not started |
-| 13. Hardening and Quality | Not started |
+| 1. Setup | Complete |
+| 2. Database and Security Foundation | Complete |
+| 3. Encryption and Core Libraries | Complete |
+| 4. Authentication | Complete |
+| 5. App Layout | Complete |
+| 6. Team Management | Complete |
+| 7. Clients | Complete |
+| 8. Projects | Complete |
+| 9. Credentials Vault | Complete |
+| 10. Environment Variables | Complete |
+| 11. Audit Logs | Complete |
+| 12. Search and Productivity | Complete |
+| 13. Hardening and Quality | In Progress |
 | 14. Deployment | Not started |
 | 15. Browser Extension | Not started |
 

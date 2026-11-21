@@ -173,11 +173,22 @@ Phases 1 through 11 are complete. Database schema, security foundation, AES-256-
 
 ---
 
+---
+
+### Phase 12: Search and Productivity (5/5 complete)
+- [x] **TASK-109**: Create global search across clients, projects and services (`src/services/search.service.ts`, `src/actions/search.actions.ts`)
+- [x] **TASK-110**: Add search shortcut (Cmd/Ctrl + K) with results scoped strictly by user access role (`GlobalSearchDialog.tsx`, `GlobalSearchButton.tsx`)
+- [x] **TASK-111**: Add tags and favorites with optimistic Zustand store (`src/services/favorite.service.ts`, `src/actions/favorite.actions.ts`, `src/features/favorites/store.ts`)
+- [x] **TASK-112**: Add custom fields for credentials with dynamic form UI and clipboard copy (`src/utils/credential-fields.ts`, `CredentialFormDialog.tsx`, `ProjectCredentialsTab.tsx`)
+- [x] **TASK-113**: Add unit tests for search scoping, tag metadata, custom fields, and favorites (`src/test/search-productivity.test.ts`) 🔒
+
+---
+
 ## Current Task
 
-**TASK-109:** Create global search across clients, projects and services (Phase 12: Search and Productivity)
+**TASK-114:** Add rate limiting on login and reveal actions (Phase 13: Hardening and Quality)
 
-**Phase:** 12, Search and Productivity
+**Phase:** 13, Hardening and Quality
 
 **Status:** Ready to start
 
@@ -198,8 +209,8 @@ Phases 1 through 11 are complete. Database schema, security foundation, AES-256-
 | 9. Credentials Vault | Complete | 15 / 15 |
 | 10. Environment Variables | Complete | 13 / 13 |
 | 11. Audit Logs | Complete | 6 / 6 |
-| 12. Search and Productivity | Not started | 0 / 5 |
-| 13. Hardening and Quality | Not started | 0 / 9 |
+| 12. Search and Productivity | Complete | 5 / 5 |
+| 13. Hardening and Quality | Ready to start | 0 / 9 |
 | 14. Deployment | Not started | 0 / 8 |
 | 15. Browser Extension (later) | Not started | 0 / 8 |
 
@@ -212,10 +223,9 @@ Phases 1 through 11 are complete. Database schema, security foundation, AES-256-
 | Git repository | Clean working tree on `main` branch |
 | Next.js project | Next.js 16 (Turbopack, App Router, React 19) in `src/` |
 | Supabase remote project | Configured at `https://wyycdjxqffgtraqukqjb.supabase.co` |
-| Database migrations | Initial schema applied in `supabase/migrations/20261121000000_initial_schema.sql` |
-| Permissions grant script | Created in `supabase/setup_profiles.sql` |
+| Database migrations | Migrations in `supabase/migrations/` |
 | `MASTER_KEY` | Generated (64-hex chars) in `.env.local` |
-| Test suite | Vitest: 126 / 126 unit tests passing |
+| Test suite | Vitest: 136 / 136 unit tests passing |
 | Production build | `next build` passing with 0 errors |
 
 ---
@@ -250,3 +260,4 @@ Phases 1 through 11 are complete. Database schema, security foundation, AES-256-
 | 2026-11-21 | Added server-side pagination with limits to /projects and /clients, lightweight client options, URL searchParams sync, and removed client-side full dataset in-memory filtering. 126/126 tests passing, build passing | Phase 12: Search and Productivity |
 | 2026-11-21 | Conditionally render pagination controls only when records exceed single-page capacity (data.totalPages > 1 || data.page > 1) across Projects, Clients, and Audit Logs. | Phase 12 |
 | 2026-11-21 | Added route-level skeleton loaders (loading.tsx) across all dashboard pages (Home, Projects, Project Detail, Clients, Client Detail, Team, Audit Logs) using shadcn Skeleton primitives. | Phase 13: Hardening and Quality |
+| 2026-11-21 | Completed Phase 12 (Search & Productivity: Global search Cmd+K scoped by role, Tags & Favorites, Custom Fields with dynamic keys, 136/136 tests passing). Resolved mobile full-screen sheet and project detail tabs overlapping layout bugs. | Phase 13: Hardening and Quality |

@@ -34,7 +34,9 @@ import {
   ExternalLink,
   Globe,
   GitBranch,
+  Star,
 } from "lucide-react";
+import { useFavoritesStore } from "@/features/favorites/store";
 import { ProjectEditSheet } from "./ProjectEditSheet";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { archiveProjectAction } from "@/actions/project.actions";
@@ -50,6 +52,7 @@ interface ProjectTableProps {
 export function ProjectTable({ projects, userRole, clients }: ProjectTableProps) {
   const router = useRouter();
   const [, startTransition] = useTransition();
+  const { isProjectFavorited, toggleProjectFavorite } = useFavoritesStore();
 
   // Edit dialog state
   const [editingProject, setEditingProject] = useState<ProjectWithDetails | null>(null);
@@ -119,19 +122,31 @@ export function ProjectTable({ projects, userRole, clients }: ProjectTableProps)
               <TableRow key={proj.id} className="hover:bg-muted/50 transition-colors">
                 {/* Project Name & Description */}
                 <TableCell>
-                  <div className="flex flex-col">
-                    <Link
-                      href={`/projects/${proj.id}`}
-                      className="flex items-center gap-2 font-medium text-foreground hover:text-primary transition-colors group"
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className={`size-6 shrink-0 ${isProjectFavorited(proj.id) ? "text-amber-400 hover:text-amber-300" : "text-muted-foreground/30 hover:text-foreground"}`}
+                      onClick={() => toggleProjectFavorite(proj.id)}
+                      aria-label={isProjectFavorited(proj.id) ? "Remove from favorites" : "Add to favorites"}
+                      title={isProjectFavorited(proj.id) ? "Favorited" : "Add to favorites"}
                     >
-                      <FolderLock className="size-4 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
-                      <span className="truncate">{proj.name}</span>
-                    </Link>
-                    {proj.description && (
-                      <span className="text-xs text-muted-foreground line-clamp-1 mt-0.5">
-                        {proj.description}
-                      </span>
-                    )}
+                      <Star className={`size-3.5 ${isProjectFavorited(proj.id) ? "fill-amber-400 text-amber-400" : ""}`} />
+                    </Button>
+                    <div className="flex flex-col">
+                      <Link
+                        href={`/projects/${proj.id}`}
+                        className="flex items-center gap-1.5 font-medium text-foreground hover:text-primary transition-colors group"
+                      >
+                        <FolderLock className="size-4 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
+                        <span className="truncate">{proj.name}</span>
+                      </Link>
+                      {proj.description && (
+                        <span className="text-xs text-muted-foreground line-clamp-1 mt-0.5">
+                          {proj.description}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 </TableCell>
 
