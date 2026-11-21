@@ -13,9 +13,9 @@ Related documents:
 
 ## Current Status
 
-Phases 1, 2, 3, 4, 5, and 6 are complete. Database schema, security foundation, AES-256-GCM encryption libraries, Supabase clients, fail-closed audit logging, full authentication flow (Login, MFA enrollment/verify, forgot/reset password, invite acceptance, and middleware guards), responsive App Layout (shadcn Sidebar, Breadcrumbs, Avatar, DataTable, ThemeToggle), and full Team Management (invite user, change role, deactivate/reactivate with immediate session invalidation, Zustand filters, and Admin-only guards) are implemented, verified, and passing all tests.
+Phases 1, 2, 3, 4, 5, 6, and 7 are complete. Database schema, security foundation, AES-256-GCM encryption libraries, Supabase clients, fail-closed audit logging, full authentication flow (Login, MFA, password reset, invites), responsive App Layout (shadcn Sidebar, Breadcrumbs, Avatar, DataTable, ThemeToggle), full Team Management (Admin controls, immediate revocation), and complete Client Management (add, edit, archive/restore clients, search & status filtering via Zustand, client detail page with projects list, RLS permissions, and unit tests) are implemented, verified, and passing all tests.
 
-**Overall progress:** 53 of 138 tasks complete (38%) — 1 skipped per user preference (TASK-005).
+**Overall progress:** 62 of 138 tasks complete (45%) — 1 skipped per user preference (TASK-005).
 
 ---
 
@@ -99,13 +99,24 @@ Phases 1, 2, 3, 4, 5, and 6 are complete. Database schema, security foundation, 
 - [x] **TASK-053**: Ensure deactivated users lose access immediately via `adminClient.auth.admin.signOut(userId)`
 - [x] **TASK-054**: Add unit tests for team management schemas, role constraints, and Zustand filter store (`src/test/team-management.test.ts`)
 
+### Phase 7: Clients (9/9 complete)
+- [x] **TASK-055**: Create Zod schemas for clients (`src/features/clients/schemas.ts`)
+- [x] **TASK-056**: Create `src/services/client.service.ts` (listClients, getClientById, createClient, updateClient, archiveClient)
+- [x] **TASK-057**: Create client server actions with role checks (`createClientAction`, `updateClientAction`, `archiveClientAction`)
+- [x] **TASK-058**: Create clients list page at `src/app/(dashboard)/clients/page.tsx` with search and status filtering
+- [x] **TASK-059**: Create add and edit client dialog (`ClientFormDialog.tsx`) using shadcn components and React Hook Form
+- [x] **TASK-060**: Add archive client functionality with `ConfirmDialog`
+- [x] **TASK-061**: Create client detail page at `src/app/(dashboard)/clients/[id]/page.tsx` showing client details and associated projects
+- [x] **TASK-062**: Add loading, empty, and error states across client views
+- [x] **TASK-063**: Add unit tests for client schemas, operations, and Zustand filter store (`src/test/client-management.test.ts`)
+
 ---
 
 ## Current Task
 
-**TASK-055:** Create Zod schemas for clients (Phase 7: Clients)
+**TASK-064:** Create Zod schemas for projects (Phase 8: Projects)
 
-**Phase:** 7, Clients
+**Phase:** 8, Projects
 
 **Status:** Ready to start
 
@@ -121,7 +132,7 @@ Phases 1, 2, 3, 4, 5, and 6 are complete. Database schema, security foundation, 
 | 4. Authentication | Complete | 10 / 10 |
 | 5. App Layout | Complete | 7 / 7 |
 | 6. Team Management | Complete | 6 / 6 |
-| 7. Clients | Not started | 0 / 9 |
+| 7. Clients | Complete | 9 / 9 |
 | 8. Projects | Not started | 0 / 11 |
 | 9. Credentials Vault | Not started | 0 / 15 |
 | 10. Environment Variables | Not started | 0 / 13 |
@@ -143,7 +154,7 @@ Phases 1, 2, 3, 4, 5, and 6 are complete. Database schema, security foundation, 
 | Database migrations | Initial schema applied in `supabase/migrations/20261121000000_initial_schema.sql` |
 | Permissions grant script | Created in `supabase/setup_profiles.sql` |
 | `MASTER_KEY` | Generated (64-hex chars) in `.env.local` |
-| Test suite | Vitest: 46 / 46 unit tests passing |
+| Test suite | Vitest: 54 / 54 unit tests passing |
 | Production build | `next build` passing with 0 errors |
 
 ---
@@ -170,3 +181,4 @@ Phases 1, 2, 3, 4, 5, and 6 are complete. Database schema, security foundation, 
 | 2026-11-21 | Created test accounts in Supabase Auth (`admin`, `manager`, `developer`), resolved Server Action middleware redirect bug | Phase 5 |
 | 2026-11-21 | Completed Phase 5 using official shadcn components (`sidebar`, `breadcrumb`, `avatar`, `alert-dialog`, `table`). 38/38 tests passing, build passing | Phase 6: Team Management |
 | 2026-11-21 | Added Zustand & strict shadcn rules across docs; Completed Phase 6 (Team Management, Admin controls, immediate revocation, Zustand filtering, 46/46 tests passing) | Phase 7: Clients |
+| 2026-11-21 | Completed Phase 7 (Client Management: list, detail view with projects, create/edit dialog, archive/restore, Zustand search & filtering, audit logs, 54/54 tests passing) | Phase 8: Projects |

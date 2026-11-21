@@ -133,15 +133,15 @@ When done, list files changed and how to test it.
 
 ## Phase 7: Clients
 
-- [ ] **TASK-055** Create Zod schemas for clients
-- [ ] **TASK-056** Create `client.service.ts`
-- [ ] **TASK-057** Create client server actions with role checks
-- [ ] **TASK-058** Create clients list page with search and pagination
-- [ ] **TASK-059** Create add and edit client form
-- [ ] **TASK-060** Add archive client functionality
-- [ ] **TASK-061** Create client detail page showing its projects
-- [ ] **TASK-062** Add loading, empty and error states
-- [ ] **TASK-063** Add tests for clients
+- [x] **TASK-055** Create Zod schemas for clients
+- [x] **TASK-056** Create `client.service.ts`
+- [x] **TASK-057** Create client server actions with role checks
+- [x] **TASK-058** Create clients list page with search and pagination
+- [x] **TASK-059** Create add and edit client form
+- [x] **TASK-060** Add archive client functionality
+- [x] **TASK-061** Create client detail page showing its projects
+- [x] **TASK-062** Add loading, empty and error states
+- [x] **TASK-063** Add tests for clients
 
 ---
 
