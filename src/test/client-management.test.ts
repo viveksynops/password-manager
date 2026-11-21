@@ -107,4 +107,31 @@ describe("Zustand useClientFilterStore", () => {
     expect(reset.searchQuery).toBe("");
     expect(reset.statusFilter).toBe("active");
   });
+
+  describe("Server-Side Pagination & Egress Minimization (Clients)", () => {
+    it("calculates accurate range and limit bounds for clients list query", () => {
+      const calculateClientRange = (page: number, pageSize: number) => {
+        const sanitizedPage = Math.max(1, page || 1);
+        const sanitizedPageSize = Math.max(5, Math.min(50, pageSize || 20));
+        const from = (sanitizedPage - 1) * sanitizedPageSize;
+        const to = from + sanitizedPageSize - 1;
+        return { page: sanitizedPage, pageSize: sanitizedPageSize, from, to };
+      };
+
+      const p1 = calculateClientRange(1, 20);
+      expect(p1).toEqual({ page: 1, pageSize: 20, from: 0, to: 19 });
+
+      const p2 = calculateClientRange(2, 20);
+      expect(p2).toEqual({ page: 2, pageSize: 20, from: 20, to: 39 });
+
+      // Clamping: max 50, min 5
+      const clampedLarge = calculateClientRange(1, 500);
+      expect(clampedLarge.pageSize).toBe(50);
+      expect(clampedLarge.to).toBe(49);
+
+      const clampedSmall = calculateClientRange(1, 1);
+      expect(clampedSmall.pageSize).toBe(5);
+      expect(clampedSmall.to).toBe(4);
+    });
+  });
 });

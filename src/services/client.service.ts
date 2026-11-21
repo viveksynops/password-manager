@@ -12,6 +12,22 @@ export interface ClientWithProjects extends Client {
   projects: Project[];
 }
 
+export interface PaginatedClients {
+  clients: ClientWithProjectCount[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}
+
+export interface ListClientsOptions {
+  includeArchived?: boolean;
+  status?: "active" | "archived" | "all";
+  search?: string;
+  page?: number;
+  pageSize?: number;
+}
+
 /**
  * Lists clients accessible to the current user (enforced by RLS).
  * Developers only see clients for projects assigned to them.
@@ -50,6 +66,73 @@ export async function listClients(options?: {
     updated_at: row.updated_at,
     project_count: row.projects?.length || 0,
   }));
+}
+
+/**
+ * Lists clients with server-side pagination, search, and status filtering.
+ * Strictly enforces range and limit on Supabase PostgREST queries to minimize egress.
+ */
+export async function listClientsPaginated(options?: ListClientsOptions): Promise<PaginatedClients> {
+  const supabase = await createServerClient();
+
+  const page = Math.max(1, Number(options?.page) || 1);
+  const pageSize = Math.max(5, Math.min(50, Number(options?.pageSize) || 20));
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
+  let query = supabase
+    .from("clients")
+    .select("*, projects(id)", { count: "exact" });
+
+  if (options?.status === "active") {
+    query = query.eq("is_archived", false);
+  } else if (options?.status === "archived") {
+    query = query.eq("is_archived", true);
+  } else if (!options?.includeArchived && !options?.status) {
+    query = query.eq("is_archived", false);
+  }
+
+  if (options?.search && options.search.trim()) {
+    const q = options.search.trim();
+    query = query.or(`name.ilike.%${q}%,contact_person.ilike.%${q}%,contact_email.ilike.%${q}%`);
+  }
+
+  query = query
+    .order("created_at", { ascending: false })
+    .range(from, to)
+    .limit(pageSize);
+
+  const { data, count, error } = await query;
+
+  if (error) {
+    throw new Error(`Failed to list clients: ${error.message}`);
+  }
+
+  const rawClients = data || [];
+  const total = count || 0;
+  const totalPages = Math.ceil(total / pageSize) || 1;
+
+  const clients: ClientWithProjectCount[] = rawClients.map((row: any) => ({
+    id: row.id,
+    name: row.name,
+    contact_person: row.contact_person,
+    contact_email: row.contact_email,
+    contact_phone: row.contact_phone,
+    notes: row.notes,
+    is_archived: row.is_archived,
+    created_by: row.created_by,
+    created_at: row.created_at,
+    updated_at: row.updated_at,
+    project_count: row.projects?.length || 0,
+  }));
+
+  return {
+    clients,
+    total,
+    page,
+    pageSize,
+    totalPages,
+  };
 }
 
 /**

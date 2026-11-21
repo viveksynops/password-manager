@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
-import { ProjectWithDetails } from "@/services/project.service";
+import React, { useState, useTransition, useEffect } from "react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { PaginatedProjects } from "@/services/project.service";
 import { UserRole, Client, UserProfile } from "@/types/database.types";
 import { ProjectTable } from "./ProjectTable";
 import { ProjectFolderGrid } from "./ProjectFolderGrid";
@@ -17,65 +18,107 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FolderLock, Plus, Search, FilterX, LayoutGrid, List } from "lucide-react";
+import { FolderLock, Plus, Search, FilterX, LayoutGrid, List, ChevronLeft, ChevronRight } from "lucide-react";
 import { useProjectStore, ProjectStatusFilter, ProjectViewMode } from "../store";
 
 interface ProjectsViewProps {
-  initialProjects: ProjectWithDetails[];
+  data: PaginatedProjects;
   clients: Pick<Client, "id" | "name">[];
-  users?: UserProfile[];
+  users?: Pick<UserProfile, "id" | "email" | "full_name">[];
   userRole: UserRole;
 }
 
 export function ProjectsView({
-  initialProjects,
+  data,
   clients,
   users = [],
   userRole,
 }: ProjectsViewProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const [isPending, startTransition] = useTransition();
+
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const canManage = userRole === "admin" || userRole === "manager";
 
-  const {
-    searchQuery,
-    statusFilter,
-    clientFilter,
-    viewMode,
-    setSearchQuery,
-    setStatusFilter,
-    setClientFilter,
-    setViewMode,
-    resetFilters,
-  } = useProjectStore();
+  // Display preference (folders vs table view) from store
+  const { viewMode, setViewMode } = useProjectStore();
 
-  const filteredProjects = useMemo(() => {
-    return initialProjects.filter((proj) => {
-      // 1. Status filter
-      if (statusFilter === "active" && proj.is_archived) return false;
-      if (statusFilter === "archived" && !proj.is_archived) return false;
+  // Active filters from URL search params
+  const activeSearch = searchParams.get("search") || "";
+  const activeStatus = (searchParams.get("status") || "active") as ProjectStatusFilter;
+  const activeClient = searchParams.get("client") || "all";
 
-      // 2. Client filter
-      if (clientFilter !== "all" && proj.client_id !== clientFilter) return false;
+  // Local search query for fluid typing
+  const [searchInput, setSearchInput] = useState(activeSearch);
 
-      // 3. Search query (matches project name, client name, tech stack, hosting)
-      if (searchQuery.trim()) {
-        const query = searchQuery.toLowerCase().trim();
-        const matchesName = proj.name.toLowerCase().includes(query);
-        const matchesClient = proj.client_name.toLowerCase().includes(query);
-        const matchesTech = proj.tech_stack?.toLowerCase().includes(query) || false;
-        const matchesHosting = proj.hosting_info?.toLowerCase().includes(query) || false;
+  useEffect(() => {
+    setSearchInput(activeSearch);
+  }, [activeSearch]);
 
-        if (!matchesName && !matchesClient && !matchesTech && !matchesHosting) {
-          return false;
+  // URL query updater helper for server-side pagination & filtering
+  const updateQuery = (updates: Record<string, string | number | null | undefined>) => {
+    startTransition(() => {
+      const nextParams = new URLSearchParams(searchParams.toString());
+
+      for (const [key, val] of Object.entries(updates)) {
+        if (val === null || val === undefined || val === "" || val === "all" || (key === "status" && val === "active")) {
+          nextParams.delete(key);
+        } else {
+          nextParams.set(key, String(val));
         }
       }
 
-      return true;
+      // If a filter is updated and not the page itself, reset page back to 1
+      if (!("page" in updates)) {
+        nextParams.delete("page");
+      }
+
+      const queryString = nextParams.toString();
+      router.push(queryString ? `${pathname}?${queryString}` : pathname);
     });
-  }, [initialProjects, searchQuery, statusFilter, clientFilter]);
+  };
+
+  const handleSearchSubmit = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    updateQuery({ search: searchInput.trim() || null });
+  };
+
+  const handleStatusChange = (val: string) => {
+    updateQuery({ status: val });
+  };
+
+  const handleClientChange = (val: string) => {
+    updateQuery({ client: val });
+  };
+
+  const handlePageChange = (newPage: number) => {
+    updateQuery({ page: newPage });
+  };
+
+  const handlePageSizeChange = (newSize: number) => {
+    updateQuery({ pageSize: newSize, page: 1 });
+  };
+
+  const handleResetFilters = () => {
+    setSearchInput("");
+    startTransition(() => {
+      const currentSize = searchParams.get("pageSize");
+      const nextParams = new URLSearchParams();
+      if (currentSize && currentSize !== "24") {
+        nextParams.set("pageSize", currentSize);
+      }
+      const qs = nextParams.toString();
+      router.push(qs ? `${pathname}?${qs}` : pathname);
+    });
+  };
 
   const hasActiveFilters =
-    searchQuery.trim().length > 0 || statusFilter !== "active" || clientFilter !== "all";
+    activeSearch.trim().length > 0 || activeStatus !== "active" || activeClient !== "all";
+
+  const fromEntry = data.total === 0 ? 0 : (data.page - 1) * data.pageSize + 1;
+  const toEntry = Math.min(data.page * data.pageSize, data.total);
 
   return (
     <div className="space-y-6">
@@ -102,27 +145,29 @@ export function ProjectsView({
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex flex-1 flex-col gap-2.5 sm:flex-row sm:items-center">
           {/* Search Input */}
-          <div className="relative w-full sm:max-w-xs">
+          <form onSubmit={handleSearchSubmit} className="relative w-full sm:max-w-xs">
             <Search className="absolute left-2.5 top-2.5 size-4 text-muted-foreground" />
             <Input
               placeholder="Search projects, clients, stack..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              onBlur={() => handleSearchSubmit()}
               className="pl-9"
             />
-          </div>
+          </form>
 
           {/* Client Filter Dropdown */}
           <div className="w-full sm:w-56">
             <Select
-              value={clientFilter}
-              onValueChange={(val) => setClientFilter(val || "all")}
+              value={activeClient}
+              onValueChange={(val) => handleClientChange(val || "all")}
+              disabled={isPending}
             >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="All Clients">
-                  {clientFilter === "all"
+                  {activeClient === "all"
                     ? "All Clients"
-                    : clients.find((c) => c.id === clientFilter)?.name || "All Clients"}
+                    : clients.find((c) => c.id === activeClient)?.name || "All Clients"}
                 </SelectValue>
               </SelectTrigger>
               <SelectContent>
@@ -140,7 +185,8 @@ export function ProjectsView({
             <Button
               variant="ghost"
               size="sm"
-              onClick={resetFilters}
+              onClick={handleResetFilters}
+              disabled={isPending}
               className="h-9 px-2.5 text-xs text-muted-foreground hover:text-foreground self-start sm:self-auto"
             >
               <FilterX className="mr-1.5 size-3.5" />
@@ -153,8 +199,8 @@ export function ProjectsView({
         <div className="flex items-center gap-2">
           {/* Status Tabs */}
           <Tabs
-            value={statusFilter}
-            onValueChange={(val) => setStatusFilter(val as ProjectStatusFilter)}
+            value={activeStatus}
+            onValueChange={handleStatusChange}
           >
             <TabsList>
               <TabsTrigger value="active">Active</TabsTrigger>
@@ -190,8 +236,8 @@ export function ProjectsView({
       </div>
 
       {/* Content State */}
-      {filteredProjects.length === 0 ? (
-        initialProjects.length === 0 ? (
+      {data.projects.length === 0 ? (
+        data.total === 0 && !hasActiveFilters ? (
           <EmptyState
             icon={FolderLock}
             title="No projects found"
@@ -203,9 +249,9 @@ export function ProjectsView({
             action={
               canManage
                 ? {
-                  label: "Create Project",
-                  onClick: () => setCreateDialogOpen(true),
-                }
+                    label: "Create Project",
+                    onClick: () => setCreateDialogOpen(true),
+                  }
                 : undefined
             }
           />
@@ -216,22 +262,81 @@ export function ProjectsView({
             description="No projects match your current search and filter criteria."
             action={{
               label: "Clear Filters",
-              onClick: resetFilters,
+              onClick: handleResetFilters,
             }}
           />
         )
-      ) : viewMode === "folders" ? (
-        <ProjectFolderGrid
-          projects={filteredProjects}
-          userRole={userRole}
-          clients={clients}
-        />
       ) : (
-        <ProjectTable
-          projects={filteredProjects}
-          userRole={userRole}
-          clients={clients}
-        />
+        <div className="space-y-4">
+          <div className={`transition-opacity duration-150 ${isPending ? "opacity-60 pointer-events-none" : "opacity-100"}`}>
+            {viewMode === "folders" ? (
+              <ProjectFolderGrid
+                projects={data.projects}
+                userRole={userRole}
+                clients={clients}
+              />
+            ) : (
+              <ProjectTable
+                projects={data.projects}
+                userRole={userRole}
+                clients={clients}
+              />
+            )}
+          </div>
+
+          {/* Server-Side Pagination Controls */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted-foreground pt-1">
+            <div className="flex items-center gap-2">
+              <span>Rows per page:</span>
+              <Select
+                value={String(data.pageSize)}
+                onValueChange={(val) => handlePageSizeChange(Number(val) || 24)}
+                disabled={isPending}
+              >
+                <SelectTrigger className="h-8 w-16 text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="12">12</SelectItem>
+                  <SelectItem value="24">24</SelectItem>
+                  <SelectItem value="48">48</SelectItem>
+                </SelectContent>
+              </Select>
+              <span>
+                Showing <span className="font-medium text-foreground">{fromEntry}</span> to{" "}
+                <span className="font-medium text-foreground">{toEntry}</span> of{" "}
+                <span className="font-medium text-foreground">{data.total}</span> entries
+              </span>
+            </div>
+
+            <div className="flex items-center gap-1.5">
+              <span className="mr-2">
+                Page <span className="font-medium text-foreground">{data.page}</span> of{" "}
+                <span className="font-medium text-foreground">{data.totalPages}</span>
+              </span>
+              <Button
+                variant="outline"
+                size="icon"
+                className="size-8"
+                disabled={data.page <= 1 || isPending}
+                onClick={() => handlePageChange(data.page - 1)}
+                aria-label="Previous page"
+              >
+                <ChevronLeft className="size-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="size-8"
+                disabled={data.page >= data.totalPages || isPending}
+                onClick={() => handlePageChange(data.page + 1)}
+                aria-label="Next page"
+              >
+                <ChevronRight className="size-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Create Project Dialog */}

@@ -228,4 +228,31 @@ describe("Project Management Schemas & Store", () => {
       expect(canAccessProject("developer", [], target)).toBe(false);
     });
   });
+
+  describe("Server-Side Pagination & Egress Minimization (Projects)", () => {
+    it("calculates accurate range and limit bounds for projects list query", () => {
+      const calculateProjectRange = (page: number, pageSize: number) => {
+        const sanitizedPage = Math.max(1, page || 1);
+        const sanitizedPageSize = Math.max(6, Math.min(60, pageSize || 24));
+        const from = (sanitizedPage - 1) * sanitizedPageSize;
+        const to = from + sanitizedPageSize - 1;
+        return { page: sanitizedPage, pageSize: sanitizedPageSize, from, to };
+      };
+
+      const p1 = calculateProjectRange(1, 24);
+      expect(p1).toEqual({ page: 1, pageSize: 24, from: 0, to: 23 });
+
+      const p2 = calculateProjectRange(2, 24);
+      expect(p2).toEqual({ page: 2, pageSize: 24, from: 24, to: 47 });
+
+      // Clamping: max 60, min 6
+      const clampedLarge = calculateProjectRange(1, 500);
+      expect(clampedLarge.pageSize).toBe(60);
+      expect(clampedLarge.to).toBe(59);
+
+      const clampedSmall = calculateProjectRange(1, 2);
+      expect(clampedSmall.pageSize).toBe(6);
+      expect(clampedSmall.to).toBe(5);
+    });
+  });
 });

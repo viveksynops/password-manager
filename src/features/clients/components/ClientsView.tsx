@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
-import { ClientWithProjectCount } from "@/services/client.service";
+import React, { useState, useTransition, useEffect } from "react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { PaginatedClients } from "@/services/client.service";
 import { UserRole } from "@/types/database.types";
-import { useClientFilterStore } from "../store";
 import { ClientTable } from "./ClientTable";
 import { ClientFormDialog } from "./ClientFormDialog";
 import { Input } from "@/components/ui/input";
@@ -16,40 +16,90 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/empty-state";
-import { Search, Building2, Plus, RotateCcw } from "lucide-react";
+import { Search, Building2, Plus, RotateCcw, ChevronLeft, ChevronRight } from "lucide-react";
 
 interface ClientsViewProps {
-  initialClients: ClientWithProjectCount[];
+  data: PaginatedClients;
   userRole: UserRole;
 }
 
-export function ClientsView({ initialClients, userRole }: ClientsViewProps) {
+export function ClientsView({ data, userRole }: ClientsViewProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const [isPending, startTransition] = useTransition();
+
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
-  const { searchQuery, statusFilter, setSearchQuery, setStatusFilter, resetFilters } =
-    useClientFilterStore();
+
+  // Active filters from URL search params
+  const activeSearch = searchParams.get("search") || "";
+  const activeStatus = searchParams.get("status") || "active";
+
+  // Local search query for fluid typing
+  const [searchInput, setSearchInput] = useState(activeSearch);
+
+  useEffect(() => {
+    setSearchInput(activeSearch);
+  }, [activeSearch]);
 
   const canManage = userRole === "admin" || userRole === "manager";
 
-  const filteredClients = useMemo(() => {
-    return initialClients.filter((client) => {
-      // 1. Search filter
-      if (searchQuery.trim()) {
-        const query = searchQuery.toLowerCase();
-        const matchesName = client.name.toLowerCase().includes(query);
-        const matchesContact = client.contact_person?.toLowerCase().includes(query) ?? false;
-        const matchesEmail = client.contact_email?.toLowerCase().includes(query) ?? false;
-        if (!matchesName && !matchesContact && !matchesEmail) return false;
+  // URL query updater helper for server-side pagination & filtering
+  const updateQuery = (updates: Record<string, string | number | null | undefined>) => {
+    startTransition(() => {
+      const nextParams = new URLSearchParams(searchParams.toString());
+
+      for (const [key, val] of Object.entries(updates)) {
+        if (val === null || val === undefined || val === "" || (key === "status" && val === "active")) {
+          nextParams.delete(key);
+        } else {
+          nextParams.set(key, String(val));
+        }
       }
 
-      // 2. Status filter
-      if (statusFilter === "active" && client.is_archived) return false;
-      if (statusFilter === "archived" && !client.is_archived) return false;
+      // If a filter is updated and not the page itself, reset page back to 1
+      if (!("page" in updates)) {
+        nextParams.delete("page");
+      }
 
-      return true;
+      const queryString = nextParams.toString();
+      router.push(queryString ? `${pathname}?${queryString}` : pathname);
     });
-  }, [initialClients, searchQuery, statusFilter]);
+  };
 
-  const hasActiveFilters = searchQuery !== "" || statusFilter !== "active";
+  const handleSearchSubmit = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    updateQuery({ search: searchInput.trim() || null });
+  };
+
+  const handleStatusChange = (val: string) => {
+    updateQuery({ status: val });
+  };
+
+  const handlePageChange = (newPage: number) => {
+    updateQuery({ page: newPage });
+  };
+
+  const handlePageSizeChange = (newSize: number) => {
+    updateQuery({ pageSize: newSize, page: 1 });
+  };
+
+  const handleResetFilters = () => {
+    setSearchInput("");
+    startTransition(() => {
+      const currentSize = searchParams.get("pageSize");
+      const nextParams = new URLSearchParams();
+      if (currentSize && currentSize !== "20") {
+        nextParams.set("pageSize", currentSize);
+      }
+      const qs = nextParams.toString();
+      router.push(qs ? `${pathname}?${qs}` : pathname);
+    });
+  };
+
+  const hasActiveFilters = activeSearch !== "" || activeStatus !== "active";
+  const fromEntry = data.total === 0 ? 0 : (data.page - 1) * data.pageSize + 1;
+  const toEntry = Math.min(data.page * data.pageSize, data.total);
 
   return (
     <div className="space-y-6">
@@ -72,22 +122,24 @@ export function ClientsView({ initialClients, userRole }: ClientsViewProps) {
         )}
       </div>
 
-      {/* Filter and Search Bar (Zustand) */}
+      {/* Filter and Search Bar */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="relative flex-1 max-w-sm">
+        <form onSubmit={handleSearchSubmit} className="relative flex-1 max-w-sm">
           <Search className="absolute left-2.5 top-2.5 size-4 text-muted-foreground" />
           <Input
             placeholder="Search by client or contact..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            onBlur={() => handleSearchSubmit()}
             className="pl-9"
           />
-        </div>
+        </form>
 
         <div className="flex items-center gap-2">
           <Select
-            value={statusFilter}
-            onValueChange={(val) => setStatusFilter(val as "active" | "archived" | "all")}
+            value={activeStatus}
+            onValueChange={(val) => handleStatusChange(val || "active")}
+            disabled={isPending}
           >
             <SelectTrigger className="w-[140px]">
               <SelectValue placeholder="Status" />
@@ -103,7 +155,8 @@ export function ClientsView({ initialClients, userRole }: ClientsViewProps) {
             <Button
               variant="ghost"
               size="sm"
-              onClick={resetFilters}
+              onClick={handleResetFilters}
+              disabled={isPending}
               className="text-xs text-muted-foreground hover:text-foreground"
             >
               <RotateCcw className="mr-1.5 size-3.5" />
@@ -114,8 +167,65 @@ export function ClientsView({ initialClients, userRole }: ClientsViewProps) {
       </div>
 
       {/* Table or Empty State */}
-      {filteredClients.length > 0 ? (
-        <ClientTable clients={filteredClients} userRole={userRole} />
+      {data.clients.length > 0 ? (
+        <div className="space-y-4">
+          <div className={`transition-opacity duration-150 ${isPending ? "opacity-60 pointer-events-none" : "opacity-100"}`}>
+            <ClientTable clients={data.clients} userRole={userRole} />
+          </div>
+
+          {/* Server-Side Pagination Controls */}
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted-foreground pt-1">
+            <div className="flex items-center gap-2">
+              <span>Rows per page:</span>
+              <Select
+                value={String(data.pageSize)}
+                onValueChange={(val) => handlePageSizeChange(Number(val) || 20)}
+                disabled={isPending}
+              >
+                <SelectTrigger className="h-8 w-16 text-xs">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="10">10</SelectItem>
+                  <SelectItem value="20">20</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                </SelectContent>
+              </Select>
+              <span>
+                Showing <span className="font-medium text-foreground">{fromEntry}</span> to{" "}
+                <span className="font-medium text-foreground">{toEntry}</span> of{" "}
+                <span className="font-medium text-foreground">{data.total}</span> entries
+              </span>
+            </div>
+
+            <div className="flex items-center gap-1.5">
+              <span className="mr-2">
+                Page <span className="font-medium text-foreground">{data.page}</span> of{" "}
+                <span className="font-medium text-foreground">{data.totalPages}</span>
+              </span>
+              <Button
+                variant="outline"
+                size="icon"
+                className="size-8"
+                disabled={data.page <= 1 || isPending}
+                onClick={() => handlePageChange(data.page - 1)}
+                aria-label="Previous page"
+              >
+                <ChevronLeft className="size-4" />
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="size-8"
+                disabled={data.page >= data.totalPages || isPending}
+                onClick={() => handlePageChange(data.page + 1)}
+                aria-label="Next page"
+              >
+                <ChevronRight className="size-4" />
+              </Button>
+            </div>
+          </div>
+        </div>
       ) : (
         <EmptyState
           icon={Building2}
@@ -127,7 +237,7 @@ export function ClientsView({ initialClients, userRole }: ClientsViewProps) {
           }
           action={
             hasActiveFilters
-              ? { label: "Reset Filters", onClick: resetFilters }
+              ? { label: "Reset Filters", onClick: handleResetFilters }
               : canManage
               ? { label: "Add Client", onClick: () => setCreateDialogOpen(true) }
               : undefined

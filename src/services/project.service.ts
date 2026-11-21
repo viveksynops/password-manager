@@ -11,6 +11,23 @@ export interface ProjectWithDetails extends Project {
   env_count: number;
 }
 
+export interface PaginatedProjects {
+  projects: ProjectWithDetails[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+}
+
+export interface ListProjectsOptions {
+  includeArchived?: boolean;
+  status?: "active" | "archived" | "all";
+  clientId?: string;
+  search?: string;
+  page?: number;
+  pageSize?: number;
+}
+
 export interface ProjectMemberWithProfile {
   id: string;
   project_id: string;
@@ -75,6 +92,102 @@ export async function listProjects(options?: {
     credentials_count: row.credentials?.length || 0,
     env_count: row.env_variables?.length || 0,
   }));
+}
+
+/**
+ * Lists projects with server-side pagination, search, and status filtering.
+ * Strictly enforces range and limit on Supabase PostgREST queries to minimize egress.
+ */
+export async function listProjectsPaginated(options?: ListProjectsOptions): Promise<PaginatedProjects> {
+  const supabase = await createServerClient();
+
+  const page = Math.max(1, Number(options?.page) || 1);
+  const pageSize = Math.max(6, Math.min(60, Number(options?.pageSize) || 24));
+  const from = (page - 1) * pageSize;
+  const to = from + pageSize - 1;
+
+  let query = supabase
+    .from("projects")
+    .select("*, clients(id, name), project_members(id), credentials(id), env_variables(id)", { count: "exact" });
+
+  if (options?.status === "active") {
+    query = query.eq("is_archived", false);
+  } else if (options?.status === "archived") {
+    query = query.eq("is_archived", true);
+  } else if (!options?.includeArchived && !options?.status) {
+    query = query.eq("is_archived", false);
+  }
+
+  if (options?.clientId && options.clientId !== "all") {
+    query = query.eq("client_id", options.clientId);
+  }
+
+  if (options?.search && options.search.trim()) {
+    const q = options.search.trim();
+    query = query.or(`name.ilike.%${q}%,tech_stack.ilike.%${q}%,hosting_info.ilike.%${q}%`);
+  }
+
+  query = query
+    .order("created_at", { ascending: false })
+    .range(from, to)
+    .limit(pageSize);
+
+  const { data, count, error } = await query;
+
+  if (error) {
+    throw new Error(`Failed to list projects: ${error.message}`);
+  }
+
+  const rawProjects = data || [];
+  const total = count || 0;
+  const totalPages = Math.ceil(total / pageSize) || 1;
+
+  const projects: ProjectWithDetails[] = rawProjects.map((row: any) => ({
+    id: row.id,
+    client_id: row.client_id,
+    name: row.name,
+    description: row.description,
+    live_url: row.live_url,
+    repo_url: row.repo_url,
+    hosting_info: row.hosting_info,
+    tech_stack: row.tech_stack,
+    is_archived: row.is_archived,
+    created_by: row.created_by,
+    created_at: row.created_at,
+    updated_at: row.updated_at,
+    client_name: row.clients?.name || "Unknown Client",
+    member_count: row.project_members?.length || 0,
+    credentials_count: row.credentials?.length || 0,
+    env_count: row.env_variables?.length || 0,
+  }));
+
+  return {
+    projects,
+    total,
+    page,
+    pageSize,
+    totalPages,
+  };
+}
+
+/**
+ * Lightweight options query for client dropdowns in project views.
+ * Fetches only id, name with limit to minimize egress.
+ */
+export async function getProjectClientOptions(): Promise<Pick<Client, "id" | "name">[]> {
+  const supabase = await createServerClient();
+  const { data, error } = await supabase
+    .from("clients")
+    .select("id, name")
+    .eq("is_archived", false)
+    .order("name")
+    .limit(100);
+
+  if (error) {
+    console.error("Failed to load client options:", error.message);
+    return [];
+  }
+  return data || [];
 }
 
 /**
