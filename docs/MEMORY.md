@@ -13,6 +13,12 @@ Related documents:
 
 ## Current Status
 
+### Production routing repair (2026-11-21)
+
+- Investigated Vercel production 404 at `https://password-manager-beige-seven.vercel.app/`. The verified domain was correctly assigned and deployment `dpl_54zCL977cVx8iRLyw2SwpsUB1YTK` was READY, but project framework was `null`. Next.js compiled successfully without being packaged as a Next.js deployment.
+- Set project `prj_FiyyvE7naDd98CfbccpQAHsxpBIq` (team `vivek-synops-projects`) framework to `nextjs` and cleared the output-directory override. Rebuilt the same production Git commit `e20d6f6876564b9d43e7d601d8ca5555a8a37377`; no application source or deployment protection settings changed.
+- Replacement deployment `dpl_BaniKkBTFKnLrh3Gq1DRNpU9Wt7v` reached READY and received the production domain. HTTP checks verified `/` redirects to `/login` with 307 and `/login` serves HTML with 200. This verifies public login reachability only; authenticated production flows and the remaining hardening/deployment checklist have not been verified.
+
 Phases 1 through 11 are complete. Database schema, security foundation, AES-256-GCM encryption libraries, Supabase clients, fail-closed audit logging, full authentication flow (Login, MFA, password reset, invites), responsive App Layout (shadcn Sidebar, Breadcrumbs, Avatar, DataTable, ThemeToggle), full Team Management (Admin controls, immediate revocation), complete Client Management, complete Project Management (folder-based grid view, responsive slide-over edit sheet, project detail view with responsive tabs), complete Credentials Vault (AES-256-GCM password encryption on save, `SecretField` with reveal auto-hide after 15s and copy clipboard auto-clear after 30s), complete Environment Variables Manager (AES-256-GCM encryption on save, environment switcher for Dev/Staging/Prod, SecretField table, typed delete confirmation for Production, Paste .env bulk import with live preview, Export .env file download with audit logging), and complete Audit Logs (Admin-only immutable append-only ledger, action/user/project/date filters, pagination, relative time with full timestamp hover tooltip, metadata inspector, and 122/122 passing unit tests) are implemented, verified, and passing all tests.
 
 **Overall progress:** 112 of 138 tasks marked complete (81%) — 1 skipped per user preference (TASK-005). Phase 12 is also marked complete; TASK-114 is next. The preceding narrative and historical verification counts describe an earlier snapshot, not a fresh verification.

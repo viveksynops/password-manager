@@ -85,7 +85,7 @@ export function PasteEnvDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-xl">
+      <DialogContent className="sm:max-w-xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex items-center gap-2">
             <div className="flex size-8 items-center justify-center rounded-lg bg-primary/10 text-primary">
@@ -98,7 +98,7 @@ export function PasteEnvDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-4 py-2">
+        <div className="space-y-4 py-2 min-w-0 max-w-full">
           {/* Environment Target */}
           <Field>
             <FieldLabel htmlFor="import-env">Target Environment</FieldLabel>
@@ -119,7 +119,7 @@ export function PasteEnvDialog({
           </Field>
 
           {/* Raw Text Input */}
-          <Field>
+          <Field className="min-w-0 max-w-full">
             <FieldLabel htmlFor="raw-env">.env Text Content</FieldLabel>
             <Textarea
               id="raw-env"
@@ -127,7 +127,7 @@ export function PasteEnvDialog({
               value={rawText}
               onChange={(e) => setRawText(e.target.value)}
               placeholder={`# Paste your .env file contents here\nDATABASE_URL=postgres://...\nNEXT_PUBLIC_API_URL=https://...\nSTRIPE_SECRET_KEY="sk_live_..."`}
-              className="font-mono text-xs"
+              className="font-mono text-xs w-full max-w-full min-w-0 break-all resize-y"
               disabled={isPending}
             />
           </Field>

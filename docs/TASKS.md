@@ -240,6 +240,8 @@ Orientation note (2026-11-21): documentation and representative code reviewed; n
 
 ## Phase 14: Deployment
 
+Deployment repair (2026-11-21): corrected Vercel framework preset from unset to Next.js and cleared output-directory override; redeployed existing commit `e20d6f6` as `dpl_BaniKkBTFKnLrh3Gq1DRNpU9Wt7v`. Production `/` now redirects to `/login`, which returns 200. TASK-128 remains open for a full authenticated smoke test; no other Phase 14 prerequisites were marked complete.
+
 - [ ] **TASK-123** Set environment variables on the host (Vercel) 🔒
 - [ ] **TASK-124** Configure production Supabase (auth URLs, SMTP for invites, MFA enabled)
 - [ ] **TASK-125** Enable Supabase backups and Point-in-Time Recovery
