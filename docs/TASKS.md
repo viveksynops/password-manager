@@ -95,16 +95,16 @@ When done, list files changed and how to test it.
 
 ## Phase 4: Authentication
 
-- [ ] **TASK-032** Create login page (email and password)
-- [ ] **TASK-033** Configure Supabase Auth session handling with `@supabase/ssr`
-- [ ] **TASK-034** Create `middleware.ts` to protect dashboard routes
-- [ ] **TASK-035** Create MFA enrollment page (QR code and verify code) 🔒
-- [ ] **TASK-036** Create MFA verification step on login 🔒
-- [ ] **TASK-037** Require MFA before accessing any dashboard page 🔒
-- [ ] **TASK-038** Add logout and session timeout handling
-- [ ] **TASK-039** Create forgot and reset password flow
-- [ ] **TASK-040** Create accept-invite page for new team members
-- [ ] **TASK-041** Test authentication flows end to end
+- [x] **TASK-032** Create login page (email and password)
+- [x] **TASK-033** Configure Supabase Auth session handling with `@supabase/ssr`
+- [x] **TASK-034** Create `middleware.ts` to protect dashboard routes
+- [x] **TASK-035** Create MFA enrollment page (QR code and verify code) 🔒
+- [x] **TASK-036** Create MFA verification step on login 🔒
+- [x] **TASK-037** Require MFA before accessing any dashboard page 🔒
+- [x] **TASK-038** Add logout and session timeout handling
+- [x] **TASK-039** Create forgot and reset password flow
+- [x] **TASK-040** Create accept-invite page for new team members
+- [x] **TASK-041** Test authentication flows end to end
 
 ---
 

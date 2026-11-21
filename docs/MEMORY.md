@@ -66,14 +66,24 @@ Planning phase is complete. Project documentation is written and ready. No appli
 - [x] **TASK-029**: Create `src/lib/auth.ts` with `getCurrentUser()` and `requireRole()`
 - [x] **TASK-030**: Create `src/services/audit.service.ts` with `logAction()`
 - [x] **TASK-031**: Create shared action result type (`ActionResult<T>`) and safe error helpers
+- [x] **TASK-032**: Create login page with shadcn and React Hook Form
+- [x] **TASK-033**: Configure Supabase Auth cookie session handling via `@supabase/ssr`
+- [x] **TASK-034**: Create `middleware.ts` protecting dashboard routes
+- [x] **TASK-035**: Create MFA enrollment page with QR code and verify code
+- [x] **TASK-036**: Create MFA verification step on login
+- [x] **TASK-037**: Enforce MFA verification in middleware and server actions
+- [x] **TASK-038**: Add logout and session timeout handling
+- [x] **TASK-039**: Create forgot password and reset password flow
+- [x] **TASK-040**: Create accept-invite page for new team members
+- [x] **TASK-041**: Add authentication schema and flow unit tests
 
 ---
 
 ## Current Task
 
-**TASK-032:** Create login page (email and password) (Phase 4: Authentication)
+**TASK-042:** Create dashboard layout with sidebar and header (Phase 5: App Layout)
 
-**Phase:** 4, Authentication
+**Phase:** 5, App Layout
 
 **Status:** Ready to start
 
@@ -81,7 +91,7 @@ Planning phase is complete. Project documentation is written and ready. No appli
 
 ## In Progress
 
-Phase 3 complete (7/7 tasks). Ready for Phase 4.
+Phase 4 complete (10/10 tasks). Ready for Phase 5.
 
 ---
 
@@ -92,7 +102,7 @@ Phase 3 complete (7/7 tasks). Ready for Phase 4.
 | 1. Setup | Mostly complete (awaiting Supabase keys) | 9 / 12 |
 | 2. Database and Security Foundation | Complete | 12 / 12 |
 | 3. Encryption and Core Libraries | Complete | 7 / 7 |
-| 4. Authentication | Not started | 0 / 10 |
+| 4. Authentication | Complete | 10 / 10 |
 | 5. App Layout | Not started | 0 / 7 |
 | 6. Team Management | Not started | 0 / 6 |
 | 7. Clients | Not started | 0 / 9 |
