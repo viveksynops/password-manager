@@ -13,10 +13,10 @@ Design principles:
 
 ## Typography
 
-| Use | Font |
-|---|---|
-| UI text | **Inter** |
-| Passwords, API keys, env values, URLs | **JetBrains Mono** (fallback: `ui-monospace`, `monospace`) |
+| Use | Font | CSS Variable |
+|---|---|---|
+| UI text & headings | **Inter** / Geist Sans | `--font-sans` |
+| Passwords, API keys, env values, code, URLs | **JetBrains Mono** / Geist Mono | `--font-mono` |
 
 | Element | Size | Weight |
 |---|---|---|
@@ -27,133 +27,113 @@ Design principles:
 | Label | 14px (`text-sm`) | 500 |
 | Helper / caption | 12px (`text-xs`) | 400 |
 
-Line height: 1.5 for body text. Never use more than two font families.
+Line height: 1.5 for body text.
 
 ---
 
-## Colors
+## Colors & Design Tokens
 
-### Light mode
+The application uses the installed **shadcn `base-vega` (zinc)** theme powered by Tailwind CSS v4 and CSS variables (OKLCH). All components must consume these CSS variables directly (or standard Tailwind utility classes like `bg-primary`, `text-foreground`, `border-border`) rather than hardcoded hex values.
 
-| Role | Color |
-|---|---|
-| Primary | `#6366F1` |
-| Primary hover | `#4F46E5` |
-| Background | `#F8FAFC` |
-| Surface (cards, dialogs) | `#FFFFFF` |
-| Text | `#0F172A` |
-| Muted text | `#64748B` |
-| Border | `#E2E8F0` |
-| Input background | `#FFFFFF` |
+### Theme Palette (shadcn CSS Variables)
 
-### Dark mode
+| Role | Light Mode Token | Dark Mode Token | Semantic Class |
+|---|---|---|---|
+| Background | `oklch(1 0 0)` | `oklch(0.141 0.005 285.823)` | `bg-background` |
+| Foreground / Text | `oklch(0.141 0.005 285.823)` | `oklch(0.985 0 0)` | `text-foreground` |
+| Card / Surface | `oklch(1 0 0)` | `oklch(0.21 0.006 285.885)` | `bg-card text-card-foreground` |
+| Popover / Dialog | `oklch(1 0 0)` | `oklch(0.21 0.006 285.885)` | `bg-popover text-popover-foreground` |
+| Primary | `oklch(0.21 0.006 285.885)` | `oklch(0.92 0.004 286.32)` | `bg-primary text-primary-foreground` |
+| Secondary | `oklch(0.967 0.001 286.375)` | `oklch(0.274 0.006 286.033)` | `bg-secondary text-secondary-foreground` |
+| Muted | `oklch(0.967 0.001 286.375)` | `oklch(0.274 0.006 286.033)` | `bg-muted text-muted-foreground` |
+| Accent | `oklch(0.967 0.001 286.375)` | `oklch(0.274 0.006 286.033)` | `bg-accent text-accent-foreground` |
+| Destructive | `oklch(0.577 0.245 27.325)` | `oklch(0.704 0.191 22.216)` | `bg-destructive text-white` |
+| Border | `oklch(0.92 0.004 286.32)` | `oklch(1 0 0 / 10%)` | `border-border` |
+| Input Border | `oklch(0.92 0.004 286.32)` | `oklch(1 0 0 / 15%)` | `border-input` |
+| Focus Ring | `oklch(0.705 0.015 286.067)` | `oklch(0.552 0.016 285.938)` | `ring-ring` |
+| Sidebar Surface | `oklch(0.985 0 0)` | `oklch(0.21 0.006 285.885)` | `bg-sidebar text-sidebar-foreground` |
 
-| Role | Color |
-|---|---|
-| Primary | `#818CF8` |
-| Background | `#0B1120` |
-| Surface | `#111827` |
-| Text | `#F1F5F9` |
-| Muted text | `#94A3B8` |
-| Border | `#1E293B` |
-
-### Status colors
+### Status Colors
 
 | Status | Color | Used for |
 |---|---|---|
-| Success | `#16A34A` | Saved, copied, active |
-| Warning | `#D97706` | Expiring key, unsaved changes |
-| Destructive | `#DC2626` | Delete, errors, revoked access |
-| Info | `#0284C7` | Tips and notices |
+| Success | Green (`#16A34A` / `text-green-600`) | Saved, copied, active status |
+| Warning | Amber (`#D97706` / `text-amber-600`) | Expiring key, unsaved changes |
+| Destructive | `var(--destructive)` | Delete, errors, revoked access |
+| Info | Sky (`#0284C7` / `text-sky-600`) | Tips, notice banners |
 
-### Environment badges
+### Environment Badges
 
-| Environment | Badge color |
-|---|---|
-| Development | Blue (`#0284C7`) |
-| Staging | Amber (`#D97706`) |
-| Production | Red (`#DC2626`) |
+| Environment | Badge color | Class |
+|---|---|---|
+| Development | Blue | `bg-sky-500/10 text-sky-600 border-sky-500/20 dark:text-sky-400` |
+| Staging | Amber | `bg-amber-500/10 text-amber-600 border-amber-500/20 dark:text-amber-400` |
+| Production | Red | `bg-red-500/10 text-red-600 border-red-500/20 dark:text-red-400` |
 
-Production uses red on purpose to remind users they are touching live data.
+Production uses red on purpose to remind users they are touching live client data.
 
-### Role badges
+### Role Badges
 
 | Role | Style |
 |---|---|
-| Admin | Primary (indigo) |
-| Manager | Neutral dark |
-| Developer | Neutral light |
+| Admin | `bg-primary text-primary-foreground` |
+| Manager | `bg-secondary text-secondary-foreground border-border` |
+| Developer | `bg-muted text-muted-foreground border-border` |
 
 Rules:
-- Use shadcn CSS variables (`--primary`, `--background`, etc.) mapped to these values. Never hardcode hex values in components.
-- Never rely on color alone to convey meaning. Pair it with an icon or text.
+- Always use shadcn CSS variables and Tailwind classes. Never hardcode one-off hex values in components.
+- Never rely on color alone to convey meaning. Pair it with an icon or clear text.
 
 ---
 
 ## Spacing and Layout
 
-- Spacing scale: Tailwind default (multiples of 4px). Prefer `4, 6, 8` between elements and `16, 24` between sections.
-- Page padding: 16px on mobile, 24px on tablet, 32px on desktop.
-- Max content width: `1280px`, centered.
-- Layout: fixed left **sidebar** (collapsible) + top header + content area.
-- Use a consistent grid: 1 column on mobile, 2 on tablet, 3 to 4 on desktop for card grids.
+- Spacing scale: Tailwind default (multiples of 4px: `p-2`, `p-4`, `p-6`, `gap-3`, etc.).
+- Page padding: 16px (`p-4`) on mobile, 24px (`p-6`) on tablet, 32px (`p-8`) on desktop.
+- Max content width: `1280px` (`max-w-7xl`), centered.
+- Layout: collapsible left sidebar (`src/components/ui/sidebar.tsx`) + top header + main content.
+- Consistent grid: 1 column on mobile, 2 on tablet, 3 to 4 on desktop.
 
 ---
 
 ## Border Radius, Borders and Shadows
 
-| Element | Radius |
-|---|---|
-| Cards, dialogs | **12px** (`rounded-xl`) |
-| Buttons, inputs, selects | **8px** (`rounded-lg`) |
-| Badges | **9999px** (`rounded-full`) |
-| Avatars | **9999px** |
+The design uses the installed shadcn base radius `--radius: 0.625rem` (10px):
 
-- Borders: 1px solid border color. Prefer borders over heavy shadows.
-- Shadows: `shadow-sm` for cards, `shadow-lg` for dialogs and dropdowns only.
-- Never mix square and rounded corners on the same page.
-
----
-
-## Buttons
-
-| Variant | Use | Style |
+| Token | Calculated Value | Used for |
 |---|---|---|
-| **Primary** | Main action on a page (Save, Add Client) | Solid indigo, white text |
-| **Secondary** | Alternative actions (Cancel, Export) | Light gray fill, dark text |
-| **Outline** | Low-emphasis actions | Border only |
-| **Ghost** | Icon actions in tables and rows | No border, hover background |
-| **Destructive** | Delete, revoke, remove access | Solid red, white text |
+| `--radius-sm` | `calc(var(--radius) * 0.6)` (~6px) | Compact elements, small tags |
+| `--radius-md` | `calc(var(--radius) * 0.8)` (~8px) | Buttons, inputs, selects |
+| `--radius-lg` | `var(--radius)` (10px) | Cards, dialogs, dropdowns |
+| `--radius-xl` | `calc(var(--radius) * 1.4)` (14px) | Large modal containers |
+| Full / Pill | `rounded-full` | Badges, status chips, avatars |
 
-Rules:
-- One Primary button per view.
-- Height: 40px default, 32px small (tables), 44px for mobile touch targets.
-- Icon buttons must have an `aria-label` and a tooltip.
-- Buttons show a **spinner and are disabled** while an action is running.
-- Destructive actions always ask for confirmation in a dialog.
-- Icons come from **lucide-react**, 16px inside buttons, 20px elsewhere.
+- Borders: 1px solid `border-border`. Prefer clean borders over heavy shadows.
+- Shadows: `shadow-xs` / `shadow-sm` for cards, `shadow-lg` for dialogs and popovers.
 
 ---
 
-## Cards
+## Component Guidelines (Do Not Edit `components/ui/*`)
 
-- Background: surface color, 1px border, **12px radius**, `shadow-sm`.
-- Padding: 24px on desktop, 16px on mobile.
-- Structure: Header (title + action) → Content → optional Footer.
-- Clickable cards show a subtle hover state (border turns primary at low opacity), never a large lift or scale.
+All base UI primitives are installed in `src/components/ui/` using shadcn (built on Base UI).
+**Rule: Do not edit shadcn components in `src/components/ui/*` directly.** Build application features and layouts on top of them by passing standard props, classes, and slots.
 
----
+### Buttons (`src/components/ui/button.tsx`)
+- Variants: `default` (primary), `outline`, `secondary`, `ghost`, `destructive`, `link`.
+- Sizes: `default`, `xs`, `sm`, `lg`, `icon`, `icon-xs`, `icon-sm`, `icon-lg`.
+- One primary (`default`) button per view.
+- Icon buttons must include an `aria-label` and tooltip.
+- Buttons show a loading state (spinner) and are disabled while submitting.
+- Destructive actions always require confirmation via `AlertDialog`.
+- Icons from **lucide-react** (16px inside buttons, 20px in navigation).
 
-## Forms and Inputs
-
+### Forms and Inputs (`field.tsx`, `label.tsx`, `input.tsx`, `select.tsx`, `textarea.tsx`)
+- Built with `@base-ui/react` form primitives (`Field`, `FieldLabel`, `FieldDescription`, `FieldError`, `FieldSet`, `FieldLegend`).
 - Labels sit above inputs, always visible. Never use placeholders as labels.
-- Required fields are marked with `*`.
-- Error messages appear directly under the field in destructive color, with an icon.
-- Helper text sits under the field in muted color.
-- Validation runs on submit and on blur. Don't show errors while the user is still typing for the first time.
-- Use shadcn `Form` + React Hook Form + Zod.
-- Focus ring: 2px primary color, visible on every interactive element.
-- Long forms use Dialog (short) or a full page (long).
+- Required fields marked with `*`.
+- Validation errors appear in `FieldError` with destructive styling.
+- Pair with React Hook Form + Zod for type-safe validation.
+- Focus ring: `focus-visible:ring-3 focus-visible:ring-ring/50 outline-none`.
 
 ---
 
@@ -284,6 +264,7 @@ Tabs: Credentials | Env Variables | Notes | Files
 | Do | Don't |
 |---|---|
 | Use shadcn/ui components and CSS variables | Create custom one-off button or card styles |
+| Use installed shadcn components as-is (wrap or pass props) | Edit files in `src/components/ui/` directly |
 | Keep the same radius, spacing and fonts on every page | Mix rounded and square elements |
 | Mask secrets by default | Show any secret on page load |
 | Confirm destructive actions | Delete on a single click |

@@ -14,7 +14,7 @@ Related documents:
 
 Planning phase is complete. Project documentation is written and ready. No application code has been written yet. Setup (Phase 1) has not started.
 
-**Overall progress:** 0 of 138 tasks complete (0%)
+**Overall progress:** 1 of 138 tasks complete (1%)
 
 ---
 
@@ -38,12 +38,14 @@ Planning phase is complete. Project documentation is written and ready. No appli
 - [x] Development rules defined (`RULES.md`)
 - [x] Task breakdown created, 138 tasks in 15 phases (`TASKS.md`)
 - [x] Architecture decisions recorded, 21 ADRs (`DECISIONS.md`)
+- [x] **TASK-001**: Initialize Next.js project with TypeScript, App Router and `src/` directory
+- [x] **TASK-004**: Initialize shadcn/ui and add base components (built on Base UI, zinc theme)
 
 ---
 
 ## Current Task
 
-**TASK-001:** Initialize Next.js project with TypeScript, App Router and `src/` directory
+**TASK-002:** Enable TypeScript `strict` mode and configure ESLint and Prettier
 
 **Phase:** 1, Setup
 
@@ -61,7 +63,7 @@ Nothing yet.
 
 | Phase | Status | Tasks done |
 |---|---|---|
-| 1. Setup | Not started | 0 / 12 |
+| 1. Setup | In progress | 2 / 12 |
 | 2. Database and Security Foundation | Not started | 0 / 12 |
 | 3. Encryption and Core Libraries | Not started | 0 / 7 |
 | 4. Authentication | Not started | 0 / 10 |
@@ -83,8 +85,8 @@ Nothing yet.
 
 | Item | Status |
 |---|---|
-| Git repository | Not created |
-| Next.js project | Not created |
+| Git repository | Initialized |
+| Next.js project | Initialized with `src/`, App Router & TypeScript |
 | Supabase project (separate for vault) | Not created |
 | Database migrations | None |
 | `MASTER_KEY` generated and backed up | No |
@@ -128,9 +130,7 @@ None.
 
 ## Next Step
 
-Start **TASK-001**: initialize the Next.js project. Then continue in order through Phase 1 (TASK-002 to TASK-012).
-
-Before starting, create the separate Supabase project for the vault (TASK-010) so the correct credentials are ready when needed.
+Start **TASK-002**: Enable TypeScript `strict` mode and configure ESLint and Prettier.
 
 ---
 
@@ -139,6 +139,7 @@ Before starting, create the separate Supabase project for the vault (TASK-010) s
 | Date | Work done | Next |
 |---|---|---|
 | 2026-11-21 | Wrote PRD, ARCHITECTURE, DESIGN, RULES, TASKS, DECISIONS and MEMORY | Start TASK-001 |
+| 2026-11-21 | Completed TASK-001 (Migrated Next.js project structure into `src/`, updated paths, verified build and lint) | Start TASK-002 |
 
 ---
 

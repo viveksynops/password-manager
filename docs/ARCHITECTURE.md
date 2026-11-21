@@ -4,7 +4,7 @@
 Next.js (App Router) + TypeScript + React
 
 ## UI Components
-shadcn/ui (built on Radix UI)
+shadcn/ui (built on Base UI)
 
 ## Styling
 Tailwind CSS

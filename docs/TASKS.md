@@ -49,10 +49,10 @@ When done, list files changed and how to test it.
 
 ## Phase 1: Setup
 
-- [ ] **TASK-001** Initialize Next.js project with TypeScript, App Router and `src/` directory
+- [x] **TASK-001** Initialize Next.js project with TypeScript, App Router and `src/` directory
 - [ ] **TASK-002** Enable TypeScript `strict` mode and configure ESLint and Prettier
 - [ ] **TASK-003** Configure Tailwind CSS
-- [ ] **TASK-004** Initialize shadcn/ui and add base components (button, input, card, table, dialog, dropdown-menu, tabs, badge, sonner, sidebar, form, select, textarea, skeleton, alert-dialog)
+- [x] **TASK-004** Initialize shadcn/ui and add base components (button, input, card, table, dialog, dropdown-menu, tabs, badge, sonner, sidebar, form, select, textarea, skeleton, alert-dialog)
 - [ ] **TASK-005** Apply `DESIGN.md` theme (Inter and JetBrains Mono fonts, color variables, radius, dark mode)
 - [ ] **TASK-006** Create folder structure from `ARCHITECTURE.md`
 - [ ] **TASK-007** Configure Git, `.gitignore`, `.env.example` and branch rules

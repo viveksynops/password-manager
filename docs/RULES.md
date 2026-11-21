@@ -66,6 +66,7 @@ If a rule here conflicts with a request, follow the rule and ask for clarificati
 
 - Follow `DESIGN.md` for colors, typography, spacing, radius and components.
 - Use shadcn/ui components and CSS variables. Do not hardcode colors or create one-off styles.
+- Do not edit `src/components/ui/*` components directly. Treat them as unedited primitives from shadcn; compose and style them via props and wrapper components.
 - Use Tailwind utility classes. No inline styles, no separate CSS files for components.
 - Use lucide-react for icons.
 - Maintain responsive design from 360px upward.
