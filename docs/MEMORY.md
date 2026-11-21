@@ -117,7 +117,7 @@ Phases 1 through 9 are complete. Database schema, security foundation, AES-256-G
 - [x] **TASK-065**: Create `src/services/project.service.ts` (listProjects with RLS, getProjectById with details, createProject, updateProject, archiveProject, assignProjectMember, removeProjectMember)
 - [x] **TASK-066**: Create project server actions with role checks (`createProjectAction`, `updateProjectAction`, `archiveProjectAction`, `assignProjectMemberAction`, `removeProjectMemberAction`)
 - [x] **TASK-067**: Create projects list page at `src/app/(dashboard)/projects/page.tsx` (< 25 lines) with folder-based grid view as default and view mode toggle
-- [x] **TASK-068**: Create add and edit project form dialog (`ProjectFormDialog.tsx`) streamlined to Client Organization and Project (Folder) Name, with additional metadata editable inside the project
+- [x] **TASK-068**: Create add project form dialog (`ProjectFormDialog.tsx`) streamlined to Client Organization and Project (Folder) Name, and right-side slide-over sheet for editing (`ProjectEditSheet.tsx` with expanded width) for all metadata, URLs, and settings
 - [x] **TASK-069**: Add archive and restore project functionality with `ConfirmDialog`
 - [x] **TASK-070**: Create project detail page at `src/app/(dashboard)/projects/[id]/page.tsx` (< 25 lines) with tabs (Credentials, Env Variables, Team Members, Overview)
 - [x] **TASK-071**: Add assign and remove team members on a project (`ProjectMembersTab.tsx`)

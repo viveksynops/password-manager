@@ -239,7 +239,6 @@ export function ProjectsView({
           open={createDialogOpen}
           onOpenChange={setCreateDialogOpen}
           clients={clients}
-          users={users}
         />
       )}
     </div>

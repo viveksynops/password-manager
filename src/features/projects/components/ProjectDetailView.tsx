@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { ProjectMembersTab } from "./ProjectMembersTab";
 import { ProjectCredentialsTab } from "@/features/credentials/components/ProjectCredentialsTab";
-import { ProjectFormDialog } from "./ProjectFormDialog";
+import { ProjectEditSheet } from "./ProjectEditSheet";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { archiveProjectAction } from "@/actions/project.actions";
 import { CredentialSummary } from "@/services/credential.service";
@@ -365,9 +365,9 @@ export function ProjectDetailView({
         </TabsContent>
       </Tabs>
 
-      {/* Edit Project Dialog */}
+      {/* Edit Project Slide-Over Sheet (Right Side) */}
       {canManage && (
-        <ProjectFormDialog
+        <ProjectEditSheet
           open={editDialogOpen}
           onOpenChange={setEditDialogOpen}
           project={project}

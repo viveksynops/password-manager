@@ -28,7 +28,7 @@ import {
   GitBranch,
   ChevronRight,
 } from "lucide-react";
-import { ProjectFormDialog } from "./ProjectFormDialog";
+import { ProjectEditSheet } from "./ProjectEditSheet";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { archiveProjectAction } from "@/actions/project.actions";
 import { toast } from "sonner";
@@ -236,9 +236,9 @@ export function ProjectFolderGrid({ projects, userRole, clients }: ProjectFolder
         ))}
       </div>
 
-      {/* Edit Project Dialog */}
+      {/* Edit Project Slide-Over Sheet (Right Side) */}
       {canManage && (
-        <ProjectFormDialog
+        <ProjectEditSheet
           open={editDialogOpen}
           onOpenChange={setEditDialogOpen}
           project={editingProject}
