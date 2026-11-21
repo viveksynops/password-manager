@@ -166,36 +166,38 @@ export function ProjectDetailView({
 
       {/* Tabs Layout */}
       <Tabs defaultValue="credentials" className="space-y-6">
-        <TabsList className="grid w-full grid-cols-4 md:w-auto md:inline-grid">
-          <TabsTrigger value="credentials" className="gap-2">
-            <KeyRound className="size-4" />
-            <span>Credentials</span>
-            <Badge variant="secondary" className="px-1.5 py-0 text-[11px]">
-              {initialCredentials.length}
-            </Badge>
-          </TabsTrigger>
+        <div className="w-full overflow-x-auto pb-1">
+          <TabsList className="inline-flex h-10 w-max items-center justify-start gap-1 p-1 bg-muted/60">
+            <TabsTrigger value="credentials" className="gap-2 px-3 py-1.5 text-xs sm:text-sm">
+              <KeyRound className="size-4 shrink-0" />
+              <span>Credentials</span>
+              <Badge variant="secondary" className="px-1.5 py-0 text-[11px] shrink-0">
+                {initialCredentials.length}
+              </Badge>
+            </TabsTrigger>
 
-          <TabsTrigger value="env" className="gap-2">
-            <FileCode2 className="size-4" />
-            <span>Env Variables</span>
-            <Badge variant="secondary" className="px-1.5 py-0 text-[11px]">
-              {env_count}
-            </Badge>
-          </TabsTrigger>
+            <TabsTrigger value="env" className="gap-2 px-3 py-1.5 text-xs sm:text-sm">
+              <FileCode2 className="size-4 shrink-0" />
+              <span>Env Variables</span>
+              <Badge variant="secondary" className="px-1.5 py-0 text-[11px] shrink-0">
+                {env_count}
+              </Badge>
+            </TabsTrigger>
 
-          <TabsTrigger value="members" className="gap-2">
-            <Users className="size-4" />
-            <span>Team Members</span>
-            <Badge variant="secondary" className="px-1.5 py-0 text-[11px]">
-              {members.length}
-            </Badge>
-          </TabsTrigger>
+            <TabsTrigger value="members" className="gap-2 px-3 py-1.5 text-xs sm:text-sm">
+              <Users className="size-4 shrink-0" />
+              <span>Team Members</span>
+              <Badge variant="secondary" className="px-1.5 py-0 text-[11px] shrink-0">
+                {members.length}
+              </Badge>
+            </TabsTrigger>
 
-          <TabsTrigger value="overview" className="gap-2">
-            <Info className="size-4" />
-            <span>Project Info</span>
-          </TabsTrigger>
-        </TabsList>
+            <TabsTrigger value="overview" className="gap-2 px-3 py-1.5 text-xs sm:text-sm">
+              <Info className="size-4 shrink-0" />
+              <span>Project Info</span>
+            </TabsTrigger>
+          </TabsList>
+        </div>
 
         {/* Credentials Tab */}
         <TabsContent value="credentials" className="space-y-4">

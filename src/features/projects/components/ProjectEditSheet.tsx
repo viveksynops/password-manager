@@ -113,7 +113,7 @@ export function ProjectEditSheet({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="right"
-        className="w-full sm:!max-w-lg data-[side=right]:sm:max-w-lg flex flex-col justify-between overflow-y-auto p-6"
+        className="w-full inset-0 sm:inset-y-0 sm:right-0 sm:left-auto sm:!max-w-lg data-[side=right]:w-full data-[side=right]:max-w-full data-[side=right]:sm:max-w-lg flex flex-col justify-between overflow-y-auto p-4 sm:p-6"
       >
         <div>
           <SheetHeader className="p-0 pb-6 border-b">
