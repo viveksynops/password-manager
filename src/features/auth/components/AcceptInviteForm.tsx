@@ -32,8 +32,9 @@ export function AcceptInviteForm() {
         toast.error(res.error);
         return;
       }
-      toast.success("Invitation accepted! Please enroll in MFA to complete account activation.");
-      router.push("/mfa/enroll");
+      toast.success("Invitation accepted! Welcome to Company Vault.");
+      router.push("/");
+      router.refresh();
     });
   };
 
@@ -86,7 +87,7 @@ export function AcceptInviteForm() {
             Setting up account...
           </>
         ) : (
-          "Accept & Setup MFA"
+          "Accept Invitation"
         )}
       </Button>
     </form>

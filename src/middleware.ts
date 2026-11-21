@@ -3,8 +3,6 @@ import { type NextRequest, NextResponse } from "next/server";
 
 const AUTH_ROUTES = [
   "/login",
-  "/mfa",
-  "/mfa/enroll",
   "/forgot-password",
   "/reset-password",
   "/accept-invite",
@@ -25,6 +23,16 @@ export async function middleware(request: NextRequest) {
   // Never redirect a Server Action POST to an HTML page as it breaks React Flight RPC.
   if (request.headers.has("next-action")) {
     return supabaseResponse;
+  }
+
+  // If user accesses old MFA routes, redirect them appropriately
+  if (pathname.startsWith("/mfa")) {
+    const targetUrl = user ? "/" : "/login";
+    const redirectResponse = NextResponse.redirect(new URL(targetUrl, request.url));
+    supabaseResponse.cookies.getAll().forEach((cookie) => {
+      redirectResponse.cookies.set(cookie.name, cookie.value);
+    });
+    return redirectResponse;
   }
 
   const isAuthRoute = AUTH_ROUTES.some((route) => pathname.startsWith(route));

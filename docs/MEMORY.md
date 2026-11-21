@@ -13,6 +13,13 @@ Related documents:
 
 ## Current Status
 
+### Mandatory MFA Removal (2026-11-21)
+- Disabled mandatory Multi-Factor Authentication requirement per user request so users log in directly to the dashboard without `/mfa/enroll` or `/mfa` interception.
+- In `src/actions/auth.actions.ts`: `loginAction` logs in directly and returns `{ requiresMfa: false, requiresMfaEnrollment: false }`.
+- In `src/middleware.ts` & `src/app/(auth)/mfa/*`: redirected any legacy `/mfa` and `/mfa/enroll` accesses to `/` for authenticated sessions or `/login` for unauthenticated sessions.
+- In `src/features/auth/components/AcceptInviteForm.tsx`: routes directly to `/` after password creation.
+- All 138 unit tests pass; production Turbopack build succeeds.
+
 ### Production routing repair (2026-11-21)
 
 - Investigated Vercel production 404 at `https://password-manager-beige-seven.vercel.app/`. The verified domain was correctly assigned and deployment `dpl_54zCL977cVx8iRLyw2SwpsUB1YTK` was READY, but project framework was `null`. Next.js compiled successfully without being packaged as a Next.js deployment.

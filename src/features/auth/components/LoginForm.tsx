@@ -38,18 +38,6 @@ export function LoginForm() {
         return;
       }
 
-      if (result.data.requiresMfaEnrollment) {
-        toast.info("Please set up Multi-Factor Authentication to secure your account.");
-        router.push("/mfa/enroll");
-        return;
-      }
-
-      if (result.data.requiresMfa) {
-        toast.info("Please enter your two-factor authentication code.");
-        router.push("/mfa");
-        return;
-      }
-
       toast.success("Welcome back!");
       router.push("/");
       router.refresh();

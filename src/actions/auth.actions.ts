@@ -76,33 +76,12 @@ export async function loginAction(rawInput: LoginInput): Promise<ActionResult<Lo
       return errorResult("This account has been deactivated. Please contact an administrator.");
     }
 
-    // Check MFA enrollment & assurance level
-    const { data: aalData } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
-    const { data: factorsData } = await supabase.auth.mfa.listFactors();
-
-    const verifiedTotpFactors = factorsData?.totp?.filter((f) => f.status === "verified") || [];
-
     await logAction({
       userId,
       action: "login",
       targetType: "auth",
       ipAddress,
     });
-
-    if (verifiedTotpFactors.length === 0) {
-      // User must enroll in MFA before accessing vault (ADR-010, TASK-035)
-      return successResult({
-        requiresMfa: false,
-        requiresMfaEnrollment: true,
-      });
-    }
-
-    if (aalData?.nextLevel === "aal2" && aalData?.currentLevel !== "aal2") {
-      return successResult({
-        requiresMfa: true,
-        requiresMfaEnrollment: false,
-      });
-    }
 
     return successResult({
       requiresMfa: false,

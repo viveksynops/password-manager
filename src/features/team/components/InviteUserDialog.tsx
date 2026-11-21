@@ -76,7 +76,7 @@ export function InviteUserDialog() {
         <DialogHeader>
           <DialogTitle>Invite Team Member</DialogTitle>
           <DialogDescription>
-            Invite a new team member to Company Vault. They will receive an invitation to set up their password and MFA.
+            Invite a new team member to Company Vault. They will receive an invitation to set up their password.
           </DialogDescription>
         </DialogHeader>
 
