@@ -59,14 +59,21 @@ Planning phase is complete. Project documentation is written and ready. No appli
 - [x] **TASK-022**: Generate TypeScript types into `src/types/database.types.ts`
 - [x] **TASK-023**: Write RLS tests (Developer cannot read unassigned projects)
 - [x] **TASK-024**: Create seed data with fake, non-real values in `supabase/seed.sql`
+- [x] **TASK-025**: Generate `MASTER_KEY` and store it in `.env.local` (64-character hex key)
+- [x] **TASK-026**: Create `src/lib/crypto.ts` with AES-256-GCM encryption and decryption (`server-only`)
+- [x] **TASK-027**: Add crypto tests in `src/test/crypto.test.ts` (round trip, unique IVs, tamper detection, wrong key fails)
+- [x] **TASK-028**: Create Supabase clients in `src/lib/supabase/` (`client.ts`, `server.ts`, `admin.ts`, `middleware.ts`)
+- [x] **TASK-029**: Create `src/lib/auth.ts` with `getCurrentUser()` and `requireRole()`
+- [x] **TASK-030**: Create `src/services/audit.service.ts` with `logAction()`
+- [x] **TASK-031**: Create shared action result type (`ActionResult<T>`) and safe error helpers
 
 ---
 
 ## Current Task
 
-**TASK-025:** Generate `MASTER_KEY` and store it in local `.env.local` and a secure backup 🔒 (Phase 3: Encryption and Core Libraries)
+**TASK-032:** Create login page (email and password) (Phase 4: Authentication)
 
-**Phase:** 3, Encryption and Core Libraries
+**Phase:** 4, Authentication
 
 **Status:** Ready to start
 
@@ -74,7 +81,7 @@ Planning phase is complete. Project documentation is written and ready. No appli
 
 ## In Progress
 
-Phase 2 complete (12/12 tasks). Ready for Phase 3.
+Phase 3 complete (7/7 tasks). Ready for Phase 4.
 
 ---
 
@@ -84,7 +91,7 @@ Phase 2 complete (12/12 tasks). Ready for Phase 3.
 |---|---|---|
 | 1. Setup | Mostly complete (awaiting Supabase keys) | 9 / 12 |
 | 2. Database and Security Foundation | Complete | 12 / 12 |
-| 3. Encryption and Core Libraries | Not started | 0 / 7 |
+| 3. Encryption and Core Libraries | Complete | 7 / 7 |
 | 4. Authentication | Not started | 0 / 10 |
 | 5. App Layout | Not started | 0 / 7 |
 | 6. Team Management | Not started | 0 / 6 |

@@ -35,6 +35,7 @@ export interface Database {
           created_at?: string;
           updated_at?: string;
         };
+        Relationships: [];
       };
       clients: {
         Row: {
@@ -73,6 +74,7 @@ export interface Database {
           created_at?: string;
           updated_at?: string;
         };
+        Relationships: [];
       };
       projects: {
         Row: {
@@ -117,6 +119,7 @@ export interface Database {
           created_at?: string;
           updated_at?: string;
         };
+        Relationships: [];
       };
       project_members: {
         Row: {
@@ -137,6 +140,7 @@ export interface Database {
           user_id?: string;
           created_at?: string;
         };
+        Relationships: [];
       };
       credentials: {
         Row: {
@@ -181,6 +185,7 @@ export interface Database {
           created_at?: string;
           updated_at?: string;
         };
+        Relationships: [];
       };
       env_variables: {
         Row: {
@@ -219,6 +224,7 @@ export interface Database {
           created_at?: string;
           updated_at?: string;
         };
+        Relationships: [];
       };
       audit_logs: {
         Row: {
@@ -243,7 +249,18 @@ export interface Database {
           metadata?: Json;
           created_at?: string;
         };
-        Update: never; // Append-only! No updates allowed.
+        Update: {
+          id?: string;
+          user_id?: string | null;
+          action?: string;
+          target_type?: string;
+          target_id?: string | null;
+          project_id?: string | null;
+          ip_address?: string | null;
+          metadata?: Json;
+          created_at?: string;
+        };
+        Relationships: [];
       };
     };
     Views: Record<string, never>;

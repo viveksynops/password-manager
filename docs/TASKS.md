@@ -83,13 +83,13 @@ When done, list files changed and how to test it.
 
 ## Phase 3: Encryption and Core Libraries
 
-- [ ] **TASK-025** Generate `MASTER_KEY` and store it in local `.env.local` and a secure backup 🔒
-- [ ] **TASK-026** Create `lib/crypto.ts` with AES-256-GCM `encrypt` and `decrypt` (`server-only`) 🔒
-- [ ] **TASK-027** Add crypto tests (round trip, unique IVs, tamper detection, wrong key fails) 🔒
-- [ ] **TASK-028** Create Supabase clients in `lib/supabase/` (browser, server, middleware)
-- [ ] **TASK-029** Create `lib/auth.ts` with `getCurrentUser()` and `requireRole()` 🔒
-- [ ] **TASK-030** Create `audit.service.ts` with a `logAction()` function 🔒
-- [ ] **TASK-031** Create shared action result type and safe error helper
+- [x] **TASK-025** Generate `MASTER_KEY` and store it in local `.env.local` and a secure backup 🔒
+- [x] **TASK-026** Create `lib/crypto.ts` with AES-256-GCM `encrypt` and `decrypt` (`server-only`) 🔒
+- [x] **TASK-027** Add crypto tests (round trip, unique IVs, tamper detection, wrong key fails) 🔒
+- [x] **TASK-028** Create Supabase clients in `lib/supabase/` (browser, server, middleware)
+- [x] **TASK-029** Create `lib/auth.ts` with `getCurrentUser()` and `requireRole()` 🔒
+- [x] **TASK-030** Create `audit.service.ts` with a `logAction()` function 🔒
+- [x] **TASK-031** Create shared action result type and safe error helper
 
 ---
 
