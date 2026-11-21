@@ -122,12 +122,12 @@ When done, list files changed and how to test it.
 
 ## Phase 6: Team Management (Admin)
 
-- [ ] **TASK-049** Create `user.service.ts` (list users, update role, deactivate)
-- [ ] **TASK-050** Create team list page (Admin only)
-- [ ] **TASK-051** Create invite user form and action (uses service role, server only) 🔒
-- [ ] **TASK-052** Add change role and deactivate user actions 🔒
-- [ ] **TASK-053** Ensure deactivated users lose access immediately 🔒
-- [ ] **TASK-054** Add tests for team management and role checks
+- [x] **TASK-049** Create `user.service.ts` (list users, update role, deactivate)
+- [x] **TASK-050** Create team list page (Admin only)
+- [x] **TASK-051** Create invite user form and action (uses service role, server only) 🔒
+- [x] **TASK-052** Add change role and deactivate user actions 🔒
+- [x] **TASK-053** Ensure deactivated users lose access immediately 🔒
+- [x] **TASK-054** Add tests for team management and role checks
 
 ---
 

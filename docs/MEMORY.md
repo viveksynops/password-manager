@@ -13,9 +13,9 @@ Related documents:
 
 ## Current Status
 
-Phases 1, 2, 3, 4, and 5 are complete. Database schema, security foundation, AES-256-GCM encryption libraries, Supabase clients, fail-closed audit logging, full authentication flow (Login, MFA enrollment/verify, forgot/reset password, invite acceptance, and middleware guards), and responsive App Layout (composed with official shadcn components: `Sidebar`, `SidebarProvider`, `SidebarInset`, `SidebarTrigger`, `Breadcrumb`, `Avatar`, `DataTable`, `EmptyState`, `ErrorState`, `ConfirmDialog`, `ThemeToggle`, and the dashboard overview home page) are implemented, verified, and passing all tests.
+Phases 1, 2, 3, 4, 5, and 6 are complete. Database schema, security foundation, AES-256-GCM encryption libraries, Supabase clients, fail-closed audit logging, full authentication flow (Login, MFA enrollment/verify, forgot/reset password, invite acceptance, and middleware guards), responsive App Layout (shadcn Sidebar, Breadcrumbs, Avatar, DataTable, ThemeToggle), and full Team Management (invite user, change role, deactivate/reactivate with immediate session invalidation, Zustand filters, and Admin-only guards) are implemented, verified, and passing all tests.
 
-**Overall progress:** 47 of 138 tasks complete (34%) — 1 skipped per user preference (TASK-005).
+**Overall progress:** 53 of 138 tasks complete (38%) — 1 skipped per user preference (TASK-005).
 
 ---
 
@@ -25,7 +25,7 @@ Phases 1, 2, 3, 4, and 5 are complete. Database schema, security foundation, AES
 
 **What it stores:** client details, project service logins (Supabase, Cloudinary, Vercel, etc.) and environment variables per project (dev, staging, production).
 
-**Stack:** Next.js (App Router, Turbopack), TypeScript, Supabase (Postgres, Auth, RLS), shadcn/ui (Base UI primitives, zinc theme), Tailwind CSS v4, Zustand (for client state if needed).
+**Stack:** Next.js (App Router, Turbopack), TypeScript, Supabase (Postgres, Auth, RLS), shadcn/ui (Base UI primitives, zinc theme), Tailwind CSS v4, Zustand (client state).
 
 **Requested by:** Software company manager.
 
@@ -41,7 +41,7 @@ Phases 1, 2, 3, 4, and 5 are complete. Database schema, security foundation, AES
 - [-] **TASK-005**: Apply `DESIGN.md` theme fonts/colors *(Skipped per user request: keep installed shadcn base theme)*
 - [x] **TASK-006**: Create folder structure from `ARCHITECTURE.md`
 - [x] **TASK-007**: Configure Git (`main` branch), `.gitignore`, and `.env.example`
-- [x] **TASK-008**: Install core packages (`@supabase/supabase-js`, `@supabase/ssr`, `zod`, `react-hook-form`, `@hookform/resolvers`, `server-only`, `sonner`, `lucide-react`)
+- [x] **TASK-008**: Install core packages (`@supabase/supabase-js`, `@supabase/ssr`, `zod`, `react-hook-form`, `@hookform/resolvers`, `server-only`, `sonner`, `lucide-react`, `zustand`)
 - [x] **TASK-009**: Set up testing tools (Vitest, React Testing Library, jsdom)
 - [x] **TASK-010**: Create a new, separate Supabase project for the vault (`https://wyycdjxqffgtraqukqjb.supabase.co`)
 - [x] **TASK-011**: Set up validated environment variables in `lib/env.ts`
@@ -91,13 +91,21 @@ Phases 1, 2, 3, 4, and 5 are complete. Database schema, security foundation, AES
 - [x] **TASK-047**: Create reusable `DataTable`, `EmptyState`, `ErrorState`, and `ConfirmDialog` components using shadcn primitives
 - [x] **TASK-048**: Create dashboard home page (`src/app/(dashboard)/page.tsx` < 25 lines) with client/project metric cards and quick actions
 
+### Phase 6: Team Management (Admin) (6/6 complete)
+- [x] **TASK-049**: Create `src/services/user.service.ts` (list users, invite, update role, deactivate/reactivate)
+- [x] **TASK-050**: Create team list page at `src/app/(dashboard)/team/page.tsx` (Admin only)
+- [x] **TASK-051**: Create invite user form and action (`InviteUserDialog.tsx`, `inviteUserAction`) using service role (server-only)
+- [x] **TASK-052**: Add change role and deactivate/reactivate actions (`updateUserRoleAction`, `setUserStatusAction`)
+- [x] **TASK-053**: Ensure deactivated users lose access immediately via `adminClient.auth.admin.signOut(userId)`
+- [x] **TASK-054**: Add unit tests for team management schemas, role constraints, and Zustand filter store (`src/test/team-management.test.ts`)
+
 ---
 
 ## Current Task
 
-**TASK-049:** Create `user.service.ts` (Phase 6: Team Management)
+**TASK-055:** Create Zod schemas for clients (Phase 7: Clients)
 
-**Phase:** 6, Team Management (Admin)
+**Phase:** 7, Clients
 
 **Status:** Ready to start
 
@@ -112,7 +120,7 @@ Phases 1, 2, 3, 4, and 5 are complete. Database schema, security foundation, AES
 | 3. Encryption and Core Libraries | Complete | 7 / 7 |
 | 4. Authentication | Complete | 10 / 10 |
 | 5. App Layout | Complete | 7 / 7 |
-| 6. Team Management | Not started | 0 / 6 |
+| 6. Team Management | Complete | 6 / 6 |
 | 7. Clients | Not started | 0 / 9 |
 | 8. Projects | Not started | 0 / 11 |
 | 9. Credentials Vault | Not started | 0 / 15 |
@@ -135,7 +143,7 @@ Phases 1, 2, 3, 4, and 5 are complete. Database schema, security foundation, AES
 | Database migrations | Initial schema applied in `supabase/migrations/20261121000000_initial_schema.sql` |
 | Permissions grant script | Created in `supabase/setup_profiles.sql` |
 | `MASTER_KEY` | Generated (64-hex chars) in `.env.local` |
-| Test suite | Vitest: 38 / 38 unit tests passing |
+| Test suite | Vitest: 46 / 46 unit tests passing |
 | Production build | `next build` passing with 0 errors |
 
 ---
@@ -150,15 +158,6 @@ Phases 1, 2, 3, 4, and 5 are complete. Database schema, security foundation, AES
 
 ---
 
-## Known Issues and Fixes
-
-- [x] **Fixed:** Replaced custom sidebar and breadcrumb implementations with official shadcn components (`npx shadcn add sidebar breadcrumb avatar`).
-- [x] **Fixed:** Middleware intercepted Server Action RPC requests (`POST /` with `next-action` header), causing `Uncaught Error: An unexpected response was received from the server`. Resolved in `src/middleware.ts` by passing through requests with `next-action` and preserving session cookies.
-- [x] **Fixed:** Next.js 16 Partial Prefetching / Cache Components blocking dynamic routes: configured `export const instant = false` on dashboard layout.
-- [x] **Fixed:** JSDOM mock for `window.matchMedia` added to `src/test/setup.ts` to support shadcn `useIsMobile`.
-
----
-
 ## Session Log
 
 | Date | Work done | Next |
@@ -170,3 +169,4 @@ Phases 1, 2, 3, 4, and 5 are complete. Database schema, security foundation, AES
 | 2026-11-21 | Completed Phase 4 (Full Auth: Login, MFA, Password Reset, Invite Acceptance, Middleware) | Test credentials |
 | 2026-11-21 | Created test accounts in Supabase Auth (`admin`, `manager`, `developer`), resolved Server Action middleware redirect bug | Phase 5 |
 | 2026-11-21 | Completed Phase 5 using official shadcn components (`sidebar`, `breadcrumb`, `avatar`, `alert-dialog`, `table`). 38/38 tests passing, build passing | Phase 6: Team Management |
+| 2026-11-21 | Added Zustand & strict shadcn rules across docs; Completed Phase 6 (Team Management, Admin controls, immediate revocation, Zustand filtering, 46/46 tests passing) | Phase 7: Clients |

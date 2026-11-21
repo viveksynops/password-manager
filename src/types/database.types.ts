@@ -297,3 +297,12 @@ export interface Database {
     };
   };
 }
+
+export type Profile = Database["public"]["Tables"]["profiles"]["Row"];
+export type UserProfile = Profile;
+export type Client = Database["public"]["Tables"]["clients"]["Row"];
+export type Project = Database["public"]["Tables"]["projects"]["Row"];
+export type ProjectMember = Database["public"]["Tables"]["project_members"]["Row"];
+export type Credential = Database["public"]["Tables"]["credentials"]["Row"];
+export type EnvVariable = Database["public"]["Tables"]["env_variables"]["Row"];
+export type AuditLog = Database["public"]["Tables"]["audit_logs"]["Row"];
