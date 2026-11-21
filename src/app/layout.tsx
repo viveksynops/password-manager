@@ -32,6 +32,7 @@ export default function RootLayout({
       lang="en"
       suppressHydrationWarning
       className={cn(
+        "dark",
         "h-full",
         "antialiased",
         geistSans.variable,
@@ -40,11 +41,12 @@ export default function RootLayout({
         inter.variable
       )}
     >
-      <body className="min-h-full flex flex-col bg-background text-foreground">
+      <body className="min-h-full flex flex-col bg-background text-foreground dark">
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
-          enableSystem
+          defaultTheme="dark"
+          forcedTheme="dark"
+          enableSystem={false}
           disableTransitionOnChange
         >
           {children}

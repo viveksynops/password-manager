@@ -27,8 +27,11 @@ import {
   ExternalLink,
   GitBranch,
   Globe,
+  Plus,
+  ChevronRight,
 } from "lucide-react";
 import { ClientFormDialog } from "./ClientFormDialog";
+import { ProjectFormDialog } from "@/features/projects/components/ProjectFormDialog";
 
 interface ClientDetailViewProps {
   client: ClientWithProjects;
@@ -37,6 +40,7 @@ interface ClientDetailViewProps {
 
 export function ClientDetailView({ client, userRole }: ClientDetailViewProps) {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [createProjectOpen, setCreateProjectOpen] = useState(false);
   const canManage = userRole === "admin" || userRole === "manager";
 
   return (
@@ -156,114 +160,112 @@ export function ClientDetailView({ client, userRole }: ClientDetailViewProps) {
               All applications, repos, and secret vaults associated with {client.name}.
             </p>
           </div>
+
+          {canManage && (
+            <Button size="sm" onClick={() => setCreateProjectOpen(true)}>
+              <Plus className="mr-1.5 size-3.5" />
+              New Project
+            </Button>
+          )}
         </div>
 
         {client.projects.length > 0 ? (
-          <div className="rounded-md border bg-card overflow-hidden shadow-xs">
-            <Table>
-              <TableHeader>
-                <TableRow className="bg-muted/40">
-                  <TableHead>Project Name</TableHead>
-                  <TableHead>Hosting / Stack</TableHead>
-                  <TableHead>Links</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="w-[100px] text-right">Vault</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {client.projects.map((project) => (
-                  <TableRow key={project.id} className="hover:bg-muted/50 transition-colors">
-                    <TableCell>
-                      <Link
-                        href={`/projects/${project.id}`}
-                        className="flex items-center gap-2.5 font-medium text-foreground hover:text-primary transition-colors group"
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3.5">
+            {client.projects.map((project) => (
+              <div
+                key={project.id}
+                className="group relative flex flex-col justify-between rounded-xl border bg-card p-4 transition-all duration-200 hover:border-primary/50 hover:shadow-md dark:hover:border-primary/40 hover:-translate-y-0.5"
+              >
+                <div>
+                  <div className="flex items-center justify-between">
+                    <Link
+                      href={`/projects/${project.id}`}
+                      className="flex size-10 items-center justify-center rounded-xl bg-primary/10 text-primary group-hover:bg-primary group-hover:text-primary-foreground transition-all duration-200 shadow-2xs"
+                      aria-label={`Open folder ${project.name}`}
+                    >
+                      <FolderLock className="size-5" />
+                    </Link>
+
+                    <Badge
+                      variant={project.is_archived ? "outline" : "default"}
+                      className="text-[11px] px-2 py-0"
+                    >
+                      {project.is_archived ? "Archived" : "Active"}
+                    </Badge>
+                  </div>
+
+                  <div className="mt-3">
+                    <Link
+                      href={`/projects/${project.id}`}
+                      className="block font-semibold text-foreground text-sm tracking-tight truncate hover:underline group-hover:text-primary transition-colors"
+                      title={project.name}
+                    >
+                      {project.name}
+                    </Link>
+
+                    {(project.hosting_info || project.tech_stack) && (
+                      <p className="text-[11px] text-muted-foreground/80 truncate mt-0.5">
+                        {project.hosting_info || project.tech_stack}
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <div className="pt-3 mt-3 border-t border-border/60 flex items-center justify-between text-xs text-muted-foreground">
+                  <div className="flex items-center gap-2">
+                    {project.live_url && (
+                      <a
+                        href={project.live_url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center text-muted-foreground hover:text-foreground transition-colors text-[11px]"
+                        title="Live Site"
                       >
-                        <FolderLock className="size-4 text-muted-foreground group-hover:text-primary transition-colors" />
-                        <span>{project.name}</span>
-                      </Link>
-                      {project.description && (
-                        <p className="text-xs text-muted-foreground truncate max-w-sm mt-0.5">
-                          {project.description}
-                        </p>
-                      )}
-                    </TableCell>
-
-                    <TableCell className="text-xs text-muted-foreground">
-                      <div className="flex flex-col truncate">
-                        <span>{project.hosting_info || "—"}</span>
-                        {project.tech_stack && (
-                          <span className="text-[11px] text-muted-foreground/80 truncate">
-                            {project.tech_stack}
-                          </span>
-                        )}
-                      </div>
-                    </TableCell>
-
-                    <TableCell>
-                      <div className="flex items-center gap-2 text-xs">
-                        {project.live_url && (
-                          <a
-                            href={project.live_url}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="inline-flex items-center text-muted-foreground hover:text-foreground transition-colors"
-                            title="Live URL"
-                          >
-                            <Globe className="size-3.5 mr-1" />
-                            Live
-                          </a>
-                        )}
-                        {project.repo_url && (
-                          <a
-                            href={project.repo_url}
-                            target="_blank"
-                            rel="noreferrer"
-                            className="inline-flex items-center text-muted-foreground hover:text-foreground transition-colors"
-                            title="Repository URL"
-                          >
-                            <GitBranch className="size-3.5 mr-1" />
-                            Repo
-                          </a>
-                        )}
-                        {!project.live_url && !project.repo_url && (
-                          <span className="text-muted-foreground">—</span>
-                        )}
-                      </div>
-                    </TableCell>
-
-                    <TableCell>
-                      <Badge
-                        variant={project.is_archived ? "outline" : "default"}
-                        className="text-xs capitalize"
+                        <Globe className="size-3 mr-1" />
+                        Live
+                      </a>
+                    )}
+                    {project.repo_url && (
+                      <a
+                        href={project.repo_url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-flex items-center text-muted-foreground hover:text-foreground transition-colors text-[11px]"
+                        title="Repository"
                       >
-                        {project.is_archived ? "Archived" : "Active"}
-                      </Badge>
-                    </TableCell>
+                        <GitBranch className="size-3 mr-1" />
+                        Repo
+                      </a>
+                    )}
+                  </div>
 
-                    <TableCell className="text-right">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        render={<Link href={`/projects/${project.id}`} />}
-                      >
-                        Open
-                        <ExternalLink className="ml-1 size-3" />
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                  <Link
+                    href={`/projects/${project.id}`}
+                    className="inline-flex items-center text-xs font-medium text-muted-foreground group-hover:text-primary transition-colors"
+                  >
+                    Open
+                    <ChevronRight className="size-3.5 ml-0.5 group-hover:translate-x-0.5 transition-transform" />
+                  </Link>
+                </div>
+              </div>
+            ))}
           </div>
         ) : (
           <EmptyState
             icon={FolderLock}
             title="No projects under this client"
             description="Projects organize credentials, environment secrets, and developer permissions."
-            action={{
-              label: "Browse Projects",
-              href: "/projects",
-            }}
+            action={
+              canManage
+                ? {
+                    label: "Create Project",
+                    onClick: () => setCreateProjectOpen(true),
+                  }
+                : {
+                    label: "Browse Projects",
+                    href: "/projects",
+                  }
+            }
           />
         )}
       </div>
@@ -274,6 +276,16 @@ export function ClientDetailView({ client, userRole }: ClientDetailViewProps) {
           open={editDialogOpen}
           onOpenChange={setEditDialogOpen}
           client={client}
+        />
+      )}
+
+      {/* Add Project Dialog */}
+      {canManage && (
+        <ProjectFormDialog
+          open={createProjectOpen}
+          onOpenChange={setCreateProjectOpen}
+          clients={[{ id: client.id, name: client.name }]}
+          defaultClientId={client.id}
         />
       )}
     </div>

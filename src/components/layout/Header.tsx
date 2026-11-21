@@ -5,7 +5,6 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Separator } from "@/components/ui/separator";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Breadcrumbs } from "./Breadcrumbs";
-import { ThemeToggle } from "./ThemeToggle";
 import { UserRole } from "@/types/database.types";
 import { Badge } from "@/components/ui/badge";
 
@@ -53,7 +52,6 @@ export function Header({ user }: HeaderProps) {
             {userInitials}
           </AvatarFallback>
         </Avatar>
-        <ThemeToggle />
       </div>
     </header>
   );

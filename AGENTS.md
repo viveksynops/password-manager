@@ -29,3 +29,8 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 ## 4. STATE MANAGEMENT
 - Use **Zustand** if client-side global state management is needed (e.g. cross-component UI state, command palettes, search/filter states, modal controllers).
 - Install with `npm install zustand` whenever global client state is required. Avoid complex/heavy alternatives like Redux.
+
+## 5. DARK MODE MANDATE
+- **Always use Dark Mode**: The app is strictly and permanently dark mode only.
+- Do NOT provide light or system theme options or toggles.
+

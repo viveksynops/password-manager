@@ -13,15 +13,17 @@ Related documents:
 
 ## Current Status
 
-Phases 1, 2, 3, 4, 5, 6, and 7 are complete. Database schema, security foundation, AES-256-GCM encryption libraries, Supabase clients, fail-closed audit logging, full authentication flow (Login, MFA, password reset, invites), responsive App Layout (shadcn Sidebar, Breadcrumbs, Avatar, DataTable, ThemeToggle), full Team Management (Admin controls, immediate revocation), and complete Client Management (add, edit, archive/restore clients, search & status filtering via Zustand, client detail page with projects list, RLS permissions, and unit tests) are implemented, verified, and passing all tests.
+Phases 1 through 9 are complete. Database schema, security foundation, AES-256-GCM encryption libraries, Supabase clients, fail-closed audit logging, full authentication flow (Login, MFA, password reset, invites), responsive App Layout (shadcn Sidebar, Breadcrumbs, Avatar, DataTable, ThemeToggle), full Team Management (Admin controls, immediate revocation), complete Client Management, complete Project Management (folder-based grid view, project detail view with tabbed sections, member assignment/removal), and complete Credentials Vault (AES-256-GCM password encryption on save, `SecretField` with reveal auto-hide after 15s and copy clipboard auto-clear after 30s, built-in strong password generator, open login site, fail-closed audit logging on all access/mutations, and 92/92 passing unit tests) are implemented, verified, and passing all tests.
 
-**Overall progress:** 62 of 138 tasks complete (45%) — 1 skipped per user preference (TASK-005).
+**Overall progress:** 88 of 138 tasks complete (64%) — 1 skipped per user preference (TASK-005).
 
 ---
 
 ## Project Summary
 
 **Product:** Company Vault, an internal password and secrets manager for client projects.
+
+**Theme:** Permanent Dark Mode Only (no light/system toggles per user mandate).
 
 **What it stores:** client details, project service logins (Supabase, Cloudinary, Vercel, etc.) and environment variables per project (dev, staging, production).
 
@@ -110,13 +112,45 @@ Phases 1, 2, 3, 4, 5, 6, and 7 are complete. Database schema, security foundatio
 - [x] **TASK-062**: Add loading, empty, and error states across client views
 - [x] **TASK-063**: Add unit tests for client schemas, operations, and Zustand filter store (`src/test/client-management.test.ts`)
 
+### Phase 8: Projects (11/11 complete)
+- [x] **TASK-064**: Create Zod schemas for projects (`src/features/projects/schemas.ts`)
+- [x] **TASK-065**: Create `src/services/project.service.ts` (listProjects with RLS, getProjectById with details, createProject, updateProject, archiveProject, assignProjectMember, removeProjectMember)
+- [x] **TASK-066**: Create project server actions with role checks (`createProjectAction`, `updateProjectAction`, `archiveProjectAction`, `assignProjectMemberAction`, `removeProjectMemberAction`)
+- [x] **TASK-067**: Create projects list page at `src/app/(dashboard)/projects/page.tsx` (< 25 lines) with folder-based grid view as default and view mode toggle
+- [x] **TASK-068**: Create add and edit project form dialog (`ProjectFormDialog.tsx`) streamlined to Client Organization and Project (Folder) Name, with additional metadata editable inside the project
+- [x] **TASK-069**: Add archive and restore project functionality with `ConfirmDialog`
+- [x] **TASK-070**: Create project detail page at `src/app/(dashboard)/projects/[id]/page.tsx` (< 25 lines) with tabs (Credentials, Env Variables, Team Members, Overview)
+- [x] **TASK-071**: Add assign and remove team members on a project (`ProjectMembersTab.tsx`)
+- [x] **TASK-072**: Confirm Developers see only assigned projects (RLS verification & isolated data access) 🔒
+- [x] **TASK-073**: Add loading, empty, and error states across all project views
+- [x] **TASK-074**: Add unit tests for projects, schemas, store, and access rules (`src/test/project-management.test.ts`)
+
+---
+
+### Phase 9: Credentials Vault (15/15 complete)
+- [x] **TASK-075**: Create Zod schemas for credentials (`src/features/credentials/schemas.ts`)
+- [x] **TASK-076**: Create `credential.service.ts` encrypting passwords on save with AES-256-GCM and unique IVs 🔒
+- [x] **TASK-077**: Create `SecretField` component with hidden, loading, revealed, and copied states (`src/components/secret-field.tsx`) 🔒
+- [x] **TASK-078**: Create credentials list on the project page with passwords excluded from list payload 🔒
+- [x] **TASK-079**: Create add credential form with service, login URL, username, password, notes (`CredentialFormDialog.tsx`)
+- [x] **TASK-080**: Create edit credential form allowing password to remain unchanged
+- [x] **TASK-081**: Create delete credential with `ConfirmDialog`
+- [x] **TASK-082**: Create `revealCredentialAction` server action with RLS check, decryption, and audit logging 🔒
+- [x] **TASK-083**: Add copy to clipboard with automatic clear after 30 seconds
+- [x] **TASK-084**: Add auto-hide of revealed passwords after 15 seconds with countdown badge
+- [x] **TASK-085**: Add "Open site" button for login URL
+- [x] **TASK-086**: Add cryptographically secure password generator (`src/utils/password-generator.ts`)
+- [x] **TASK-087**: Add fail-closed audit logging for create, update, delete, reveal, and copy actions 🔒
+- [x] **TASK-088**: Add loading, empty, and error states across credential vault views
+- [x] **TASK-089**: Add unit tests for credentials, encryption round trip, generator, and access rules (`src/test/credential-management.test.ts`)
+
 ---
 
 ## Current Task
 
-**TASK-064:** Create Zod schemas for projects (Phase 8: Projects)
+**TASK-090:** Create Zod schemas for env variables (Phase 10: Environment Variables)
 
-**Phase:** 8, Projects
+**Phase:** 10, Environment Variables
 
 **Status:** Ready to start
 
@@ -133,8 +167,8 @@ Phases 1, 2, 3, 4, 5, 6, and 7 are complete. Database schema, security foundatio
 | 5. App Layout | Complete | 7 / 7 |
 | 6. Team Management | Complete | 6 / 6 |
 | 7. Clients | Complete | 9 / 9 |
-| 8. Projects | Not started | 0 / 11 |
-| 9. Credentials Vault | Not started | 0 / 15 |
+| 8. Projects | Complete | 11 / 11 |
+| 9. Credentials Vault | Complete | 15 / 15 |
 | 10. Environment Variables | Not started | 0 / 13 |
 | 11. Audit Logs | Not started | 0 / 6 |
 | 12. Search and Productivity | Not started | 0 / 5 |
@@ -154,7 +188,7 @@ Phases 1, 2, 3, 4, 5, 6, and 7 are complete. Database schema, security foundatio
 | Database migrations | Initial schema applied in `supabase/migrations/20261121000000_initial_schema.sql` |
 | Permissions grant script | Created in `supabase/setup_profiles.sql` |
 | `MASTER_KEY` | Generated (64-hex chars) in `.env.local` |
-| Test suite | Vitest: 54 / 54 unit tests passing |
+| Test suite | Vitest: 92 / 92 unit tests passing |
 | Production build | `next build` passing with 0 errors |
 
 ---
@@ -182,3 +216,5 @@ Phases 1, 2, 3, 4, 5, 6, and 7 are complete. Database schema, security foundatio
 | 2026-11-21 | Completed Phase 5 using official shadcn components (`sidebar`, `breadcrumb`, `avatar`, `alert-dialog`, `table`). 38/38 tests passing, build passing | Phase 6: Team Management |
 | 2026-11-21 | Added Zustand & strict shadcn rules across docs; Completed Phase 6 (Team Management, Admin controls, immediate revocation, Zustand filtering, 46/46 tests passing) | Phase 7: Clients |
 | 2026-11-21 | Completed Phase 7 (Client Management: list, detail view with projects, create/edit dialog, archive/restore, Zustand search & filtering, audit logs, 54/54 tests passing) | Phase 8: Projects |
+| 2026-11-21 | Completed Phase 8 (Project Management: list, folder grid view as default, detail view with tabs, create/edit dialog, archive/restore, member assignment & removal, Zustand store, 72/72 tests passing) | Phase 9: Credentials Vault |
+| 2026-11-21 | Completed Phase 9 (Credentials Vault: AES-256-GCM encryption on save, SecretField with 15s auto-hide and 30s clipboard auto-clear, password generator, open site, fail-closed audit logs, 92/92 tests passing, build passing) | Phase 10: Environment Variables |

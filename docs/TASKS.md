@@ -147,37 +147,37 @@ When done, list files changed and how to test it.
 
 ## Phase 8: Projects
 
-- [ ] **TASK-064** Create Zod schemas for projects
-- [ ] **TASK-065** Create `project.service.ts`
-- [ ] **TASK-066** Create project server actions with role checks
-- [ ] **TASK-067** Create projects list page (filtered by user access)
-- [ ] **TASK-068** Create add and edit project form
-- [ ] **TASK-069** Add archive project functionality
-- [ ] **TASK-070** Create project detail page with tabs (Credentials, Env Variables)
-- [ ] **TASK-071** Add assign and remove team members on a project
-- [ ] **TASK-072** Confirm Developers see only assigned projects 🔒
-- [ ] **TASK-073** Add loading, empty and error states
-- [ ] **TASK-074** Add tests for projects and access rules
+- [x] **TASK-064** Create Zod schemas for projects
+- [x] **TASK-065** Create `project.service.ts`
+- [x] **TASK-066** Create project server actions with role checks
+- [x] **TASK-067** Create projects list page (filtered by user access)
+- [x] **TASK-068** Create add and edit project form
+- [x] **TASK-069** Add archive project functionality
+- [x] **TASK-070** Create project detail page with tabs (Credentials, Env Variables)
+- [x] **TASK-071** Add assign and remove team members on a project
+- [x] **TASK-072** Confirm Developers see only assigned projects 🔒
+- [x] **TASK-073** Add loading, empty and error states
+- [x] **TASK-074** Add tests for projects and access rules
 
 ---
 
 ## Phase 9: Credentials Vault
 
-- [ ] **TASK-075** Create Zod schemas for credentials
-- [ ] **TASK-076** Create `credential.service.ts` that encrypts on save 🔒
-- [ ] **TASK-077** Create `SecretField` component (hidden, loading, revealed, copied states) 🔒
-- [ ] **TASK-078** Create credentials list on the project page (passwords not included in the list data) 🔒
-- [ ] **TASK-079** Create add credential form (service, login URL, username, password, notes)
-- [ ] **TASK-080** Create edit credential form (password can be left unchanged)
-- [ ] **TASK-081** Create delete credential with confirmation
-- [ ] **TASK-082** Create `revealCredential` server action: check access, decrypt, write audit log 🔒
-- [ ] **TASK-083** Add copy with automatic clipboard clear after 30 seconds
-- [ ] **TASK-084** Add auto-hide of revealed values after 15 seconds
-- [ ] **TASK-085** Add "Open site" button for the login URL
-- [ ] **TASK-086** Add password generator
-- [ ] **TASK-087** Add audit logging for create, update and delete of credentials 🔒
-- [ ] **TASK-088** Add loading, empty and error states
-- [ ] **TASK-089** Add tests for credentials (encryption stored, access rules, audit entries) 🔒
+- [x] **TASK-075** Create Zod schemas for credentials
+- [x] **TASK-076** Create `credential.service.ts` that encrypts on save 🔒
+- [x] **TASK-077** Create `SecretField` component (hidden, loading, revealed, copied states) 🔒
+- [x] **TASK-078** Create credentials list on the project page (passwords not included in the list data) 🔒
+- [x] **TASK-079** Create add credential form (service, login URL, username, password, notes)
+- [x] **TASK-080** Create edit credential form (password can be left unchanged)
+- [x] **TASK-081** Create delete credential with confirmation
+- [x] **TASK-082** Create `revealCredential` server action: check access, decrypt, write audit log 🔒
+- [x] **TASK-083** Add copy with automatic clipboard clear after 30 seconds
+- [x] **TASK-084** Add auto-hide of revealed values after 15 seconds
+- [x] **TASK-085** Add "Open site" button for the login URL
+- [x] **TASK-086** Add password generator
+- [x] **TASK-087** Add audit logging for create, update and delete of credentials 🔒
+- [x] **TASK-088** Add loading, empty and error states
+- [x] **TASK-089** Add tests for credentials (encryption stored, access rules, audit entries) 🔒
 
 ---
 
