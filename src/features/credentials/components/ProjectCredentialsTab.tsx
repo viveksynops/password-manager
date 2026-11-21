@@ -181,7 +181,7 @@ export function ProjectCredentialsTab({
           />
         )
       ) : (
-        <div className="rounded-md border bg-card overflow-hidden shadow-xs">
+        <div className="rounded-md border bg-card overflow-hidden shadow-xs w-full max-w-full min-w-0">
           <Table>
             <TableHeader>
               <TableRow className="bg-muted/30">

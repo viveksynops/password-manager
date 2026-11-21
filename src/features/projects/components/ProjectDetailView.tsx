@@ -169,9 +169,9 @@ export function ProjectDetailView({
       </div>
 
       {/* Tabs Layout */}
-      <Tabs defaultValue="credentials" className="space-y-6">
-        <div className="w-full overflow-x-auto pb-1 scrollbar-none">
-          <TabsList className="inline-flex h-10 w-max min-w-full sm:min-w-fit items-center justify-start gap-1 p-1 bg-muted/60 rounded-lg">
+      <Tabs defaultValue="credentials" className="space-y-6 w-full max-w-full min-w-0">
+        <div className="w-full max-w-full overflow-x-auto pb-1 scrollbar-none">
+          <TabsList className="inline-flex h-10 w-max items-center justify-start gap-1 p-1 bg-muted/60 rounded-lg">
             <TabsTrigger value="credentials" className="shrink-0 flex-none gap-2 px-3.5 py-1.5 text-xs sm:text-sm">
               <KeyRound className="size-4 shrink-0" />
               <span>Credentials</span>
