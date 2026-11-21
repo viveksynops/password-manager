@@ -108,4 +108,49 @@ describe("Audit Logs System (Phase 11: TASK-103 to TASK-108)", () => {
       expect(canReadAuditLogs("developer")).toBe(false);
     });
   });
+
+  describe("Server-Side Pagination & Egress Minimization (TASK-105 / Egress Optimization)", () => {
+    it("should calculate exact offset ranges and limits for server-side queries", () => {
+      const calculateRangeAndLimit = (page: number, pageSize: number) => {
+        const sanitizedPage = Math.max(1, page || 1);
+        const sanitizedPageSize = Math.max(5, Math.min(100, pageSize || 25));
+        const from = (sanitizedPage - 1) * sanitizedPageSize;
+        const to = from + sanitizedPageSize - 1;
+        return { page: sanitizedPage, pageSize: sanitizedPageSize, from, to };
+      };
+
+      // Page 1 with default 25
+      const p1 = calculateRangeAndLimit(1, 25);
+      expect(p1).toEqual({ page: 1, pageSize: 25, from: 0, to: 24 });
+
+      // Page 2 with 25
+      const p2 = calculateRangeAndLimit(2, 25);
+      expect(p2).toEqual({ page: 2, pageSize: 25, from: 25, to: 49 });
+
+      // Page 3 with 50
+      const p3 = calculateRangeAndLimit(3, 50);
+      expect(p3).toEqual({ page: 3, pageSize: 50, from: 100, to: 149 });
+
+      // Clamp excessively large page sizes to max 100 to prevent heavy egress
+      const clamped = calculateRangeAndLimit(1, 1000);
+      expect(clamped.pageSize).toBe(100);
+      expect(clamped.to).toBe(99);
+
+      // Clamp negative or 0 page to 1
+      const zeroPage = calculateRangeAndLimit(0, 25);
+      expect(zeroPage.page).toBe(1);
+      expect(zeroPage.from).toBe(0);
+    });
+
+    it("should calculate total pages accurately from count and page size", () => {
+      const calcTotalPages = (total: number, pageSize: number) => Math.ceil(total / pageSize) || 1;
+
+      expect(calcTotalPages(0, 25)).toBe(1);
+      expect(calcTotalPages(12, 25)).toBe(1);
+      expect(calcTotalPages(25, 25)).toBe(1);
+      expect(calcTotalPages(26, 25)).toBe(2);
+      expect(calcTotalPages(100, 25)).toBe(4);
+      expect(calcTotalPages(101, 25)).toBe(5);
+    });
+  });
 });

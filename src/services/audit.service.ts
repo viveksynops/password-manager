@@ -1,6 +1,6 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
-import { AuditLog, Json } from "@/types/database.types";
+import { AuditLog, Json, UserProfile, Project } from "@/types/database.types";
 import { AuditLogFilterInput } from "@/features/audit-logs/schemas";
 
 export interface LogActionParams {
@@ -66,20 +66,24 @@ export async function logAction(params: LogActionParams): Promise<void> {
 /**
  * Lists audit logs with filters and pagination (TASK-104 / TASK-105).
  * Admin only. RLS enforces that only admin users can read audit logs.
+ * Strictly uses server-side limit and range to minimize egress.
  */
 export async function listAuditLogs(
   filters: Partial<AuditLogFilterInput> = {}
 ): Promise<PaginatedAuditLogs> {
   const supabase = await createClient();
 
-  const page = Math.max(1, filters.page || 1);
-  const pageSize = Math.max(5, Math.min(100, filters.pageSize || 25));
+  const page = Math.max(1, Number(filters.page) || 1);
+  const pageSize = Math.max(5, Math.min(100, Number(filters.pageSize) || 25));
   const from = (page - 1) * pageSize;
   const to = from + pageSize - 1;
 
   let query = supabase
     .from("audit_logs")
-    .select("*, project:projects(id, name)", { count: "exact" });
+    .select(
+      "id, user_id, action, target_type, target_id, project_id, ip_address, metadata, created_at, project:projects(id, name)",
+      { count: "exact" }
+    );
 
   // 1. Action filter
   if (filters.action && filters.action !== "all") {
@@ -116,8 +120,11 @@ export async function listAuditLogs(
     }
   }
 
-  // Sort by most recent
-  query = query.order("created_at", { ascending: false }).range(from, to);
+  // Sort by most recent and apply server-side pagination with limit
+  query = query
+    .order("created_at", { ascending: false })
+    .range(from, to)
+    .limit(pageSize);
 
   const { data, count, error } = await query;
 
@@ -129,7 +136,7 @@ export async function listAuditLogs(
   const total = count || 0;
   const totalPages = Math.ceil(total / pageSize) || 1;
 
-  // Retrieve user profiles for actors in this page
+  // Retrieve user profiles only for actors in this page slice (minimal egress)
   const userIds = Array.from(new Set(rawLogs.map((l) => l.user_id).filter(Boolean))) as string[];
   const userProfileMap = new Map<string, { email: string; full_name: string | null }>();
 
@@ -137,7 +144,8 @@ export async function listAuditLogs(
     const { data: profiles } = await supabase
       .from("profiles")
       .select("id, email, full_name")
-      .in("id", userIds);
+      .in("id", userIds)
+      .limit(userIds.length);
 
     for (const p of profiles || []) {
       userProfileMap.set(p.id, { email: p.email, full_name: p.full_name });
@@ -169,4 +177,42 @@ export async function listAuditLogs(
     pageSize,
     totalPages,
   };
+}
+
+/**
+ * Lightweight options query for user filter dropdown.
+ * Fetches only id, email, full_name with limit to minimize egress.
+ */
+export async function getAuditLogUserOptions(): Promise<Pick<UserProfile, "id" | "email" | "full_name">[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("profiles")
+    .select("id, email, full_name")
+    .order("email")
+    .limit(100);
+
+  if (error) {
+    console.error("Failed to load user options for audit logs:", error.message);
+    return [];
+  }
+  return data || [];
+}
+
+/**
+ * Lightweight options query for project filter dropdown.
+ * Fetches only id, name with limit to avoid transferring relational arrays.
+ */
+export async function getAuditLogProjectOptions(): Promise<Pick<Project, "id" | "name">[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("projects")
+    .select("id, name")
+    .order("name")
+    .limit(100);
+
+  if (error) {
+    console.error("Failed to load project options for audit logs:", error.message);
+    return [];
+  }
+  return data || [];
 }

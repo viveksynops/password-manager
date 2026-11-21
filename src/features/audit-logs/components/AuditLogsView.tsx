@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState, useEffect, useTransition } from "react";
-import { AuditLogWithDetails, PaginatedAuditLogs } from "@/services/audit.service";
+import React, { useTransition } from "react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import { PaginatedAuditLogs } from "@/services/audit.service";
 import { UserProfile, Project } from "@/types/database.types";
 import { AuditLogsFilterBar } from "./AuditLogsFilterBar";
 import { AuditLogsTable } from "./AuditLogsTable";
@@ -15,66 +16,84 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useAuditLogStore } from "../store";
-import { getAuditLogsAction } from "@/actions/audit.actions";
 import {
   ChevronLeft,
   ChevronRight,
-  Loader2,
   RefreshCw,
   ScrollText,
-  Search,
   ShieldCheck,
 } from "lucide-react";
-import { toast } from "sonner";
 
 interface AuditLogsViewProps {
-  initialData: PaginatedAuditLogs;
-  users: UserProfile[];
+  data: PaginatedAuditLogs;
+  users: Pick<UserProfile, "id" | "email" | "full_name">[];
   projects: Pick<Project, "id" | "name">[];
 }
 
-export function AuditLogsView({ initialData, users, projects }: AuditLogsViewProps) {
-  const {
-    action,
-    userId,
-    projectId,
-    targetType,
-    dateRange,
-    page,
-    pageSize,
-    setPage,
-    setPageSize,
-    resetFilters,
-  } = useAuditLogStore();
-
-  const [data, setData] = useState<PaginatedAuditLogs>(initialData);
+export function AuditLogsView({ data, users, projects }: AuditLogsViewProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
 
-  // Refetch when filters or page changes
-  const fetchLogs = (targetPage = page, targetPageSize = pageSize) => {
-    startTransition(async () => {
-      const res = await getAuditLogsAction({
-        action: action as any,
-        userId,
-        projectId,
-        targetType,
-        dateRange,
-        page: targetPage,
-        pageSize: targetPageSize,
-      });
+  // Active filter values directly from URL searchParams
+  const activeAction = searchParams.get("action") || "all";
+  const activeUserId = searchParams.get("userId") || "all";
+  const activeProjectId = searchParams.get("projectId") || "all";
+  const activeDateRange = searchParams.get("dateRange") || "all";
 
-      if (res.success) {
-        setData(res.data);
-      } else {
-        toast.error(res.error || "Failed to load audit logs.");
+  // URL query updater helper for server-side pagination & filtering
+  const updateQuery = (updates: Record<string, string | number | null | undefined>) => {
+    startTransition(() => {
+      const nextParams = new URLSearchParams(searchParams.toString());
+
+      for (const [key, val] of Object.entries(updates)) {
+        if (val === null || val === undefined || val === "" || val === "all") {
+          nextParams.delete(key);
+        } else {
+          nextParams.set(key, String(val));
+        }
       }
+
+      // If a filter is updated and not the page itself, reset page back to 1
+      if (!("page" in updates)) {
+        nextParams.delete("page");
+      }
+
+      const queryString = nextParams.toString();
+      router.push(queryString ? `${pathname}?${queryString}` : pathname);
     });
   };
 
-  useEffect(() => {
-    fetchLogs(page, pageSize);
-  }, [action, userId, projectId, targetType, dateRange, page, pageSize]);
+  const handlePageChange = (newPage: number) => {
+    updateQuery({ page: newPage });
+  };
+
+  const handlePageSizeChange = (newSize: number) => {
+    updateQuery({ pageSize: newSize, page: 1 });
+  };
+
+  const handleFilterChange = (key: string, value: string) => {
+    updateQuery({ [key]: value });
+  };
+
+  const handleResetFilters = () => {
+    startTransition(() => {
+      const currentSize = searchParams.get("pageSize");
+      const nextParams = new URLSearchParams();
+      if (currentSize && currentSize !== "25") {
+        nextParams.set("pageSize", currentSize);
+      }
+      const qs = nextParams.toString();
+      router.push(qs ? `${pathname}?${qs}` : pathname);
+    });
+  };
+
+  const handleRefresh = () => {
+    startTransition(() => {
+      router.refresh();
+    });
+  };
 
   const fromEntry = data.total === 0 ? 0 : (data.page - 1) * data.pageSize + 1;
   const toEntry = Math.min(data.page * data.pageSize, data.total);
@@ -104,7 +123,7 @@ export function AuditLogsView({ initialData, users, projects }: AuditLogsViewPro
         <Button
           variant="outline"
           size="sm"
-          onClick={() => fetchLogs()}
+          onClick={handleRefresh}
           disabled={isPending}
           className="self-start sm:self-auto h-9"
         >
@@ -114,7 +133,17 @@ export function AuditLogsView({ initialData, users, projects }: AuditLogsViewPro
       </div>
 
       {/* Filter Bar */}
-      <AuditLogsFilterBar users={users} projects={projects} />
+      <AuditLogsFilterBar
+        users={users}
+        projects={projects}
+        action={activeAction}
+        userId={activeUserId}
+        projectId={activeProjectId}
+        dateRange={activeDateRange}
+        onFilterChange={handleFilterChange}
+        onReset={handleResetFilters}
+        disabled={isPending}
+      />
 
       {/* Main Table / Empty State */}
       {data.logs.length === 0 ? (
@@ -127,25 +156,28 @@ export function AuditLogsView({ initialData, users, projects }: AuditLogsViewPro
               : "No audit logs match the current filter criteria."
           }
           action={
-            data.total > 0
+            data.total > 0 || activeAction !== "all" || activeUserId !== "all" || activeProjectId !== "all" || activeDateRange !== "all"
               ? {
                   label: "Clear Filters",
-                  onClick: resetFilters,
+                  onClick: handleResetFilters,
                 }
               : undefined
           }
         />
       ) : (
         <div className="space-y-4">
-          <AuditLogsTable logs={data.logs} />
+          <div className={`transition-opacity duration-150 ${isPending ? "opacity-60 pointer-events-none" : "opacity-100"}`}>
+            <AuditLogsTable logs={data.logs} />
+          </div>
 
-          {/* Pagination Controls */}
+          {/* Server-Side Pagination Controls */}
           <div className="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-muted-foreground pt-1">
             <div className="flex items-center gap-2">
               <span>Rows per page:</span>
               <Select
                 value={String(data.pageSize)}
-                onValueChange={(val) => setPageSize(Number(val) || 25)}
+                onValueChange={(val) => handlePageSizeChange(Number(val) || 25)}
+                disabled={isPending}
               >
                 <SelectTrigger className="h-8 w-16 text-xs">
                   <SelectValue />
@@ -174,7 +206,7 @@ export function AuditLogsView({ initialData, users, projects }: AuditLogsViewPro
                 size="icon"
                 className="size-8"
                 disabled={data.page <= 1 || isPending}
-                onClick={() => setPage(data.page - 1)}
+                onClick={() => handlePageChange(data.page - 1)}
                 aria-label="Previous page"
               >
                 <ChevronLeft className="size-4" />
@@ -184,7 +216,7 @@ export function AuditLogsView({ initialData, users, projects }: AuditLogsViewPro
                 size="icon"
                 className="size-8"
                 disabled={data.page >= data.totalPages || isPending}
-                onClick={() => setPage(data.page + 1)}
+                onClick={() => handlePageChange(data.page + 1)}
                 aria-label="Next page"
               >
                 <ChevronRight className="size-4" />

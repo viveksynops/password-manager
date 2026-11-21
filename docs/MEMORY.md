@@ -215,7 +215,7 @@ Phases 1 through 11 are complete. Database schema, security foundation, AES-256-
 | Database migrations | Initial schema applied in `supabase/migrations/20261121000000_initial_schema.sql` |
 | Permissions grant script | Created in `supabase/setup_profiles.sql` |
 | `MASTER_KEY` | Generated (64-hex chars) in `.env.local` |
-| Test suite | Vitest: 92 / 92 unit tests passing |
+| Test suite | Vitest: 124 / 124 unit tests passing |
 | Production build | `next build` passing with 0 errors |
 
 ---
@@ -245,3 +245,5 @@ Phases 1 through 11 are complete. Database schema, security foundation, AES-256-
 | 2026-11-21 | Completed Phase 7 (Client Management: list, detail view with projects, create/edit dialog, archive/restore, Zustand search & filtering, audit logs, 54/54 tests passing) | Phase 8: Projects |
 | 2026-11-21 | Completed Phase 8 (Project Management: list, folder grid view as default, detail view with tabs, create/edit dialog, archive/restore, member assignment & removal, Zustand store, 72/72 tests passing) | Phase 9: Credentials Vault |
 | 2026-11-21 | Completed Phase 9 (Credentials Vault: AES-256-GCM encryption on save, SecretField with 15s auto-hide and 30s clipboard auto-clear, password generator, open site, fail-closed audit logs, 92/92 tests passing, build passing) | Phase 10: Environment Variables |
+| 2026-11-21 | Completed Phase 10 & 11 (Audit Logs, append-only ledger, filters, metadata inspection, 122/122 tests passing) | Phase 12 |
+| 2026-11-21 | Optimized Audit Logs with server-side URL pagination, explicit limits, range, and lightweight filter queries to minimize Supabase egress. 124/124 tests passing, build passing | Phase 12: Search and Productivity |

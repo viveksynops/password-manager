@@ -10,12 +10,18 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { Activity, Calendar, FilterX, FolderLock, User } from "lucide-react";
-import { useAuditLogStore } from "../store";
 import { UserProfile, Project } from "@/types/database.types";
 
 interface AuditLogsFilterBarProps {
-  users: UserProfile[];
+  users: Pick<UserProfile, "id" | "email" | "full_name">[];
   projects: Pick<Project, "id" | "name">[];
+  action: string;
+  userId: string;
+  projectId: string;
+  dateRange: string;
+  onFilterChange: (key: string, value: string) => void;
+  onReset: () => void;
+  disabled?: boolean;
 }
 
 const ACTION_LABELS: Record<string, string> = {
@@ -41,19 +47,17 @@ const DATE_RANGE_LABELS: Record<string, string> = {
   "30d": "Last 30 Days",
 };
 
-export function AuditLogsFilterBar({ users, projects }: AuditLogsFilterBarProps) {
-  const {
-    action,
-    userId,
-    projectId,
-    dateRange,
-    setAction,
-    setUserId,
-    setProjectId,
-    setDateRange,
-    resetFilters,
-  } = useAuditLogStore();
-
+export function AuditLogsFilterBar({
+  users,
+  projects,
+  action,
+  userId,
+  projectId,
+  dateRange,
+  onFilterChange,
+  onReset,
+  disabled = false,
+}: AuditLogsFilterBarProps) {
   const hasActiveFilters =
     action !== "all" ||
     userId !== "all" ||
@@ -70,7 +74,11 @@ export function AuditLogsFilterBar({ users, projects }: AuditLogsFilterBarProps)
     <div className="rounded-lg border bg-card/60 p-2.5 flex flex-wrap items-center gap-2.5 shadow-xs">
       {/* Action Filter */}
       <div className="w-full sm:w-52">
-        <Select value={action} onValueChange={(val) => setAction(val ?? "all")}>
+        <Select
+          value={action}
+          onValueChange={(val) => onFilterChange("action", val ?? "all")}
+          disabled={disabled}
+        >
           <SelectTrigger className="h-9 text-xs w-full">
             <div className="flex items-center gap-1.5 truncate">
               <Activity className="size-3.5 text-muted-foreground shrink-0" />
@@ -100,7 +108,11 @@ export function AuditLogsFilterBar({ users, projects }: AuditLogsFilterBarProps)
 
       {/* User Filter */}
       <div className="w-full sm:w-56">
-        <Select value={userId} onValueChange={(val) => setUserId(val ?? "all")}>
+        <Select
+          value={userId}
+          onValueChange={(val) => onFilterChange("userId", val ?? "all")}
+          disabled={disabled}
+        >
           <SelectTrigger className="h-9 text-xs w-full">
             <div className="flex items-center gap-1.5 truncate">
               <User className="size-3.5 text-muted-foreground shrink-0" />
@@ -123,7 +135,11 @@ export function AuditLogsFilterBar({ users, projects }: AuditLogsFilterBarProps)
 
       {/* Project Filter */}
       <div className="w-full sm:w-48">
-        <Select value={projectId} onValueChange={(val) => setProjectId(val ?? "all")}>
+        <Select
+          value={projectId}
+          onValueChange={(val) => onFilterChange("projectId", val ?? "all")}
+          disabled={disabled}
+        >
           <SelectTrigger className="h-9 text-xs w-full">
             <div className="flex items-center gap-1.5 truncate">
               <FolderLock className="size-3.5 text-muted-foreground shrink-0" />
@@ -148,7 +164,8 @@ export function AuditLogsFilterBar({ users, projects }: AuditLogsFilterBarProps)
       <div className="w-full sm:w-44">
         <Select
           value={dateRange}
-          onValueChange={(val) => setDateRange(((val as any) ?? "all") as "all" | "today" | "7d" | "30d")}
+          onValueChange={(val) => onFilterChange("dateRange", val ?? "all")}
+          disabled={disabled}
         >
           <SelectTrigger className="h-9 text-xs w-full">
             <div className="flex items-center gap-1.5 truncate">
@@ -174,7 +191,8 @@ export function AuditLogsFilterBar({ users, projects }: AuditLogsFilterBarProps)
           variant="ghost"
           size="sm"
           className="h-9 px-2.5 text-xs text-muted-foreground hover:text-foreground"
-          onClick={resetFilters}
+          onClick={onReset}
+          disabled={disabled}
         >
           <FilterX className="mr-1.5 size-3.5" />
           Reset Filters
