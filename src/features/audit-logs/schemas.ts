@@ -14,6 +14,18 @@ export const auditActionEnum = z.enum([
   "invite",
   "role_change",
   "deactivate",
+  "share.create",
+  "share.update_items",
+  "share.extend",
+  "share.regenerate_pin",
+  "share.revoke",
+  "share.unlock",
+  "share.delete",
+  "share.pin_success",
+  "share.pin_failed",
+  "share.locked",
+  "share.reveal",
+  "share.blocked",
 ]);
 
 export const auditDateRangeEnum = z.enum(["all", "today", "7d", "30d"]);

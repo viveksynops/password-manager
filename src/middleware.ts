@@ -36,6 +36,16 @@ export async function middleware(request: NextRequest) {
   }
 
   const isAuthRoute = AUTH_ROUTES.some((route) => pathname.startsWith(route));
+  const isShareRoute = pathname.startsWith("/share");
+
+  // Public share links are accessible without Supabase login
+  if (isShareRoute) {
+    supabaseResponse.headers.set("Referrer-Policy", "no-referrer");
+    supabaseResponse.headers.set("X-Robots-Tag", "noindex, nofollow");
+    supabaseResponse.headers.set("Cache-Control", "no-store, no-cache, must-revalidate");
+    supabaseResponse.headers.set("X-Frame-Options", "DENY");
+    return supabaseResponse;
+  }
 
   // 1. Unauthenticated users cannot access private dashboard routes
   if (!user && !isAuthRoute) {

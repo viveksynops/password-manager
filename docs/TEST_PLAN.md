@@ -354,7 +354,49 @@ Run these full flows with fake data before release:
 
 ---
 
-## 21. Pre-Release Checklist
+## 21. Client Share Links (Phase 12B)
+
+### Creating links
+- [ ] Manager can create a link with each expiry preset and the dates are correct
+- [ ] Creating with no items selected is rejected
+- [ ] Creating with items from another project is rejected 🔒
+- [ ] Developer cannot create, list, revoke or view share links 🔒
+- [ ] Link and PIN are shown once and cannot be retrieved later
+- [ ] No expiry and Production selections show confirmations
+- [ ] Token and PIN hashes are never returned to the browser 🔒
+
+### Client access
+- [ ] Correct link and PIN shows only the selected items
+- [ ] Items not selected are not visible and cannot be requested 🔒
+- [ ] Wrong PIN shows a generic error
+- [ ] 5 wrong PINs lock the link for 30 minutes, and the correct PIN is also rejected during lockout 🔒
+- [ ] Clearing cookies does not reset the attempt counter 🔒
+- [ ] More than 10 failed attempts per hour from one IP are blocked across links 🔒
+- [ ] Invalid, expired and revoked tokens show the identical generic page 🔒
+- [ ] The PIN screen reveals only the project name
+- [ ] Secrets are masked by default and absent from the page HTML and list response 🔒
+- [ ] Reveal returns the right value with `no-store` headers 🔒
+- [ ] Revealing an item ID that belongs to another share or project is rejected 🔒
+- [ ] Session expires after 20 minutes of inactivity
+
+### Expiry and control
+- [ ] A link stops working at the moment of expiry, even with an active client session 🔒
+- [ ] Revoking ends an active client session on the next request 🔒
+- [ ] Regenerating the PIN invalidates the old PIN and active sessions 🔒
+- [ ] Extending a link makes an expired link work again with the same token
+- [ ] Max views stops the link after the limit
+- [ ] Editing the item selection is reflected immediately for the client
+- [ ] Deleting a shared credential removes it from the client view
+- [ ] Deleting a link keeps its audit entries
+
+### Audit
+- [ ] Every `share.*` event in section 12 writes an audit entry 🔒
+- [ ] Audit entries contain no token, PIN or secret values 🔒
+- [ ] If the audit write fails on reveal, no secret is returned 🔒
+
+---
+
+## 22. Pre-Release Checklist
 
 All of these must be true before going live:
 

@@ -95,6 +95,10 @@ src/
 │   │   ├── projects/[id]/page.tsx
 │   │   ├── audit-logs/page.tsx
 │   │   └── team/page.tsx
+│   ├── (public)/
+│   │   └── share/[token]/
+│   │       ├── page.tsx          (PIN gate and shared secret viewer)
+│   │       └── layout.tsx        (isolated public minimal layout)
 │   ├── api/
 │   ├── layout.tsx
 │   └── globals.css
@@ -110,14 +114,23 @@ src/
 │   ├── projects/
 │   ├── credentials/
 │   ├── env-variables/
+│   ├── share-links/         (management dialogs, item picker, PIN form, viewer)
 │   ├── audit-logs/
 │   └── team/
+├── actions/
+│   ├── share-link.actions.ts   (team-authenticated management)
+│   └── share-access.actions.ts (public PIN verification & secret reveal)
 ├── services/
 │   ├── client.service.ts
 │   ├── project.service.ts
 │   ├── credential.service.ts
 │   ├── env.service.ts
+│   ├── share-link.service.ts   (team management via user session)
+│   ├── share-access.service.ts (scoped service-role access for public share)
 │   ├── audit.service.ts
+│   └── user.service.ts
+├── lib/
+│   ├── share/               (token, pin, session HMAC, expiry)
 │   └── user.service.ts
 ├── actions/
 │   ├── credential.actions.ts

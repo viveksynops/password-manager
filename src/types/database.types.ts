@@ -262,6 +262,123 @@ export interface Database {
         };
         Relationships: [];
       };
+      share_links: {
+        Row: {
+          id: string;
+          project_id: string;
+          created_by: string;
+          label: string;
+          token_hash: string;
+          pin_hash: string;
+          pin_salt: string;
+          expires_at: string | null;
+          never_expires: boolean;
+          max_views: number | null;
+          view_count: number;
+          status: "active" | "revoked";
+          revoked_at: string | null;
+          revoked_by: string | null;
+          failed_attempts: number;
+          locked_until: string | null;
+          session_version: number;
+          last_accessed_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          project_id: string;
+          created_by: string;
+          label: string;
+          token_hash: string;
+          pin_hash: string;
+          pin_salt: string;
+          expires_at?: string | null;
+          never_expires?: boolean;
+          max_views?: number | null;
+          view_count?: number;
+          status?: "active" | "revoked";
+          revoked_at?: string | null;
+          revoked_by?: string | null;
+          failed_attempts?: number;
+          locked_until?: string | null;
+          session_version?: number;
+          last_accessed_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          id?: string;
+          project_id?: string;
+          created_by?: string;
+          label?: string;
+          token_hash?: string;
+          pin_hash?: string;
+          pin_salt?: string;
+          expires_at?: string | null;
+          never_expires?: boolean;
+          max_views?: number | null;
+          view_count?: number;
+          status?: "active" | "revoked";
+          revoked_at?: string | null;
+          revoked_by?: string | null;
+          failed_attempts?: number;
+          locked_until?: string | null;
+          session_version?: number;
+          last_accessed_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      share_link_items: {
+        Row: {
+          id: string;
+          share_link_id: string;
+          item_type: "credential" | "env_variable";
+          item_id: string;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          share_link_id: string;
+          item_type: "credential" | "env_variable";
+          item_id: string;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          share_link_id?: string;
+          item_type?: "credential" | "env_variable";
+          item_id?: string;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
+      share_link_attempts: {
+        Row: {
+          id: string;
+          share_link_id: string;
+          ip_address: string | null;
+          success: boolean;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          share_link_id: string;
+          ip_address?: string | null;
+          success: boolean;
+          created_at?: string;
+        };
+        Update: {
+          id?: string;
+          share_link_id?: string;
+          ip_address?: string | null;
+          success?: boolean;
+          created_at?: string;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -310,3 +427,6 @@ export type ProjectMember = Database["public"]["Tables"]["project_members"]["Row
 export type Credential = Database["public"]["Tables"]["credentials"]["Row"];
 export type EnvVariable = Database["public"]["Tables"]["env_variables"]["Row"];
 export type AuditLog = Database["public"]["Tables"]["audit_logs"]["Row"];
+export type ShareLink = Database["public"]["Tables"]["share_links"]["Row"];
+export type ShareLinkItem = Database["public"]["Tables"]["share_link_items"]["Row"];
+export type ShareLinkAttempt = Database["public"]["Tables"]["share_link_attempts"]["Row"];

@@ -8,6 +8,16 @@ const envSchema = z.object({
     .string()
     .length(64, "MASTER_KEY must be a 64-character (32-byte) hex string")
     .regex(/^[0-9a-fA-F]+$/, "MASTER_KEY must be a valid hex string"),
+  SHARE_PIN_PEPPER: z
+    .string()
+    .length(64, "SHARE_PIN_PEPPER must be a 64-character (32-byte) hex string")
+    .regex(/^[0-9a-fA-F]+$/, "SHARE_PIN_PEPPER must be a valid hex string")
+    .optional(),
+  SHARE_SESSION_SECRET: z
+    .string()
+    .length(64, "SHARE_SESSION_SECRET must be a 64-character (32-byte) hex string")
+    .regex(/^[0-9a-fA-F]+$/, "SHARE_SESSION_SECRET must be a valid hex string")
+    .optional(),
 });
 
 export type Env = z.infer<typeof envSchema>;

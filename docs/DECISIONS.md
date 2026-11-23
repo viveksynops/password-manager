@@ -143,15 +143,39 @@ Related documents: `PRD.md`, `ARCHITECTURE.md`, `DESIGN.md`, `RULES.md`, `TASKS.
 
 ---
 
-## ADR-012: Use the service-role key only for admin tasks
+## ADR-012: Use the service-role key only for admin tasks (Amended by ADR-023)
+
+**Status:** Accepted (Amended by ADR-023)
+
+**Decision:** `SUPABASE_SERVICE_ROLE_KEY` is used only for inviting and managing users, and in server-only code. It is never used to read secrets during normal authenticated flows. The sole exception is `share-access.service.ts` for unauthenticated client share requests where RLS cannot run due to lack of a user session (see ADR-023).
+
+**Reason:** The service role bypasses RLS. Limiting it to admin functions and strictly scoped share lookups keeps RLS meaningful for everything else.
+
+**Consequence:** Normal user queries always use the user's session client. Share requests run through the isolated, audit-logged `share-access.service.ts` module.
+
+---
+
+## ADR-022: Client Share Links with PIN Protection
 
 **Status:** Accepted
 
-**Decision:** `SUPABASE_SERVICE_ROLE_KEY` is used only for inviting and managing users, in server-only code. It is never used to read secrets.
+**Decision:** Projects can have expiring, read-only share links secured by a 256-bit URL token and a 6-digit PIN. Clients enter the PIN to receive a 20-minute sliding HMAC session cookie to view and reveal explicitly shared credentials and environment variables.
 
-**Reason:** The service role bypasses RLS. Limiting it to a few admin functions keeps RLS meaningful for everything else.
+**Reason:** Eliminates sending plaintext secrets over email or Slack during client handovers.
 
-**Consequence:** Normal queries always use the user's session client.
+**Consequence:** External unauthenticated clients can access specific secrets if they have both the link and PIN. Strict lockout, rate limiting, and immutable audit logs are required.
+
+---
+
+## ADR-023: Service-Role Exception for Share Links
+
+**Status:** Accepted
+
+**Decision:** `share-access.service.ts` is permitted to use the service-role client to read only those credentials and environment variables explicitly attached to a validated, unexpired, unrevoked share link in `share_link_items`.
+
+**Reason:** Clients do not have Supabase auth accounts, so Postgres RLS cannot evaluate user session context.
+
+**Consequence:** `share-access.service.ts` is strictly `server-only`, performs IDOR checks on every item request, and logs every access to `audit_logs` before returning any decrypted secret.
 
 ---
 

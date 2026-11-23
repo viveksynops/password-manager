@@ -33,7 +33,10 @@ import {
   Server,
   Code2,
   Calendar,
+  Share2,
 } from "lucide-react";
+import { ShareLinksTab } from "@/features/share-links/components/ShareLinksTab";
+import { ShareLinkSummary } from "@/services/share-link.service";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
@@ -43,6 +46,7 @@ interface ProjectDetailViewProps {
   clients: Pick<Client, "id" | "name">[];
   initialCredentials?: CredentialSummary[];
   initialEnvVariables?: EnvVariableSummary[];
+  initialShareLinks?: ShareLinkSummary[];
   userRole: UserRole;
 }
 
@@ -52,6 +56,7 @@ export function ProjectDetailView({
   clients,
   initialCredentials = [],
   initialEnvVariables = [],
+  initialShareLinks = [],
   userRole,
 }: ProjectDetailViewProps) {
   const router = useRouter();
@@ -197,6 +202,16 @@ export function ProjectDetailView({
               </Badge>
             </TabsTrigger>
 
+            {canManage && (
+              <TabsTrigger value="share" className="shrink-0 flex-none gap-2 px-3.5 py-1.5 text-xs sm:text-sm">
+                <Share2 className="size-4 shrink-0" />
+                <span>Share Links</span>
+                <Badge variant="secondary" className="px-1.5 py-0 text-[11px] shrink-0">
+                  {initialShareLinks.length}
+                </Badge>
+              </TabsTrigger>
+            )}
+
             <TabsTrigger value="overview" className="shrink-0 flex-none gap-2 px-3.5 py-1.5 text-xs sm:text-sm">
               <Info className="size-4 shrink-0" />
               <span>Project Info</span>
@@ -238,6 +253,19 @@ export function ProjectDetailView({
             </CardContent>
           </Card>
         </TabsContent>
+
+        {/* Client Share Links Tab */}
+        {canManage && (
+          <TabsContent value="share" className="space-y-4">
+            <ShareLinksTab
+              projectId={project.id}
+              projectName={project.name}
+              shareLinks={initialShareLinks}
+              credentials={initialCredentials}
+              envVariables={initialEnvVariables}
+            />
+          </TabsContent>
+        )}
 
         {/* Project Info / Overview Tab */}
         <TabsContent value="overview" className="space-y-6">

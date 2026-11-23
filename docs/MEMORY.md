@@ -2,16 +2,50 @@
 
 This file is the current state of the project. Update it at the end of every work session and after every completed task. AI tools must read it at the start of every session and update it at the end.
 
-**Last updated:** 2026-11-21
+**Last updated:** 2026-11-23
 
 Related documents:
 - `DECISIONS.md`: permanent decisions (rarely changes)
 - `MEMORY.md`: current project state (changes often)
-- `TASKS.md`: full task breakdown (138 tasks across 15 phases)
+- `TASKS.md`: full task breakdown (168 tasks across 16 phases)
 
 ---
 
 ## Current Status
+
+### Phase 12B: Client Share Links Complete & UI Polished (2026-11-23)
+
+- **Feature Implementation (`FEATURE_CLIENT_SHARE.md`):** Implemented expiring, zero-knowledge read-only share links protected with a 6-digit PIN allowing external clients without accounts to view selected credentials and environment variables for a single project.
+- **Crypto & Security Foundation (`src/lib/share/`):**
+  - **Token (`token.ts`):** 256-bit random base64url token (`crypto.randomBytes(32)`), stored as deterministic SHA-256 hex digest (`hashToken`).
+  - **PIN (`pin.ts`):** 6-digit numeric PIN, hashed using `scrypt` with per-link random salt and server-side pepper `SHARE_PIN_PEPPER`. Verified via timing-safe comparison (`crypto.timingSafeEqual`).
+  - **Expiry (`expiry.ts`):** Presets (`30d`, `60d`, `120d`, `1y`, `never`) and expiration detection (`isExpired`).
+  - **Session (`session.ts`):** 20-minute sliding HMAC-SHA256 session cookie (`cv_share_session`) signed with `SHARE_SESSION_SECRET`. Session payload includes `shareLinkId` and `sessionVersion` for instant invalidation upon PIN regeneration, item updates, or revocation.
+  - **Protection Invariants:** 5 consecutive failed PIN attempts trigger a 30-minute lockout on the share link. Cross-link IP rate limiting blocks IPs exceeding 10 failed attempts per hour across all links. Constant 500ms delay on failed attempts mitigates timing side-channels.
+- **Database & RLS (`supabase/migrations/20261123000000_client_share_links.sql`):**
+  - Created `share_links`, `share_link_items`, and `share_link_attempts` tables with indexes.
+  - Strict RLS: Only authenticated active Admins and Managers with project access can manage share links or items. Developers and anonymous users are completely denied.
+  - Exported TypeScript database definitions in `src/types/database.types.ts` (`ShareLink`, `ShareLinkItem`, `ShareLinkAttempt`).
+- **Audit Logging & Unauthenticated Access Fix:**
+  - Added all `share.*` action types (`share.create`, `share.update_items`, `share.extend`, `share.regenerate_pin`, `share.revoke`, `share.unlock`, `share.delete`, `share.pin_success`, `share.pin_failed`, `share.locked`, `share.reveal`, `share.blocked`) to schemas, services, and badge UI (`AuditActionBadge.tsx`).
+  - Updated `src/services/audit.service.ts` so anonymous client actions (`!params.userId || params.action.startsWith("share.")`) log using `createAdminClient()`, resolving the Brave/incognito browser RLS audit blocker (`Audit logging failed: Security operation aborted`).
+- **Team-Side UI & Polish (`src/features/share-links/components/`):**
+  - Mounted `ShareLinksTab` in `ProjectDetailView.tsx` with a new "Share Links" tab trigger (visible to Admin/Manager only).
+  - Modernized `ShareLinksTab.tsx` with live search input, status filter tabs (All, Active, Expired, Revoked), status indicator badges, views counter with `<Eye>`, and an **Access PIN** column with one-click regeneration modal trigger.
+  - Resolved dialog button collision across dialog footers (`CreateShareDialog`, `EditShareItemsDialog`, `ExtendExpiryDialog`, `RegeneratePinDialog`) by applying `gap-2.5 sm:gap-2.5`.
+  - Moved Sonner toast notifications in `src/app/layout.tsx` to `position="bottom-right"`.
+  - Built zero-dependency date utilities in `src/lib/date.ts` replacing external `date-fns` references.
+- **Client-Side Viewer (`(public)/share/[token]/`):**
+  - Created public layout (`layout.tsx`) and lean server page (`page.tsx` < 25 lines) with `export const instant = false;`.
+  - Implemented `SharePublicView`, `ClientPinForm` (using shadcn `input-otp`), and `ClientShareViewer`.
+  - Fixed "Lock Session" behavior to immediately wipe revealed secrets from client state and revert back to PIN entry.
+  - Implemented `ClientSecretField` for on-demand decryption with 15s auto-hide countdown and 30s clipboard auto-clear.
+  - Strict IDOR Protection: `share-access.service.ts` verifies that the requested item is explicitly linked in `share_link_items` for that share link before decrypting, and logs a fail-closed audit entry before returning any plaintext secret.
+  - Updated `middleware.ts` to allow `/share/*` without Supabase auth and attached security headers (`Referrer-Policy: no-referrer`, `X-Robots-Tag: noindex, nofollow`, `Cache-Control: no-store, no-cache, must-revalidate`, `X-Frame-Options: DENY`).
+- **Testing & Verification:**
+  - 18 test suites passed (165/165 tests): including `src/test/share-crypto.test.ts`, `src/test/share-access.test.ts`, and updated `src/test/rls-policies.test.ts`.
+  - Next.js production build (`npm run build`) succeeded with Turbopack, partial prerendering, zero TypeScript errors, and zero lint errors across all 17 routes.
+  - **Git Status:** All changes remain in the local working tree without committing or pushing per explicit user instructions ("dont push or commit").
 
 ### Archive client RPC type correction (2026-11-21)
 

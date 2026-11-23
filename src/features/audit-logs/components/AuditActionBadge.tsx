@@ -15,6 +15,7 @@ import {
   UserPlus,
   ShieldAlert,
   UserX,
+  Share2,
 } from "lucide-react";
 
 interface AuditActionBadgeProps {
@@ -144,6 +145,17 @@ export function AuditActionBadge({ action }: AuditActionBadgeProps) {
         </Badge>
       );
     default:
+      if (action.startsWith("share.")) {
+        return (
+          <Badge
+            variant="outline"
+            className="border-cyan-500/40 text-cyan-400 bg-cyan-500/10 font-mono text-[11px] gap-1"
+          >
+            <Share2 className="size-3" />
+            {action}
+          </Badge>
+        );
+      }
       return (
         <Badge variant="outline" className="font-mono text-[11px]">
           {action}

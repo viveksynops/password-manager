@@ -1,5 +1,6 @@
 import "server-only";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { AuditLog, Json, UserProfile, Project } from "@/types/database.types";
 import { AuditLogFilterInput } from "@/features/audit-logs/schemas";
 
@@ -17,8 +18,20 @@ export interface LogActionParams {
     | "mfa_verify"
     | "invite"
     | "role_change"
-    | "deactivate";
-  targetType: "credential" | "env_variable" | "project" | "client" | "user" | "auth";
+    | "deactivate"
+    | "share.create"
+    | "share.update_items"
+    | "share.extend"
+    | "share.regenerate_pin"
+    | "share.revoke"
+    | "share.unlock"
+    | "share.delete"
+    | "share.pin_success"
+    | "share.pin_failed"
+    | "share.locked"
+    | "share.reveal"
+    | "share.blocked";
+  targetType: "credential" | "env_variable" | "project" | "client" | "user" | "auth" | "share_link";
   targetId?: string | null;
   projectId?: string | null;
   ipAddress?: string | null;
@@ -44,7 +57,13 @@ export interface PaginatedAuditLogs {
  * ADR-013 & Security Rule: If writing to the audit log fails, the operation MUST fail.
  */
 export async function logAction(params: LogActionParams): Promise<void> {
-  const supabase = await createClient();
+  // Client share operations and unauthenticated operations (e.g. failed login)
+  // do not have an authenticated Supabase user session cookie.
+  // Use createAdminClient() so RLS does not reject the append-only audit entry (ADR-023).
+  const isUnauthenticatedAction = !params.userId || params.action.startsWith("share.");
+  const supabase = isUnauthenticatedAction
+    ? createAdminClient()
+    : await createClient();
 
   const { error } = await supabase.from("audit_logs").insert({
     user_id: params.userId ?? null,
@@ -57,6 +76,25 @@ export async function logAction(params: LogActionParams): Promise<void> {
   });
 
   if (error) {
+    // If authenticated client failed, retry via admin client
+    if (!isUnauthenticatedAction) {
+      try {
+        const adminClient = createAdminClient();
+        const { error: adminError } = await adminClient.from("audit_logs").insert({
+          user_id: params.userId ?? null,
+          action: params.action,
+          target_type: params.targetType,
+          target_id: params.targetId ?? null,
+          project_id: params.projectId ?? null,
+          ip_address: params.ipAddress ?? null,
+          metadata: (params.metadata ?? {}) as Json,
+        });
+        if (!adminError) return;
+      } catch {
+        // Fall through to critical error throw
+      }
+    }
+
     // Critical security invariant: never allow access or mutation without an audit record
     console.error("[CRITICAL] Failed to write audit log entry:", error.message);
     throw new Error("Audit logging failed: Security operation aborted.");

@@ -36,6 +36,20 @@ function canCreateClient(user: User): boolean {
   return user.status === "active" && (user.role === "admin" || user.role === "manager");
 }
 
+function canManageShareLinks(
+  user: User,
+  projectId: string,
+  memberships: ProjectMembership[]
+): boolean {
+  if (user.status !== "active") return false;
+  if (user.role !== "admin" && user.role !== "manager") return false;
+  return canAccessProject(user, projectId, memberships);
+}
+
+function canViewShareAttempts(user: User): boolean {
+  return user.status === "active" && user.role === "admin";
+}
+
 describe("RLS Policy Access Rules (TASK-023)", () => {
   const admin: User = { id: "user-admin", role: "admin", status: "active" };
   const manager: User = { id: "user-manager", role: "manager", status: "active" };
@@ -87,5 +101,28 @@ describe("RLS Policy Access Rules (TASK-023)", () => {
     expect(canCreateClient(admin)).toBe(true);
     expect(canCreateClient(manager)).toBe(true);
     expect(canCreateClient(devAlpha)).toBe(false);
+  });
+
+  describe("Share Links RLS (TASK-143, TASK-145)", () => {
+    it("Admin and Manager can manage share links for projects they have access to", () => {
+      expect(canManageShareLinks(admin, projectA, memberships)).toBe(true);
+      expect(canManageShareLinks(manager, projectA, memberships)).toBe(true);
+    });
+
+    it("Developers CANNOT manage or create share links, even for assigned projects", () => {
+      expect(canManageShareLinks(devAlpha, projectA, memberships)).toBe(false);
+      expect(canManageShareLinks(devBeta, projectB, memberships)).toBe(false);
+    });
+
+    it("Deactivated Admin/Manager CANNOT manage share links", () => {
+      const inactiveAdmin: User = { id: "user-inactive-admin", role: "admin", status: "deactivated" };
+      expect(canManageShareLinks(inactiveAdmin, projectA, memberships)).toBe(false);
+    });
+
+    it("Only Admin can view share link access attempts (RLS SELECT on share_link_attempts)", () => {
+      expect(canViewShareAttempts(admin)).toBe(true);
+      expect(canViewShareAttempts(manager)).toBe(false);
+      expect(canViewShareAttempts(devAlpha)).toBe(false);
+    });
   });
 });

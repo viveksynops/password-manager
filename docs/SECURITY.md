@@ -308,6 +308,17 @@ For any change touching auth, roles, crypto, RLS, secrets or logging, a second p
 
 ---
 
+## 15. Client Share Links Security Controls
+
+- **Dual-Factor Sharing:** Links combine a 256-bit unguessable URL token (`crypto.randomBytes(32)`) with a 6-digit numeric PIN.
+- **PIN Protection:** PINs are stored as salted `scrypt` hashes with a server-side pepper (`SHARE_PIN_PEPPER`). Timing-safe equality checks are enforced via `crypto.timingSafeEqual`.
+- **Brute-Force Lockout:** 5 failed PIN attempts lock the link for 30 minutes. 10 failed attempts per hour per IP blocks attempts across links.
+- **Tightly Scoped Service-Role Access (ADR-023):** `share-access.service.ts` is the single authorized module allowed to query secrets for unauthenticated client sessions. It strictly validates that requested items exist within `share_link_items` for that specific active, unexpired, unrevoked share link.
+- **Session Security:** 20-minute sliding HMAC-SHA256 session cookie (`SHARE_SESSION_SECRET`) with `HttpOnly`, `Secure`, `SameSite=Strict`, `Path=/share`. Full link status and item membership are re-evaluated on every server action.
+- **Immutable Audit Trail:** All client access attempts, failures, and secret reveals write to `audit_logs` before any decrypted value is released.
+
+---
+
 ## What Must Never Happen
 
 - A secret appears in page HTML, a URL, logs, an error message or the browser bundle

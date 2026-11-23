@@ -220,6 +220,41 @@ When done, list files changed and how to test it.
 
 ---
 
+## Phase 12B: Client Share Links (FEATURE_CLIENT_SHARE.md)
+
+- [x] **TASK-139** Update `PRD.md`, `DECISIONS.md` (ADR-022, ADR-023, amend ADR-012), `ARCHITECTURE.md`, `SECURITY.md` and `TEST_PLAN.md`
+- [x] **TASK-140** Add `SHARE_PIN_PEPPER` and `SHARE_SESSION_SECRET` to `.env.example` and `lib/env.ts` 🔒
+- [x] **TASK-141** Create migration for `share_links`, `share_link_items`, `share_link_attempts` with indexes 🔒
+- [x] **TASK-142** Add RLS policies for the share tables 🔒
+- [x] **TASK-143** Extend audit log actions with the `share.*` types
+- [x] **TASK-144** Regenerate `database.types.ts`
+- [x] **TASK-145** Write RLS tests for share tables (developer and anon denied) 🔒
+- [x] **TASK-146** Create `lib/share/token.ts` (generate and hash token) and unit tests 🔒
+- [x] **TASK-147** Create `lib/share/pin.ts` (generate, scrypt hash with pepper, timing-safe verify) and unit tests 🔒
+- [x] **TASK-148** Create `lib/share/expiry.ts` (presets, `isExpired`) and unit tests
+- [x] **TASK-149** Create `lib/share/session.ts` (sign and verify cookie, sliding expiry) and unit tests 🔒
+- [x] **TASK-150** Create Zod schemas for share links
+- [x] **TASK-151** Create `share-link.service.ts` (create, list safe fields, update items, extend, revoke, regenerate PIN, unlock, delete) 🔒
+- [x] **TASK-152** Create team server actions with auth, role and project-access checks and audit logs 🔒
+- [x] **TASK-153** Build the Share tab list with status badges and empty, loading and error states
+- [x] **TASK-154** Build the create dialog with expiry select and item picker
+- [x] **TASK-155** Build the "link and PIN shown once" dialog
+- [x] **TASK-156** Add extend, revoke, regenerate PIN, unlock, edit items and delete actions with confirmations
+- [x] **TASK-157** Build the access history view
+- [x] **TASK-158** Create `share-access.service.ts` (service-role, server-only, scoped to one validated share) 🔒
+- [x] **TASK-159** Implement `verifyPin` with attempt counting, per-link and per-IP lockout, delay and generic errors 🔒
+- [x] **TASK-160** Implement `getSharedItems` and `revealSharedItem` with full re-validation and IDOR checks 🔒
+- [x] **TASK-161** Build the `/share/[token]` route, PIN form and viewer using the existing `SecretField`
+- [x] **TASK-162** Update `middleware.ts` to allow `/share/*` without Supabase auth and add security headers (`no-referrer`, `noindex`, `no-store`) 🔒
+- [x] **TASK-163** Redact share tokens from logs and error reporting 🔒
+- [x] **TASK-164** Add integration tests for share scenarios 🔒
+- [x] **TASK-165** Add end-to-end tests for create, open, PIN, reveal, revoke and expiry
+- [x] **TASK-166** Responsive and accessibility check of client pages
+- [x] **TASK-167** Security review of the whole feature using the `SECURITY.md` pull request checklist 🔒
+- [x] **TASK-168** Update `MEMORY.md` and mark the feature complete
+
+---
+
 ## Phase 13: Hardening and Quality
 
 Type-check follow-up (2026-11-21): added the migration-defined `archive_client_cascade` signature to database types; TypeScript and targeted lint pass. Existing archive-client SECURITY DEFINER migration still needs authorization review before deployment. No database change, commit, push, or deployment performed.
@@ -306,6 +341,7 @@ Copy this when adding new tasks:
 | 10. Environment Variables | Complete |
 | 11. Audit Logs | Complete |
 | 12. Search and Productivity | Complete |
+| 12B. Client Share Links | Complete |
 | 13. Hardening and Quality | In Progress |
 | 14. Deployment | Not started |
 | 15. Browser Extension | Not started |

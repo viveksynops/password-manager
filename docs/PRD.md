@@ -120,12 +120,16 @@ Create one secure, central place where the team stores and retrieves all client 
 
 ---
 
+## In Scope (Feature Addition)
+- Client share links with PIN protection, expiration, and granular secret selection (see `docs/FEATURE_CLIENT_SHARE.md`)
+
+---
+
 ## Out of Scope
-- Public or client-facing access
+- Direct client login accounts or client editing
 - Mobile app
 - Payments or billing
 - Automatic password rotation
-- Sharing secrets with people outside the company
 - Replacing client-side secret managers (e.g. Vercel env settings)
 
 ---
