@@ -1,8 +1,10 @@
 node_modules
 .next
+apps/web/.next
 dist
 build
 .turbo
 package-lock.json
 src/components/ui
+apps/web/src/components/ui
 docs

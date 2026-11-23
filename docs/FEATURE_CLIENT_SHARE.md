@@ -300,7 +300,7 @@ Add placeholders to `.env.example` and the validated `lib/env.ts`. Keep a secure
 Follow the layers in `ARCHITECTURE.md`: UI → actions → services → Supabase.
 
 ```
-src/
+apps/web/src/
 ├── app/
 │   ├── (dashboard)/projects/[id]/        (add "Share" tab)
 │   └── (public)/share/[token]/

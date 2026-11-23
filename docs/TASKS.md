@@ -49,7 +49,7 @@ When done, list files changed and how to test it.
 
 ## Phase 1: Setup
 
-- [x] **TASK-001** Initialize Next.js project with TypeScript, App Router and `src/` directory
+- [x] **TASK-001** Initialize Next.js project with TypeScript, App Router and `apps/web/src/` directory
 - [x] **TASK-002** Enable TypeScript `strict` mode and configure ESLint and Prettier
 - [x] **TASK-003** Configure Tailwind CSS
 - [x] **TASK-004** Initialize shadcn/ui and add base components (button, input, card, table, dialog, dropdown-menu, tabs, badge, sonner, sidebar, form, select, textarea, skeleton, alert-dialog)

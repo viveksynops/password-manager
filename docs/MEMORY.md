@@ -13,10 +13,28 @@ Related documents:
 
 ## Current Status
 
+### Monorepo Setup (2026-11-23)
+
+- **Monorepo Migration:** Restructured the project into an npm-workspaces monorepo (`apps/*`).
+- **Web App Relocation:** The Next.js web application was moved into `apps/web` with package name `"web"`. All Git history preserved via `git mv`.
+- **Root Workspace:** Created root `package.json` with workspace config `["apps/*"]` and script delegation (`dev`, `build`, `start`, `lint`, `test`, `format` with `-w web`).
+- **Environment & Git:**
+  - Added `.nvmrc` with Node 26.
+  - Updated root `.gitignore` to match nested `apps/web/node_modules`, `apps/web/.next`, etc.
+  - Moved `.env.local` untracked to `apps/web/.env.local`.
+  - Configured `apps/web/next.config.ts` with `turbopack.root` pointing to repo root (`../../`).
+  - Added fallback path resolution in `apps/web/scripts/create-test-users.mjs` for root/workspace execution.
+- **Dependencies & ADR:**
+  - Zero version drift: verified all 11 critical packages (`next`, `react`, `react-dom`, `@supabase/ssr`, `@supabase/supabase-js`, `zod`, `zustand`, `tailwindcss`, `@tailwindcss/turbopack`, `typescript`, `vitest`) are strictly identical.
+  - Added ADR-024 to `docs/DECISIONS.md`.
+  - Updated documentation path references (`AGENTS.md`, `ARCHITECTURE.md`, `DESIGN.md`, `RULES.md`, `TASKS.md`, `MEMORY.md`, `FEATURE_CLIENT_SHARE.md`).
+  - Added `apps/web/src/app/not-found.tsx` to handle 404s and resolve Turbopack's `/_not-found/page` route requirement.
+  - Verified `tsc --noEmit -p apps/web` (0 errors), `npm run test` (18/18 suites, 165/165 tests passed), `npm run build` (all 17 routes compiled successfully), and `npm run dev`.
+
 ### Phase 12B: Client Share Links Complete & UI Polished (2026-11-23)
 
 - **Feature Implementation (`FEATURE_CLIENT_SHARE.md`):** Implemented expiring, zero-knowledge read-only share links protected with a 6-digit PIN allowing external clients without accounts to view selected credentials and environment variables for a single project.
-- **Crypto & Security Foundation (`src/lib/share/`):**
+- **Crypto & Security Foundation (`apps/web/src/lib/share/`):**
   - **Token (`token.ts`):** 256-bit random base64url token (`crypto.randomBytes(32)`), stored as deterministic SHA-256 hex digest (`hashToken`).
   - **PIN (`pin.ts`):** 6-digit numeric PIN, hashed using `scrypt` with per-link random salt and server-side pepper `SHARE_PIN_PEPPER`. Verified via timing-safe comparison (`crypto.timingSafeEqual`).
   - **Expiry (`expiry.ts`):** Presets (`30d`, `60d`, `120d`, `1y`, `never`) and expiration detection (`isExpired`).
@@ -25,16 +43,16 @@ Related documents:
 - **Database & RLS (`supabase/migrations/20261123000000_client_share_links.sql`):**
   - Created `share_links`, `share_link_items`, and `share_link_attempts` tables with indexes.
   - Strict RLS: Only authenticated active Admins and Managers with project access can manage share links or items. Developers and anonymous users are completely denied.
-  - Exported TypeScript database definitions in `src/types/database.types.ts` (`ShareLink`, `ShareLinkItem`, `ShareLinkAttempt`).
+  - Exported TypeScript database definitions in `apps/web/src/types/database.types.ts` (`ShareLink`, `ShareLinkItem`, `ShareLinkAttempt`).
 - **Audit Logging & Unauthenticated Access Fix:**
   - Added all `share.*` action types (`share.create`, `share.update_items`, `share.extend`, `share.regenerate_pin`, `share.revoke`, `share.unlock`, `share.delete`, `share.pin_success`, `share.pin_failed`, `share.locked`, `share.reveal`, `share.blocked`) to schemas, services, and badge UI (`AuditActionBadge.tsx`).
-  - Updated `src/services/audit.service.ts` so anonymous client actions (`!params.userId || params.action.startsWith("share.")`) log using `createAdminClient()`, resolving the Brave/incognito browser RLS audit blocker (`Audit logging failed: Security operation aborted`).
-- **Team-Side UI & Polish (`src/features/share-links/components/`):**
+  - Updated `apps/web/src/services/audit.service.ts` so anonymous client actions (`!params.userId || params.action.startsWith("share.")`) log using `createAdminClient()`, resolving the Brave/incognito browser RLS audit blocker (`Audit logging failed: Security operation aborted`).
+- **Team-Side UI & Polish (`apps/web/src/features/share-links/components/`):**
   - Mounted `ShareLinksTab` in `ProjectDetailView.tsx` with a new "Share Links" tab trigger (visible to Admin/Manager only).
   - Modernized `ShareLinksTab.tsx` with live search input, status filter tabs (All, Active, Expired, Revoked), status indicator badges, views counter with `<Eye>`, and an **Access PIN** column with one-click regeneration modal trigger.
   - Resolved dialog button collision across dialog footers (`CreateShareDialog`, `EditShareItemsDialog`, `ExtendExpiryDialog`, `RegeneratePinDialog`) by applying `gap-2.5 sm:gap-2.5`.
-  - Moved Sonner toast notifications in `src/app/layout.tsx` to `position="bottom-right"`.
-  - Built zero-dependency date utilities in `src/lib/date.ts` replacing external `date-fns` references.
+  - Moved Sonner toast notifications in `apps/web/src/app/layout.tsx` to `position="bottom-right"`.
+  - Built zero-dependency date utilities in `apps/web/src/lib/date.ts` replacing external `date-fns` references.
 - **Client-Side Viewer (`(public)/share/[token]/`):**
   - Created public layout (`layout.tsx`) and lean server page (`page.tsx` < 25 lines) with `export const instant = false;`.
   - Implemented `SharePublicView`, `ClientPinForm` (using shadcn `input-otp`), and `ClientShareViewer`.
@@ -43,13 +61,13 @@ Related documents:
   - Strict IDOR Protection: `share-access.service.ts` verifies that the requested item is explicitly linked in `share_link_items` for that share link before decrypting, and logs a fail-closed audit entry before returning any plaintext secret.
   - Updated `middleware.ts` to allow `/share/*` without Supabase auth and attached security headers (`Referrer-Policy: no-referrer`, `X-Robots-Tag: noindex, nofollow`, `Cache-Control: no-store, no-cache, must-revalidate`, `X-Frame-Options: DENY`).
 - **Testing & Verification:**
-  - 18 test suites passed (165/165 tests): including `src/test/share-crypto.test.ts`, `src/test/share-access.test.ts`, and updated `src/test/rls-policies.test.ts`.
+  - 18 test suites passed (165/165 tests): including `apps/web/src/test/share-crypto.test.ts`, `apps/web/src/test/share-access.test.ts`, and updated `apps/web/src/test/rls-policies.test.ts`.
   - Next.js production build (`npm run build`) succeeded with Turbopack, partial prerendering, zero TypeScript errors, and zero lint errors across all 17 routes.
   - **Git Status:** All changes remain in the local working tree without committing or pushing per explicit user instructions ("dont push or commit").
 
 ### Archive client RPC type correction (2026-11-21)
 
-- The `archiveClient` RPC call matched the local migration, but `Database.public.Functions` omitted `archive_client_cascade`. Added its migration-defined signature to `src/types/database.types.ts`: UUID client ID as string, boolean archive flag, and `Json` return for PostgreSQL `jsonb`. No cast or runtime service change was needed.
+- The `archiveClient` RPC call matched the local migration, but `Database.public.Functions` omitted `archive_client_cascade`. Added its migration-defined signature to `apps/web/src/types/database.types.ts`: UUID client ID as string, boolean archive flag, and `Json` return for PostgreSQL `jsonb`. No cast or runtime service change was needed.
 - TypeScript, targeted ESLint, and production build pass; the earlier archive-client type-check blocker is resolved. Database types were aligned with the local migration, not regenerated from a verified live database schema. No migration, RPC mutation, commit, push, or deployment was performed.
 - Security follow-up: the existing uncommitted `20261121000003_archive_client_cascade.sql` defines a `SECURITY DEFINER` mutation without an explicit caller authorization check or restricted EXECUTE grants. Review before deploying/using it; this type correction does not establish runtime authorization or migration application.
 
@@ -58,7 +76,7 @@ Related documents:
 - Added the missing `cn` import from `@/lib/utils` to `ProjectFolderGrid.tsx`, preserving the existing uncommitted dropdown changes.
 - Added `await connection()` to the shared Supabase server-client factory before client initialization, so page/service calls independently stay out of prerendering. A boundary in the dashboard layout alone does not cover independently rendered pages. Authentication checks, roles, and MFA behavior were not changed.
 - The supplied hydration diff shows `cz-shortcut-listen` on `<body>`, absent from app source and consistent with browser extension injection. Did not add blanket hydration-warning suppression; verify with extensions disabled.
-- Validation: targeted ESLint passed; all 143 tests passed; unauthenticated local `/projects` returned the expected 307 redirect. Production compilation succeeded, but TypeScript and build completion are blocked by the pre-existing `archive_client_cascade` RPC call missing from generated database types (`src/services/client.service.ts:277`). No authenticated browser verification performed. No commit, push, migration, or deployment was made.
+- Validation: targeted ESLint passed; all 143 tests passed; unauthenticated local `/projects` returned the expected 307 redirect. Production compilation succeeded, but TypeScript and build completion are blocked by the pre-existing `archive_client_cascade` RPC call missing from generated database types (`apps/web/src/services/client.service.ts:277`). No authenticated browser verification performed. No commit, push, migration, or deployment was made.
 
 ### Phase 14: Deployment Complete (2026-11-21)
 - **TASK-123:** Production environment variables configured in Vercel (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `MASTER_KEY`).
@@ -70,9 +88,9 @@ Related documents:
 - **Git Status:** Uncommitted in local working tree per user instruction ("dont commit or push").
 
 ### Phase 13: Hardening and Quality Complete (2026-11-21)
-- **TASK-114 (Rate Limiting):** Implemented zero-cost sliding-window rate limiting in `src/lib/rate-limit.ts`. Applied to `loginAction` (5 attempts / 15m), `revealCredentialAction` (30 reveals / 1m), `revealEnvVariableAction` (30 reveals / 1m), and `exportEnvAction` (5 exports / 5m). Covered by 5 new unit tests in `src/test/rate-limit.test.ts`.
+- **TASK-114 (Rate Limiting):** Implemented zero-cost sliding-window rate limiting in `apps/web/src/lib/rate-limit.ts`. Applied to `loginAction` (5 attempts / 15m), `revealCredentialAction` (30 reveals / 1m), `revealEnvVariableAction` (30 reveals / 1m), and `exportEnvAction` (5 exports / 5m). Covered by 5 new unit tests in `apps/web/src/test/rate-limit.test.ts`.
 - **TASK-115 (Security Headers):** Added comprehensive web security headers in `next.config.ts`: HSTS (`max-age=63072000; includeSubDomains; preload`), `X-Frame-Options: DENY`, `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy`, and strict `Content-Security-Policy`.
-- **TASK-116 & TASK-117 (Secret Sanitization):** Verified that decrypted secrets never appear in server action errors, console logs, page HTML props, or audit logs. Sanitized `handleActionError` in `src/lib/action-result.ts` to prevent internal database errors or cryptographical state leaks.
+- **TASK-116 & TASK-117 (Secret Sanitization):** Verified that decrypted secrets never appear in server action errors, console logs, page HTML props, or audit logs. Sanitized `handleActionError` in `apps/web/src/lib/action-result.ts` to prevent internal database errors or cryptographical state leaks.
 - **TASK-118 (Accessibility Check):** Verified focus indicators (`focus-visible:ring-1 focus-visible:ring-ring`), full keyboard navigation, screen reader ARIA labels on all interactive/icon buttons, and dark mode contrast exceeding WCAG AA.
 - **TASK-119 (Responsive Layout):** Verified responsive layouts at 360px mobile, 768px tablet, and 1440px desktop with full-screen mobile sheets and zero horizontal blowout.
 - **TASK-120 (RLS Review):** Audited all 8 database RLS policies (`profiles`, `clients`, `projects`, `project_members`, `credentials`, `env_variables`, `audit_logs`, `user_favorites`) to confirm fail-closed zero-leakage security boundaries.
@@ -82,9 +100,9 @@ Related documents:
 
 ### Mandatory MFA Removal (2026-11-21)
 - Disabled mandatory Multi-Factor Authentication requirement per user request so users log in directly to the dashboard without `/mfa/enroll` or `/mfa` interception.
-- In `src/actions/auth.actions.ts`: `loginAction` logs in directly and returns `{ requiresMfa: false, requiresMfaEnrollment: false }`.
-- In `src/middleware.ts` & `src/app/(auth)/mfa/*`: redirected any legacy `/mfa` and `/mfa/enroll` accesses to `/` for authenticated sessions or `/login` for unauthenticated sessions.
-- In `src/features/auth/components/AcceptInviteForm.tsx`: routes directly to `/` after password creation.
+- In `apps/web/src/actions/auth.actions.ts`: `loginAction` logs in directly and returns `{ requiresMfa: false, requiresMfaEnrollment: false }`.
+- In `apps/web/src/middleware.ts` & `apps/web/src/app/(auth)/mfa/*`: redirected any legacy `/mfa` and `/mfa/enroll` accesses to `/` for authenticated sessions or `/login` for unauthenticated sessions.
+- In `apps/web/src/features/auth/components/AcceptInviteForm.tsx`: routes directly to `/` after password creation.
 - All 138 unit tests pass; production Turbopack build succeeds.
 
 ### Production routing repair (2026-11-21)
@@ -101,8 +119,8 @@ Phases 1 through 11 are complete. Database schema, security foundation, AES-256-
 
 - Read all project documents and inspected representative routes, auth helpers, actions, services, secret handling, search, favorites, and tests. No application code changed; no tests, build, live database checks, or browser verification were run in this session.
 - Working structure: client -> project -> credentials and environment variables; Next.js App Router UI -> server actions -> services -> user-session Supabase client, with server-only crypto. Admin manages users and audit logs; Manager manages clients/projects; Developer access is scoped by project membership. Secret mutation permissions need to be read from the implementation and policies: the test-plan matrix still leaves Developer deletion unresolved.
-- Security follow-up: credential custom fields are serialized into plaintext `notes` by `src/utils/credential-fields.ts`, saved and returned by `src/services/credential.service.ts`, and displayed/copied directly in `ProjectCredentialsTab.tsx`. Fields intended for API keys or other secrets do not receive the password encryption, SecretField masking, or audited reveal/copy controls. This conflicts with the documented secret-handling requirements and needs review before release.
-- Verification limitation: `src/test/rls-policies.test.ts` models access rules with local functions; it does not execute database RLS policies. Historical passing unit-test counts do not establish live RLS enforcement or end-to-end security.
+- Security follow-up: credential custom fields are serialized into plaintext `notes` by `apps/web/src/utils/credential-fields.ts`, saved and returned by `apps/web/src/services/credential.service.ts`, and displayed/copied directly in `ProjectCredentialsTab.tsx`. Fields intended for API keys or other secrets do not receive the password encryption, SecretField masking, or audited reveal/copy controls. This conflicts with the documented secret-handling requirements and needs review before release.
+- Verification limitation: `apps/web/src/test/rls-policies.test.ts` models access rules with local functions; it does not execute database RLS policies. Historical passing unit-test counts do not establish live RLS enforcement or end-to-end security.
 - Documentation drift: DESIGN.md still describes theme switching, while AGENTS.md mandates permanent dark mode and the root layout forces dark mode. Follow AGENTS.md. Search/favorites services also contain explicit `any` despite the strict typing rule.
 - TASK-114 remains unstarted. No production readiness claim was established by this orientation.
 
@@ -125,7 +143,7 @@ Phases 1 through 11 are complete. Database schema, security foundation, AES-256-
 ## Completed Tasks
 
 ### Phase 1: Setup (11/12 complete, 1 skipped)
-- [x] **TASK-001**: Initialize Next.js project with TypeScript, App Router and `src/` directory
+- [x] **TASK-001**: Initialize Next.js project with TypeScript, App Router and `apps/web/src/` directory
 - [x] **TASK-002**: Enable TypeScript `strict` mode and configure ESLint and Prettier
 - [x] **TASK-003**: Configure Tailwind CSS (Tailwind v4 with `@theme inline` and shadcn integration)
 - [x] **TASK-004**: Initialize shadcn/ui and add base components (Base UI primitives, zinc theme)
@@ -148,78 +166,78 @@ Phases 1 through 11 are complete. Database schema, security foundation, AES-256-
 - [x] **TASK-019**: Create `env_variables` table with RLS
 - [x] **TASK-020**: Create append-only `audit_logs` table with RLS and immutable Postgres trigger
 - [x] **TASK-021**: Create helper SQL functions for role and project-access checks (`is_admin`, `is_manager_or_admin`, `has_project_access`, `has_client_access`)
-- [x] **TASK-022**: Generate TypeScript types into `src/types/database.types.ts`
-- [x] **TASK-023**: Write RLS tests in `src/test/rls-policies.test.ts`
+- [x] **TASK-022**: Generate TypeScript types into `apps/web/src/types/database.types.ts`
+- [x] **TASK-023**: Write RLS tests in `apps/web/src/test/rls-policies.test.ts`
 - [x] **TASK-024**: Create seed data in `supabase/seed.sql`
 
 ### Phase 3: Encryption and Core Libraries (7/7 complete)
 - [x] **TASK-025**: Generate `MASTER_KEY` (64-hex char AES-256-GCM key) in `.env.local`
-- [x] **TASK-026**: Create `src/lib/crypto.ts` with AES-256-GCM encryption and decryption (`server-only`)
-- [x] **TASK-027**: Add crypto tests in `src/test/crypto.test.ts` (round trip, unique IVs, tamper detection, wrong key fails)
-- [x] **TASK-028**: Create Supabase clients in `src/lib/supabase/` (`client.ts`, `server.ts`, `admin.ts`, `middleware.ts`)
-- [x] **TASK-029**: Create `src/lib/auth.ts` with `getCurrentUser()`, `requireRole()`, `requireAdmin()`, `requireManagerOrAdmin()`
-- [x] **TASK-030**: Create `src/services/audit.service.ts` with fail-closed `logAction()`
-- [x] **TASK-031**: Create shared action result type (`ActionResult<T>`) and safe error helpers in `src/lib/action-result.ts`
+- [x] **TASK-026**: Create `apps/web/src/lib/crypto.ts` with AES-256-GCM encryption and decryption (`server-only`)
+- [x] **TASK-027**: Add crypto tests in `apps/web/src/test/crypto.test.ts` (round trip, unique IVs, tamper detection, wrong key fails)
+- [x] **TASK-028**: Create Supabase clients in `apps/web/src/lib/supabase/` (`client.ts`, `server.ts`, `admin.ts`, `middleware.ts`)
+- [x] **TASK-029**: Create `apps/web/src/lib/auth.ts` with `getCurrentUser()`, `requireRole()`, `requireAdmin()`, `requireManagerOrAdmin()`
+- [x] **TASK-030**: Create `apps/web/src/services/audit.service.ts` with fail-closed `logAction()`
+- [x] **TASK-031**: Create shared action result type (`ActionResult<T>`) and safe error helpers in `apps/web/src/lib/action-result.ts`
 
 ### Phase 4: Authentication (10/10 complete)
-- [x] **TASK-032**: Create login page with shadcn UI and React Hook Form (`src/app/(auth)/login/page.tsx`, `LoginForm.tsx`)
+- [x] **TASK-032**: Create login page with shadcn UI and React Hook Form (`apps/web/src/app/(auth)/login/page.tsx`, `LoginForm.tsx`)
 - [x] **TASK-033**: Configure Supabase Auth cookie session handling via `@supabase/ssr`
-- [x] **TASK-034**: Create `src/middleware.ts` protecting dashboard routes and preserving Server Action RPC headers (`next-action`)
-- [x] **TASK-035**: Create MFA enrollment page (`src/app/(auth)/mfa/enroll/page.tsx`, `MfaEnrollForm.tsx`)
-- [x] **TASK-036**: Create MFA verification step on login (`src/app/(auth)/mfa/page.tsx`, `MfaVerifyForm.tsx`)
+- [x] **TASK-034**: Create `apps/web/src/middleware.ts` protecting dashboard routes and preserving Server Action RPC headers (`next-action`)
+- [x] **TASK-035**: Create MFA enrollment page (`apps/web/src/app/(auth)/mfa/enroll/page.tsx`, `MfaEnrollForm.tsx`)
+- [x] **TASK-036**: Create MFA verification step on login (`apps/web/src/app/(auth)/mfa/page.tsx`, `MfaVerifyForm.tsx`)
 - [x] **TASK-037**: Enforce MFA verification in middleware and server actions (`loginAction`, `verifyMfaAction`, `enrollMfaAction`)
 - [x] **TASK-038**: Add logout (`logoutAction`) and session refresh handling
 - [x] **TASK-039**: Create forgot password (`/forgot-password`) and reset password (`/reset-password`) flow
 - [x] **TASK-040**: Create accept-invite page (`/accept-invite`) for new team members
-- [x] **TASK-041**: Add authentication schema tests in `src/test/auth-schemas.test.ts`
+- [x] **TASK-041**: Add authentication schema tests in `apps/web/src/test/auth-schemas.test.ts`
 
 ### Phase 5: App Layout (7/7 complete)
 - [x] **TASK-042**: Create dashboard layout with official shadcn sidebar (`SidebarProvider`, `Sidebar`, `SidebarInset`) and header
 - [x] **TASK-043**: Make sidebar responsive (built-in mobile Sheet and `SidebarTrigger`)
 - [x] **TASK-044**: Show sidebar items by role (hide Team and Audit Logs from developer role)
-- [x] **TASK-045**: Add official shadcn `Breadcrumb` component (`src/components/layout/Breadcrumbs.tsx`)
-- [x] **TASK-046**: Add dark mode toggle with `next-themes` (`src/components/layout/ThemeToggle.tsx`)
+- [x] **TASK-045**: Add official shadcn `Breadcrumb` component (`apps/web/src/components/layout/Breadcrumbs.tsx`)
+- [x] **TASK-046**: Add dark mode toggle with `next-themes` (`apps/web/src/components/layout/ThemeToggle.tsx`)
 - [x] **TASK-047**: Create reusable `DataTable`, `EmptyState`, `ErrorState`, and `ConfirmDialog` components using shadcn primitives
-- [x] **TASK-048**: Create dashboard home page (`src/app/(dashboard)/page.tsx` < 25 lines) with client/project metric cards and quick actions
+- [x] **TASK-048**: Create dashboard home page (`apps/web/src/app/(dashboard)/page.tsx` < 25 lines) with client/project metric cards and quick actions
 
 ### Phase 6: Team Management (Admin) (6/6 complete)
-- [x] **TASK-049**: Create `src/services/user.service.ts` (list users, invite, update role, deactivate/reactivate)
-- [x] **TASK-050**: Create team list page at `src/app/(dashboard)/team/page.tsx` (Admin only)
+- [x] **TASK-049**: Create `apps/web/src/services/user.service.ts` (list users, invite, update role, deactivate/reactivate)
+- [x] **TASK-050**: Create team list page at `apps/web/src/app/(dashboard)/team/page.tsx` (Admin only)
 - [x] **TASK-051**: Create invite user form and action (`InviteUserDialog.tsx`, `inviteUserAction`) using service role (server-only)
 - [x] **TASK-052**: Add change role and deactivate/reactivate actions (`updateUserRoleAction`, `setUserStatusAction`)
 - [x] **TASK-053**: Ensure deactivated users lose access immediately via `adminClient.auth.admin.signOut(userId)`
-- [x] **TASK-054**: Add unit tests for team management schemas, role constraints, and Zustand filter store (`src/test/team-management.test.ts`)
+- [x] **TASK-054**: Add unit tests for team management schemas, role constraints, and Zustand filter store (`apps/web/src/test/team-management.test.ts`)
 
 ### Phase 7: Clients (9/9 complete)
-- [x] **TASK-055**: Create Zod schemas for clients (`src/features/clients/schemas.ts`)
-- [x] **TASK-056**: Create `src/services/client.service.ts` (listClients, getClientById, createClient, updateClient, archiveClient)
+- [x] **TASK-055**: Create Zod schemas for clients (`apps/web/src/features/clients/schemas.ts`)
+- [x] **TASK-056**: Create `apps/web/src/services/client.service.ts` (listClients, getClientById, createClient, updateClient, archiveClient)
 - [x] **TASK-057**: Create client server actions with role checks (`createClientAction`, `updateClientAction`, `archiveClientAction`)
-- [x] **TASK-058**: Create clients list page at `src/app/(dashboard)/clients/page.tsx` with search and status filtering
+- [x] **TASK-058**: Create clients list page at `apps/web/src/app/(dashboard)/clients/page.tsx` with search and status filtering
 - [x] **TASK-059**: Create add and edit client dialog (`ClientFormDialog.tsx`) using shadcn components and React Hook Form
 - [x] **TASK-060**: Add archive client functionality with `ConfirmDialog`
-- [x] **TASK-061**: Create client detail page at `src/app/(dashboard)/clients/[id]/page.tsx` showing client details and associated projects
+- [x] **TASK-061**: Create client detail page at `apps/web/src/app/(dashboard)/clients/[id]/page.tsx` showing client details and associated projects
 - [x] **TASK-062**: Add loading, empty, and error states across client views
-- [x] **TASK-063**: Add unit tests for client schemas, operations, and Zustand filter store (`src/test/client-management.test.ts`)
+- [x] **TASK-063**: Add unit tests for client schemas, operations, and Zustand filter store (`apps/web/src/test/client-management.test.ts`)
 
 ### Phase 8: Projects (11/11 complete)
-- [x] **TASK-064**: Create Zod schemas for projects (`src/features/projects/schemas.ts`)
-- [x] **TASK-065**: Create `src/services/project.service.ts` (listProjects with RLS, getProjectById with details, createProject, updateProject, archiveProject, assignProjectMember, removeProjectMember)
+- [x] **TASK-064**: Create Zod schemas for projects (`apps/web/src/features/projects/schemas.ts`)
+- [x] **TASK-065**: Create `apps/web/src/services/project.service.ts` (listProjects with RLS, getProjectById with details, createProject, updateProject, archiveProject, assignProjectMember, removeProjectMember)
 - [x] **TASK-066**: Create project server actions with role checks (`createProjectAction`, `updateProjectAction`, `archiveProjectAction`, `assignProjectMemberAction`, `removeProjectMemberAction`)
-- [x] **TASK-067**: Create projects list page at `src/app/(dashboard)/projects/page.tsx` (< 25 lines) with folder-based grid view as default and view mode toggle
+- [x] **TASK-067**: Create projects list page at `apps/web/src/app/(dashboard)/projects/page.tsx` (< 25 lines) with folder-based grid view as default and view mode toggle
 - [x] **TASK-068**: Create add project form dialog (`ProjectFormDialog.tsx`) streamlined to Client Organization and Project (Folder) Name, and responsive slide-over sheet for editing (`ProjectEditSheet.tsx`: 100% full screen on mobile, max-w-lg on desktop) for all metadata, URLs, and settings
 - [x] **TASK-069**: Add archive and restore project functionality with `ConfirmDialog`
-- [x] **TASK-070**: Create project detail page at `src/app/(dashboard)/projects/[id]/page.tsx` (< 25 lines) with responsive horizontal-scrolling tabs (Credentials, Env Variables, Team Members, Overview)
+- [x] **TASK-070**: Create project detail page at `apps/web/src/app/(dashboard)/projects/[id]/page.tsx` (< 25 lines) with responsive horizontal-scrolling tabs (Credentials, Env Variables, Team Members, Overview)
 - [x] **TASK-071**: Add assign and remove team members on a project (`ProjectMembersTab.tsx`)
 - [x] **TASK-072**: Confirm Developers see only assigned projects (RLS verification & isolated data access) 🔒
 - [x] **TASK-073**: Add loading, empty, and error states across all project views
-- [x] **TASK-074**: Add unit tests for projects, schemas, store, and access rules (`src/test/project-management.test.ts`)
+- [x] **TASK-074**: Add unit tests for projects, schemas, store, and access rules (`apps/web/src/test/project-management.test.ts`)
 
 ---
 
 ### Phase 9: Credentials Vault (15/15 complete)
-- [x] **TASK-075**: Create Zod schemas for credentials (`src/features/credentials/schemas.ts`)
+- [x] **TASK-075**: Create Zod schemas for credentials (`apps/web/src/features/credentials/schemas.ts`)
 - [x] **TASK-076**: Create `credential.service.ts` encrypting passwords on save with AES-256-GCM and unique IVs 🔒
-- [x] **TASK-077**: Create `SecretField` component with hidden, loading, revealed, and copied states (`src/components/secret-field.tsx`) 🔒
+- [x] **TASK-077**: Create `SecretField` component with hidden, loading, revealed, and copied states (`apps/web/src/components/secret-field.tsx`) 🔒
 - [x] **TASK-078**: Create credentials list on the project page with passwords excluded from list payload 🔒
 - [x] **TASK-079**: Create add credential form with service, login URL, username, password, notes (`CredentialFormDialog.tsx`)
 - [x] **TASK-080**: Create edit credential form allowing password to remain unchanged
@@ -228,18 +246,18 @@ Phases 1 through 11 are complete. Database schema, security foundation, AES-256-
 - [x] **TASK-083**: Add copy to clipboard with automatic clear after 30 seconds
 - [x] **TASK-084**: Add auto-hide of revealed passwords after 15 seconds with countdown badge
 - [x] **TASK-085**: Add "Open site" button for login URL
-- [x] **TASK-086**: Add cryptographically secure password generator (`src/utils/password-generator.ts`)
+- [x] **TASK-086**: Add cryptographically secure password generator (`apps/web/src/utils/password-generator.ts`)
 - [x] **TASK-087**: Add fail-closed audit logging for create, update, delete, reveal, and copy actions 🔒
 - [x] **TASK-088**: Add loading, empty, and error states across credential vault views
-- [x] **TASK-089**: Add unit tests for credentials, encryption round trip, generator, and access rules (`src/test/credential-management.test.ts`)
+- [x] **TASK-089**: Add unit tests for credentials, encryption round trip, generator, and access rules (`apps/web/src/test/credential-management.test.ts`)
 
 ---
 
 ### Phase 10: Environment Variables (13/13 complete)
-- [x] **TASK-090**: Create Zod schemas for env variables (`src/features/env-variables/schemas.ts`)
-- [x] **TASK-091**: Create `src/utils/env-parser.ts` utility to parse and export `.env` text (handles quotes, multiline, inline comments, empty values, duplicates)
-- [x] **TASK-092**: Add unit tests for env parser (`src/test/env-parser.test.ts`)
-- [x] **TASK-093**: Create `src/services/env.service.ts` that encrypts on save with AES-256-GCM and unique IVs 🔒
+- [x] **TASK-090**: Create Zod schemas for env variables (`apps/web/src/features/env-variables/schemas.ts`)
+- [x] **TASK-091**: Create `apps/web/src/utils/env-parser.ts` utility to parse and export `.env` text (handles quotes, multiline, inline comments, empty values, duplicates)
+- [x] **TASK-092**: Add unit tests for env parser (`apps/web/src/test/env-parser.test.ts`)
+- [x] **TASK-093**: Create `apps/web/src/services/env.service.ts` that encrypts on save with AES-256-GCM and unique IVs 🔒
 - [x] **TASK-094**: Create environment switcher (Dev, Staging, Prod) with color-coded badges and counts (`EnvSwitcher.tsx`)
 - [x] **TASK-095**: Create env variables table using `SecretField` with reveal and copy auto-protection (`EnvVariablesTable.tsx`)
 - [x] **TASK-096**: Create add and edit variable form dialog (`EnvVariableFormDialog.tsx`) with key generator
@@ -248,28 +266,28 @@ Phases 1 through 11 are complete. Database schema, security foundation, AES-256-
 - [x] **TASK-099**: Create "Export .env" action with file download and fail-closed audit log (`ExportEnvDialog.tsx`) 🔒
 - [x] **TASK-100**: Add reveal and copy actions with fail-closed audit logging (`revealEnvVariableAction`) 🔒
 - [x] **TASK-101**: Add loading, empty, and error states across environment variables views (`ProjectEnvTab.tsx`)
-- [x] **TASK-102**: Add unit tests for env variables, schemas, encryption round-trip, production confirmation, and export (`src/test/env-variables.test.ts`) 🔒
+- [x] **TASK-102**: Add unit tests for env variables, schemas, encryption round-trip, production confirmation, and export (`apps/web/src/test/env-variables.test.ts`) 🔒
 
 ---
 
 ### Phase 11: Audit Logs (6/6 complete)
 - [x] **TASK-103**: Make sure all sensitive actions write audit logs (verified across auth, team, clients, projects, credentials, and env variables)
-- [x] **TASK-104**: Create audit logs page at `src/app/(dashboard)/audit-logs/page.tsx` (< 25 lines, Admin only)
+- [x] **TASK-104**: Create audit logs page at `apps/web/src/app/(dashboard)/audit-logs/page.tsx` (< 25 lines, Admin only)
 - [x] **TASK-105**: Add filters (action, user, project, date range) and pagination (`AuditLogsFilterBar.tsx`, `AuditLogsView.tsx`)
 - [x] **TASK-106**: Show relative time with full timestamp on hover via `Tooltip` (`RelativeTimeTooltip.tsx`)
 - [x] **TASK-107**: Confirm audit logs cannot be edited or deleted by any role via immutable Postgres trigger and RLS 🔒
-- [x] **TASK-108**: Add unit tests for audit logs, filters, schemas, formatting, and immutability invariants (`src/test/audit-logs.test.ts`) 🔒
+- [x] **TASK-108**: Add unit tests for audit logs, filters, schemas, formatting, and immutability invariants (`apps/web/src/test/audit-logs.test.ts`) 🔒
 
 ---
 
 ---
 
 ### Phase 12: Search and Productivity (5/5 complete)
-- [x] **TASK-109**: Create global search across clients, projects and services (`src/services/search.service.ts`, `src/actions/search.actions.ts`)
+- [x] **TASK-109**: Create global search across clients, projects and services (`apps/web/src/services/search.service.ts`, `apps/web/src/actions/search.actions.ts`)
 - [x] **TASK-110**: Add search shortcut (Cmd/Ctrl + K) with results scoped strictly by user access role (`GlobalSearchDialog.tsx`, `GlobalSearchButton.tsx`)
-- [x] **TASK-111**: Add tags and favorites with optimistic Zustand store (`src/services/favorite.service.ts`, `src/actions/favorite.actions.ts`, `src/features/favorites/store.ts`)
-- [x] **TASK-112**: Add custom fields for credentials with dynamic form UI and clipboard copy (`src/utils/credential-fields.ts`, `CredentialFormDialog.tsx`, `ProjectCredentialsTab.tsx`)
-- [x] **TASK-113**: Add unit tests for search scoping, tag metadata, custom fields, and favorites (`src/test/search-productivity.test.ts`) 🔒
+- [x] **TASK-111**: Add tags and favorites with optimistic Zustand store (`apps/web/src/services/favorite.service.ts`, `apps/web/src/actions/favorite.actions.ts`, `apps/web/src/features/favorites/store.ts`)
+- [x] **TASK-112**: Add custom fields for credentials with dynamic form UI and clipboard copy (`apps/web/src/utils/credential-fields.ts`, `CredentialFormDialog.tsx`, `ProjectCredentialsTab.tsx`)
+- [x] **TASK-113**: Add unit tests for search scoping, tag metadata, custom fields, and favorites (`apps/web/src/test/search-productivity.test.ts`) 🔒
 
 ---
 
@@ -278,7 +296,7 @@ Phases 1 through 11 are complete. Database schema, security foundation, AES-256-
 ### Header overflow fix (2026-11-21)
 
 - Fixed the header action group's sizing: the search button used `w-full` inside an intrinsically sized flex group, so the button grew beyond the group's allocated width and pushed the role badge and avatar outside the viewport. Search now uses explicit responsive widths and an icon-only mobile presentation. Header navigation takes the remaining space; breadcrumbs stay on one line, truncate the current label, and show only the current crumb below `md`.
-- Changed only `src/components/global-search-button.tsx`, `src/components/layout/Header.tsx`, and `src/components/layout/Breadcrumbs.tsx` plus task/memory documentation. No shadcn primitives changed.
+- Changed only `apps/web/src/components/global-search-button.tsx`, `apps/web/src/components/layout/Header.tsx`, and `apps/web/src/components/layout/Breadcrumbs.tsx` plus task/memory documentation. No shadcn primitives changed.
 - Browser measurements: before, a 1536px viewport had 1619px document scroll width; after, document scroll width equals viewport width at 360px, 768px, and 1536px. Confirmed tablet sidebar collapse also retains a fitting header. Restored the original desktop viewport and expanded sidebar.
 - Validation: targeted ESLint and TypeScript checks passed; all 136 tests passed; production build passed. Build retains existing middleware deprecation and Turbopack root warnings.
 - Separate follow-up: opening global search produced a runtime error (`Cannot read properties of undefined (reading 'subscribe')`), and the dev overlay also reported blocking `Date.now()` prerender diagnostics. Search interaction is not verified as working; these issues were not changed in this CSS layout fix. Reload restored the dashboard.
@@ -318,7 +336,7 @@ Phases 1 through 11 are complete. Database schema, security foundation, AES-256-
 | Item | Status |
 |---|---|
 | Git repository | Clean working tree on `main` branch |
-| Next.js project | Next.js 16 (Turbopack, App Router, React 19) in `src/` |
+| Next.js project | Next.js 16 (Turbopack, App Router, React 19) in `apps/web/src/` |
 | Supabase remote project | Configured at `https://wyycdjxqffgtraqukqjb.supabase.co` |
 | Database migrations | Migrations in `supabase/migrations/` |
 | `MASTER_KEY` | Generated (64-hex chars) in `.env.local` |
@@ -359,3 +377,4 @@ Phases 1 through 11 are complete. Database schema, security foundation, AES-256-
 | 2026-11-21 | Added route-level skeleton loaders (loading.tsx) across all dashboard pages (Home, Projects, Project Detail, Clients, Client Detail, Team, Audit Logs) using shadcn Skeleton primitives. | Phase 13: Hardening and Quality |
 | 2026-11-21 | Completed Phase 12 (Search & Productivity: Global search Cmd+K scoped by role, Tags & Favorites, Custom Fields with dynamic keys, 136/136 tests passing). Resolved mobile full-screen sheet and project detail tabs overlapping layout bugs. | Phase 13: Hardening and Quality |
 | 2026-11-21 | Fixed header cutoff: replaced w-full with w-auto min-w-0 flex-1 on SidebarInset in layout.tsx so header spans exactly 100vw - sidebar width, displaying search, role badge, and user avatar with zero clipping. | Phase 13: Hardening and Quality |
+`n### Local dev server recovery (2026-11-23)`n- Stopped the pre-migration Next.js process that was still serving the repository-root .next directory after the app moved to apps/web. Restarted through root npm run dev, which delegates to the web workspace.`n- Verified localhost:3000 redirects to /login (307) and /login returns 200. No application code changes were needed. Server remains running; no commit or push performed.

@@ -287,6 +287,24 @@ Related documents: `PRD.md`, `ARCHITECTURE.md`, `DESIGN.md`, `RULES.md`, `TASKS.
 
 ---
 
+## ADR-024: Use a monorepo
+
+**Status:** Accepted
+
+**Decision:** Use npm workspaces. The Next.js app lives in apps/web. The
+browser extension (apps/extension) and an optional desktop app (apps/desktop)
+will be added later. supabase/ and docs/ stay at the repo root.
+
+**Reason:** The extension and web app share an API contract (types and Zod
+schemas). One repo keeps them in sync, with one set of docs and one pull
+request for changes that touch both.
+
+**Consequence:** Vercel must use apps/web as its Root Directory. Commands run
+from the repo root or with the -w web flag. Shared code moves into
+packages/types when the extension needs it.
+
+---
+
 ## Out of Scope Decisions (Not Doing)
 
 | Item | Reason |

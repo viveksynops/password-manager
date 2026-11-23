@@ -2,9 +2,14 @@ import { createClient } from "@supabase/supabase-js";
 import fs from "fs";
 import path from "path";
 
-// Load .env.local manually
-const envPath = path.resolve(process.cwd(), ".env.local");
-if (fs.existsSync(envPath)) {
+// Load .env.local manually (supports running from root or apps/web)
+const possibleEnvPaths = [
+  path.resolve(process.cwd(), ".env.local"),
+  path.resolve(process.cwd(), "apps/web/.env.local"),
+  path.resolve(path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, "$1")), "../.env.local"),
+];
+const envPath = possibleEnvPaths.find((p) => fs.existsSync(p));
+if (envPath && fs.existsSync(envPath)) {
   const content = fs.readFileSync(envPath, "utf-8");
   for (const line of content.split("\n")) {
     const trimmed = line.trim();

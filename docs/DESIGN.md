@@ -91,7 +91,7 @@ Rules:
 - Spacing scale: Tailwind default (multiples of 4px: `p-2`, `p-4`, `p-6`, `gap-3`, etc.).
 - Page padding: 16px (`p-4`) on mobile, 24px (`p-6`) on tablet, 32px (`p-8`) on desktop.
 - Max content width: `1280px` (`max-w-7xl`), centered.
-- Layout: collapsible left sidebar (`src/components/ui/sidebar.tsx`) + top header + main content.
+- Layout: collapsible left sidebar (`apps/web/src/components/ui/sidebar.tsx`) + top header + main content.
 - Consistent grid: 1 column on mobile, 2 on tablet, 3 to 4 on desktop.
 
 ---
@@ -115,10 +115,10 @@ The design uses the installed shadcn base radius `--radius: 0.625rem` (10px):
 
 ## Component Guidelines (Do Not Edit `components/ui/*`)
 
-All base UI primitives are installed in `src/components/ui/` using shadcn (built on Base UI).
-**Rule: Do not edit shadcn components in `src/components/ui/*` directly.** Build application features and layouts on top of them by passing standard props, classes, and slots.
+All base UI primitives are installed in `apps/web/src/components/ui/` using shadcn (built on Base UI).
+**Rule: Do not edit shadcn components in `apps/web/src/components/ui/*` directly.** Build application features and layouts on top of them by passing standard props, classes, and slots.
 
-### Buttons (`src/components/ui/button.tsx`)
+### Buttons (`apps/web/src/components/ui/button.tsx`)
 - Variants: `default` (primary), `outline`, `secondary`, `ghost`, `destructive`, `link`.
 - Sizes: `default`, `xs`, `sm`, `lg`, `icon`, `icon-xs`, `icon-sm`, `icon-lg`.
 - One primary (`default`) button per view.
@@ -264,7 +264,7 @@ Tabs: Credentials | Env Variables | Notes | Files
 | Do | Don't |
 |---|---|
 | Use shadcn/ui components and CSS variables | Create custom one-off button or card styles |
-| Use installed shadcn components as-is (wrap or pass props) | Edit files in `src/components/ui/` directly |
+| Use installed shadcn components as-is (wrap or pass props) | Edit files in `apps/web/src/components/ui/` directly |
 | Keep the same radius, spacing and fonts on every page | Mix rounded and square elements |
 | Mask secrets by default | Show any secret on page load |
 | Confirm destructive actions | Delete on a single click |
