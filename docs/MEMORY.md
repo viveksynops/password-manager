@@ -28,6 +28,8 @@ Related documents:
   - Zero version drift: verified all 11 critical packages (`next`, `react`, `react-dom`, `@supabase/ssr`, `@supabase/supabase-js`, `zod`, `zustand`, `tailwindcss`, `@tailwindcss/turbopack`, `typescript`, `vitest`) are strictly identical.
   - Added ADR-024 to `docs/DECISIONS.md`.
   - Updated documentation path references (`AGENTS.md`, `ARCHITECTURE.md`, `DESIGN.md`, `RULES.md`, `TASKS.md`, `MEMORY.md`, `FEATURE_CLIENT_SHARE.md`).
+  - Added `apps/web/src/app/not-found.tsx` to handle 404s and resolve Turbopack's `/_not-found/page` route requirement.
+  - Verified `tsc --noEmit -p apps/web` (0 errors), `npm run test` (18/18 suites, 165/165 tests passed), `npm run build` (all 17 routes compiled successfully), and `npm run dev`.
 
 ### Phase 12B: Client Share Links Complete & UI Polished (2026-11-23)
 
@@ -375,3 +377,4 @@ Phases 1 through 11 are complete. Database schema, security foundation, AES-256-
 | 2026-11-21 | Added route-level skeleton loaders (loading.tsx) across all dashboard pages (Home, Projects, Project Detail, Clients, Client Detail, Team, Audit Logs) using shadcn Skeleton primitives. | Phase 13: Hardening and Quality |
 | 2026-11-21 | Completed Phase 12 (Search & Productivity: Global search Cmd+K scoped by role, Tags & Favorites, Custom Fields with dynamic keys, 136/136 tests passing). Resolved mobile full-screen sheet and project detail tabs overlapping layout bugs. | Phase 13: Hardening and Quality |
 | 2026-11-21 | Fixed header cutoff: replaced w-full with w-auto min-w-0 flex-1 on SidebarInset in layout.tsx so header spans exactly 100vw - sidebar width, displaying search, role badge, and user avatar with zero clipping. | Phase 13: Hardening and Quality |
+`n### Local dev server recovery (2026-11-23)`n- Stopped the pre-migration Next.js process that was still serving the repository-root .next directory after the app moved to apps/web. Restarted through root npm run dev, which delegates to the web workspace.`n- Verified localhost:3000 redirects to /login (307) and /login returns 200. No application code changes were needed. Server remains running; no commit or push performed.
