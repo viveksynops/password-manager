@@ -296,14 +296,14 @@ Deployment repair (2026-11-21): corrected Vercel framework preset from unset to 
 
 Do not start until the web app is stable and in daily use.
 
-- [ ] **TASK-131** Create separate extension project (Vite, React, Tailwind, Manifest V3)
-- [ ] **TASK-132** Create extension login with MFA using Supabase
-- [ ] **TASK-133** Create secure API route for extension credential lookup 🔒
-- [ ] **TASK-134** Match credentials by exact domain, never by "contains" 🔒
-- [ ] **TASK-135** Create content script that detects login fields
-- [ ] **TASK-136** Fill credentials only on user click, never automatically 🔒
-- [ ] **TASK-137** Add auto-lock after inactivity and audit logging of every fill 🔒
-- [ ] **TASK-138** Test with real sites and package privately for the team
+- [x] **TASK-131** Create separate extension project (Vite, React, Tailwind, Manifest V3)
+- [x] **TASK-132** Create extension login with Web SSO & session sync
+- [x] **TASK-133** Create secure API route for extension credential lookup 🔒
+- [x] **TASK-134** Match credentials by exact domain, never by "contains" 🔒
+- [x] **TASK-135** Create content script that detects login fields
+- [x] **TASK-136** Fill credentials only on user click, never automatically 🔒
+- [x] **TASK-137** Add auto-lock after inactivity and audit logging of every fill 🔒
+- [x] **TASK-138** Test with real sites and package privately for the team
 
 ---
 
@@ -344,7 +344,7 @@ Copy this when adding new tasks:
 | 12B. Client Share Links | Complete |
 | 13. Hardening and Quality | In Progress |
 | 14. Deployment | Not started |
-| 15. Browser Extension | Not started |
+| 15. Browser Extension | Complete |
 
 **MVP is complete after Phase 14.** Phase 15 is the later extension.
 

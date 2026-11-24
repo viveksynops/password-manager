@@ -13,6 +13,53 @@ Related documents:
 
 ## Current Status
 
+### Browser Extension Auto-Lock, Web SSO & Production Packaging (2026-11-24)
+
+- **Production Target Configured:**
+  - Configured live production URL `https://password-manager-beige-seven.vercel.app` as default origin across `apps/extension/.env`, `apps/extension/.env.production`, and fallback constants in `src/App.tsx` and `src/content/index.ts`.
+  - Added production origin to `host_permissions` in `public/manifest.json`.
+  - Updated web CORS handlers in `/api/extension/session` and `/api/extension/lookup` to authorize requests from `password-manager-beige-seven.vercel.app`.
+- **TASK-138 Complete (Packaging & Distribution):**
+  - Added `"package"` script to `apps/extension/package.json` that compiles and archives the build into `dist/company-vault-extension.zip` (107 KB) ready for Chrome Web Store upload or team distribution.
+- **TASK-137 Complete (Auto-Lock & Background Worker):**
+  - Implemented Manifest V3 Background Service Worker (`apps/extension/src/background/index.ts`) with Chrome Alarms API (`CV_INACTIVITY_CHECK` checking every minute).
+  - 15-Minute Inactivity Protection: Tracks user activity timestamps in `chrome.storage.local`. If 15 minutes elapse with no actions, the vault state is locked (`isLocked: true`) and an amber badge (`LOCK`) is displayed on the extension icon.
+  - Manual Lock / Unlock: User can click "Lock" directly from the extension popup footer. Re-opening a locked vault presents an "Auto-Locked" screen requiring explicit "Unlock Vault".
+  - In-Page Dropdown Guard: When the vault is auto-locked, the in-page autofill dropdown also displays the locked state and an "Unlock Vault" button.
+  - Form & URL Exclusion Guard: Automatically disables key icon injection across all Company Vault domains (`localhost`, `127.0.0.1`, and `password-manager-beige-seven.vercel.app`), on any URL fields, and on non-auth forms (e.g. "Add New Client", "Contact Email", newsletter forms). Credentials autofill icons strictly appear only when a password field is present on an authentic login form.
+  - Audit Logging: Verified every password decryption or autofill records an immutable audit log entry in `audit_logs` (`action: "reveal"`, `metadata: { source: "browser_extension", action: "extension_fill", domain, ... }`).
+- **Web Session SSO:** Integrated seamless Single Sign-On between the web app and the Chrome extension.
+  - Extension shares authenticated Supabase session cookies (`credentials: "include"`) with zero manual password entry or separate MFA screens needed in the popup.
+  - If the user is logged out, the extension popup displays a "Web Sign-In Required" view with a direct "Sign in with Web" button linking to `/login`.
+  - When the user logs in on the web app, the extension immediately detects the active session and unlocks the vault.
+- **Backend API Routes (`apps/web`):**
+  - `/api/extension/session`: Validates session cookies, returns user profile, email, and role with CORS support for `chrome-extension://*`.
+  - `/api/extension/lookup`: Performs strict exact-domain matching (TASK-134), queries credentials for the user's assigned projects, decrypts secrets on demand for autofill, and writes fail-closed immutable audit logs.
+- **Verification:**
+  - `npm run build -w extension`: Built in 1.89s (`background.js`, `content.js`, `popup.js`).
+  - `npm run package -w extension`: Built and generated `dist/company-vault-extension.zip`.
+  - `npm run test -w web`: 18/18 test suites and 165/165 tests passed.
+  - `npm run build -w web`: Turbopack production build compiled all 19 routes successfully.
+  - Git status: local working tree preserved on `main` without committing or pushing per user rules.
+
+### Browser Extension Scaffolding & In-Page Autofill (2026-11-23)
+
+- **Workspace Setup:** Created `apps/extension` using Vite, React 19, TypeScript, and Manifest V3 (`public/manifest.json`).
+- **Shared Theme & UI:** Configured with the identical shadcn theme as `apps/web` (`base-vega` style, `zinc` baseColor, OKLCH dark tokens in `src/index.css`).
+- **Popup UI (`src/App.tsx`):** Implemented Company Vault popup interface with header branding, active tab domain badge, live credential search, credential cards with masked passwords, one-click copy, and autofill triggers.
+- **In-Page Autofill & Browser Coexistence (`src/content/index.ts`):**
+  - Attached key icon button to detected email/password/login inputs via isolated Shadow DOM.
+  - Clean separation from Google Password Manager: clicking the input field lets native Google Password Manager work without interference; Company Vault dropdown only appears when explicitly clicking the key icon.
+  - When clicking the key icon, `input.blur()` is called to immediately dismiss Chrome's native autofill popup, eliminating popup collisions.
+  - Dropdown aligns neatly to the right edge underneath the key icon, and dismisses on outside clicks (including clicking the input) or pressing `Escape`.
+  - Added strict credential field classifier (`isCredentialInput`) to only attach icons to password, email, and login username fields, explicitly ignoring search bars, role="searchbox", and non-auth inputs.
+  - Added full SPA element lifecycle tracking: cleans up orphaned/detached icon hosts from `document.body` on route transitions (such as unmounting the login form and navigating to the dashboard), with `MutationObserver`, `popstate`, and `pushState`/`replaceState` hooks.
+- **Verification:**
+  - `npm run build -w extension`: Built successfully in 1.09s to `apps/extension/dist/`.
+  - `npm run test -w web`: All 18 test suites and 165 tests pass.
+  - `npm run build -w web`: Next.js Turbopack production build compiles all 17 routes with 0 errors.
+- **Git Status:** All changes remain in the local working tree on `main` without committing or pushing per user instruction.
+
 ### Monorepo Setup (2026-11-23)
 
 - **Monorepo Migration:** Restructured the project into an npm-workspaces monorepo (`apps/*`).

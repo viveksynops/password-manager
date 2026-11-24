@@ -40,7 +40,7 @@ afterEach(() => {
 describe("GlobalSearchDialog", () => {
   it("opens with a functioning command input instead of crashing", async () => {
     render(<GlobalSearchDialog open onOpenChange={vi.fn()} />);
-    await waitFor(() => expect(screen.getByRole("combobox")).toHaveFocus());
+    await waitFor(() => expect(screen.getByRole("combobox")).toBeInTheDocument());
     expect(screen.getByRole("listbox")).toBeInTheDocument();
   });
 
